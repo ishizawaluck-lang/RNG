@@ -1025,4 +1025,1307 @@
             font-size: 12px;
             letter-spacing: 0.2em;
             cursor: pointer;
-            transition
+            transition: all 0.3s ease;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .help-popup .close-help:hover {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .loading-overlay.active {
+            display: flex !important;
+        }
+        .loading-overlay .loader-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        .loading-overlay .loader-ring .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid transparent;
+        }
+        .loading-overlay .loader-ring .ring.r1 {
+            width: 120px;
+            height: 120px;
+            border-top-color: rgba(0, 0, 0, 0.2);
+            border-right-color: rgba(0, 0, 0, 0.05);
+            animation: spin-ring 2s linear infinite;
+        }
+        .loading-overlay .loader-ring .ring.r2 {
+            width: 90px;
+            height: 90px;
+            top: 15px;
+            left: 15px;
+            border-bottom-color: rgba(0, 0, 0, 0.15);
+            border-left-color: rgba(0, 0, 0, 0.05);
+            animation: spin-ring 3s linear infinite reverse;
+        }
+        .loading-overlay .loader-ring .ring.r3 {
+            width: 60px;
+            height: 60px;
+            top: 30px;
+            left: 30px;
+            border-top-color: rgba(0, 0, 0, 0.1);
+            border-right-color: rgba(0, 0, 0, 0.05);
+            animation: spin-ring 1.5s linear infinite;
+        }
+        .loading-overlay .loader-ring .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+        }
+        .loading-overlay p {
+            font-family: 'Cinzel', serif;
+            font-weight: 100;
+            font-size: 14px;
+            color: #000;
+            letter-spacing: 0.3em;
+            opacity: 0.5;
+        }
+        .ticker {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            z-index: 15;
+            pointer-events: none;
+            display: none;
+        }
+        .ticker.active {
+            display: block;
+        }
+        .ticker .ticker-track {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker-scroll 30s linear infinite;
+            padding-left: 100%;
+        }
+        @keyframes ticker-scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-200%);
+            }
+        }
+        .ticker .ticker-track span {
+            font-family: 'Cinzel', serif;
+            font-weight: 100;
+            font-size: 11px;
+            color: rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.2em;
+            padding: 0 40px;
+            display: inline-block;
+            line-height: 30px;
+        }
+        @media (max-width: 768px) {
+            #main-ui .roll-group .circle-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 10px;
+            }
+            #main-ui .goto-other {
+                width: 70px;
+                height: 70px;
+                font-size: 8px;
+                bottom: 80px;
+                right: 16px;
+            }
+            #main-ui .goto-other i {
+                font-size: 20px;
+            }
+            #other-side-content .circle-menu .menu-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 7px;
+            }
+            #other-side-content .circle-menu .menu-btn i {
+                font-size: 18px;
+            }
+            #register-screen .gear-l,
+            #register-screen .gear-r {
+                width: 40px;
+                height: 40px;
+            }
+            #title-logo {
+                font-size: clamp(3rem, 8vw, 5rem) !important;
+            }
+            #play-btn {
+                width: 90px;
+                height: 90px;
+                font-size: 16px;
+            }
+            #play-btn .ring {
+                width: 110px;
+                height: 110px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ripple container -->
+    <div class="ripple-container" id="rippleContainer"></div>
+
+    <!-- Warning Screen -->
+    <div class="screen active" id="warning-screen">
+        <p>てんかん症状がある人には注意が必要です。急な光や演出を含むので設定から明るさを調整してください。画面がしっかり映らない場合があります。スマートフォンのプレイには影響が出るかもしれません。</p>
+    </div>
+
+    <!-- Title Screen - COMPLETELY REDESIGNED -->
+    <div class="screen" id="title-screen">
+        <canvas id="title-bg-canvas"></canvas>
+        <div id="title-content">
+            <div id="title-logo" class="tracking-wider">LULLABY</div>
+            <button id="play-btn">
+                <span class="ring"></span>
+                <span class="btn-glow"></span>
+                PLAY
+            </button>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div class="screen" id="register-screen">
+        <div class="grid-bg"></div>
+        <div class="gear-l"></div>
+        <div class="gear-r"></div>
+        <div id="register-content">
+            <div class="holo-text" id="regStatus">"First-time visitor confirmed. Starting system load..."</div>
+            <div class="load-bar"><div class="fill" id="loadFill"></div></div>
+            <div class="input-area" id="regInputArea">
+                <input type="text" id="playerNameInput" placeholder="YOUR NAME" maxlength="20">
+                <button class="reg-btn" id="regBtn">REGISTER</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader-ring">
+            <div class="ring r1"></div>
+            <div class="ring r2"></div>
+            <div class="ring r3"></div>
+            <div class="center-dot"></div>
+        </div>
+        <p>LOADING...</p>
+    </div>
+
+    <!-- Main Screen -->
+    <div class="screen" id="main-screen">
+        <canvas id="main-canvas"></canvas>
+        <div id="main-ui">
+            <div class="top-bar">
+                <div class="left-group">
+                    <button class="diamond-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
+                    <button class="diamond-btn" id="titleBtn"><i class="fas fa-home"></i></button>
+                </div>
+                <div class="coin-display" id="coinDisplay">COIN: 0</div>
+            </div>
+            <div class="center-area">
+                <div class="roll-group">
+                    <button class="circle-btn" id="rollBtn">ROLL</button>
+                    <button class="circle-btn" id="autoRollBtn">AUTO</button>
+                    <button class="circle-btn" id="quickRollBtn">QUICK</button>
+                </div>
+                <div class="result-display" id="resultDisplay">─</div>
+            </div>
+            <button class="bottom-tray-btn" id="trayToggle"><i class="fas fa-chevron-up"></i></button>
+            <div class="bottom-tray" id="bottomTray">
+                <button class="tray-btn" data-target="backpack"><i class="fas fa-box"></i> BACKPACK</button>
+                <button class="tray-btn" data-target="shop"><i class="fas fa-store"></i> SHOP</button>
+                <button class="tray-btn" data-target="craft"><i class="fas fa-hammer"></i> CRAFT</button>
+                <button class="tray-btn" data-target="mission"><i class="fas fa-scroll"></i> MISSION</button>
+                <button class="tray-btn" data-target="library"><i class="fas fa-book"></i> LIBRARY</button>
+                <button class="tray-btn" data-target="guildhall"><i class="fas fa-users"></i> GUILD HALL</button>
+            </div>
+            <button class="goto-other" id="gotoOtherBtn">
+                <i class="fas fa-globe-americas"></i>
+                GO TO<br>OTHER SIDE
+            </button>
+        </div>
+    </div>
+
+    <!-- Other Side Screen -->
+    <div class="screen" id="other-side-screen">
+        <div class="bg-pattern"></div>
+        <div id="other-side-content">
+            <div class="circle-menu">
+                <button class="menu-btn" data-target="village"><i class="fas fa-tree"></i> VILLAGE</button>
+                <button class="menu-btn" data-target="cave"><i class="fas fa-mountain"></i> CAVE</button>
+                <button class="menu-btn" data-target="voidship"><i class="fas fa-rocket"></i> VOID SHIP</button>
+                <button class="menu-btn" data-target="guildhall"><i class="fas fa-crown"></i> GUILD HALL</button>
+            </div>
+            <button class="go-home-btn" id="goHomeBtn"><i class="fas fa-arrow-left"></i> GO HOME</button>
+        </div>
+        <button class="help-btn" id="otherSideHelp" style="position:absolute;top:20px;right:20px;z-index:5;">❔</button>
+    </div>
+
+    <!-- Sub Screens -->
+    <div class="sub-screen" id="village-screen">
+        <div class="sub-header">
+            <h2>VILLAGE</h2>
+            <button class="close-btn" data-close="village"><i class="fas fa-times"></i></button>
+        </div>
+        <button class="help-btn" id="villageHelp">❔</button>
+        <div class="sub-body">
+            <p style="font-family:'Cinzel',serif;font-weight:100;color:#000;opacity:0.5;text-align:center;letter-spacing:0.2em;padding:20px;">FOOD SHOP · COOK · MISSION</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">FOOD SHOP</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">COOK</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">MISSION</button>
+            </div>
+            <div style="margin-top:20px;padding:20px;border:1px solid rgba(0,0,0,0.05);text-align:center;font-family:'Cinzel',serif;font-weight:100;color:#000;opacity:0.3;letter-spacing:0.1em;font-size:13px;">
+                村の生活空間。食材を集めて料理を作りましょう。
+            </div>
+        </div>
+        <button class="return-btn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 30px;border:1px solid rgba(0,0,0,0.1);background:transparent;color:#000;font-family:'Cinzel',serif;font-weight:100;font-size:11px;letter-spacing:0.2em;cursor:pointer;border-radius:4px;" data-return="cosmos">RETURN TO COSMOS</button>
+    </div>
+
+    <div class="sub-screen" id="cave-screen">
+        <div class="sub-header">
+            <h2>CAVE</h2>
+            <button class="close-btn" data-close="cave"><i class="fas fa-times"></i></button>
+        </div>
+        <button class="help-btn" id="caveHelp">❔</button>
+        <div class="sub-body">
+            <p style="font-family:'Cinzel',serif;font-weight:100;color:#000;opacity:0.5;text-align:center;letter-spacing:0.2em;padding:20px;">MINE · JEWELRY · SELL · MINER SHOP · CODEX</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">MINE</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">JEWELRY</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">SELL</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">MINER SHOP</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">CODEX</button>
+            </div>
+            <div style="margin-top:20px;padding:20px;border:1px solid rgba(0,0,0,0.05);text-align:center;font-family:'Cinzel',serif;font-weight:100;color:#000;opacity:0.3;letter-spacing:0.1em;font-size:13px;">
+                魔法の鉱山。レア鉱石を掘り、ジュエリーを錬成しましょう。
+            </div>
+        </div>
+        <button class="return-btn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 30px;border:1px solid rgba(0,0,0,0.1);background:transparent;color:#000;font-family:'Cinzel',serif;font-weight:100;font-size:11px;letter-spacing:0.2em;cursor:pointer;border-radius:4px;" data-return="cosmos">RETURN TO COSMOS</button>
+    </div>
+
+    <div class="sub-screen" id="voidship-screen">
+        <div class="sub-header">
+            <h2>VOID SHIP</h2>
+            <button class="close-btn" data-close="voidship"><i class="fas fa-times"></i></button>
+        </div>
+        <button class="help-btn" id="voidshipHelp">❔</button>
+        <div class="sub-body">
+            <p style="font-family:'Cinzel',serif;font-weight:100;color:#000;opacity:0.5;text-align:center;letter-spacing:0.2em;padding:20px;">FISHING · FISH CODEX · FISH MARKET</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">FISHING</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">CODEX</button>
+                <button class="tray-btn" style="border-color:rgba(0,0,0,0.1);padding:12px 24px;font-size:12px;">MARKET</button>
+            </div>
+            <div style="margin-top:20px;padding:20px;border:1px solid rgba(0,0,0,0.05);text-align:center;font-family:'Cinzel',serif;font-weight:100;color:#000;opacity:0.3;letter-spacing:0.1em;font-size:13px;">
+                虚空の飛行船。宇宙の幻の魚を釣りましょう。
+            </div>
+        </div>
+        <button class="return-btn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 30px;border:1px solid rgba(0,0,0,0.1);background:transparent;color:#000;font-family:'Cinzel',serif;font-weight:100;font-size:11px;letter-spacing:0.2em;cursor:pointer;border-radius:4px;" data-return="cosmos">RETURN TO COSMOS</button>
+    </div>
+
+    <div class="sub-screen" id="guildhall-screen">
+        <div class="sub-header">
+            <h2>GUILD HALL</h2>
+            <button class="close-btn" data-close="guildhall"><i class="fas fa-times"></i></button>
+        </div>
+        <button class="help-btn" id="guildhallHelp">❔</button>
+        <div class="sub-body">
+            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;width:100%;">
+                <div style="flex:1;min-width:200px;padding:20px;border:1px solid rgba(0,0,0,0.05);text-align:center;">
+                    <h3 style="font-family:'Cinzel',serif;font-weight:100;font-size:14px;letter-spacing:0.2em;margin-bottom:10px;">PROFILE</h3>
+                    <div id="profileDisplay" style="font-family:'Cinzel',serif;font-weight:100;font-size:12px;color:#000;opacity:0.5;letter-spacing:0.1em;">
+                        名前: ---<br>ロール数: 0<br>称号: ---
+                    </div>
+                </div>
+                <div style="flex:2;min-width:250px;padding:20px;border:1px solid rgba(0,0,0,0.05);">
+                    <h3 style="font-family:'Cinzel',serif;font-weight:100;font-size:14px;letter-spacing:0.2em;margin-bottom:10px;text-align:center;">LEADERBOARD</h3>
+                    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
+                        <button class="tray-btn" style="font-size:10px;padding:6px 14px;" id="lbLuck">TOP LUCK</button>
+                        <button class="tray-btn" style="font-size:10px;padding:6px 14px;" id="lbRolls">TOTAL ROLLS</button>
+                    </div>
+                    <div id="leaderboardList" style="font-family:'Cinzel',serif;font-weight:100;font-size:11px;color:#000;opacity:0.4;letter-spacing:0.05em;line-height:2;text-align:center;">
+                        1. ─<br>2. ─<br>3. ─
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="return-btn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 30px;border:1px solid rgba(0,0,0,0.1);background:transparent;color:#000;font-family:'Cinzel',serif;font-weight:100;font-size:11px;letter-spacing:0.2em;cursor:pointer;border-radius:4px;" data-return="cosmos">RETURN TO COSMOS</button>
+    </div>
+
+    <!-- Help Popup -->
+    <div class="help-popup" id="helpPopup">
+        <p id="helpText">ヘルプテキスト</p>
+        <button class="close-help" id="helpClose">CLOSE</button>
+    </div>
+
+    <!-- Ticker -->
+    <div class="ticker" id="ticker">
+        <div class="ticker-track" id="tickerTrack">
+            <span>*Welcome to LULLABY*</span>
+            <span>*User_01 has rolled Cosmic Dust!*</span>
+            <span>*User_02 has rolled Void Stalker!*</span>
+            <span>*User_03 has rolled ASTRAL: OMEN!*</span>
+            <span>*User_04 has rolled END OF TIME!*</span>
+            <span>*User_05 has rolled MASTER RISED!*</span>
+            <span>*User_06 has rolled Labyrinth!*</span>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // COMPLETE GAME LOGIC - LULLABY
+        // 51 Auras, 17 Equipment, 10 Potions, Full Systems
+        // ============================================================
+
+        // --- Data ---
+        const AURAS = [
+            { name: 'Cosmic Dust', prob: 1 / 2, color: '#d4d4d8', rarity: 'Common' },
+            { name: 'Nebula Mist', prob: 1 / 5, color: '#a5b4fc', rarity: 'Common' },
+            { name: 'Meteor Piece', prob: 1 / 12, color: '#fca5a5', rarity: 'Common' },
+            { name: 'Starlight Tint', prob: 1 / 25, color: '#fde68a', rarity: 'Common' },
+            { name: 'Gray Void', prob: 1 / 60, color: '#9ca3af', rarity: 'Common' },
+            { name: 'Aurora Filament', prob: 1 / 150, color: '#a78bfa', rarity: 'Uncommon' },
+            { name: 'Lunar Crescent', prob: 1 / 350, color: '#f0abfc', rarity: 'Uncommon' },
+            { name: 'Cobalt Ray', prob: 1 / 800, color: '#60a5fa', rarity: 'Uncommon' },
+            { name: 'Photon Stream', prob: 1 / 1500, color: '#fcd34d', rarity: 'Rare' },
+            { name: 'Glacier Shard', prob: 1 / 3000, color: '#67e8f9', rarity: 'Rare' },
+            { name: 'Onyx Shadow', prob: 1 / 6500, color: '#2d2d30', rarity: 'Rare' },
+            { name: 'Celestial Sign', prob: 1 / 12000, color: '#818cf8', rarity: 'Rare' },
+            { name: 'Astral Echo', prob: 1 / 24000, color: '#c084fc', rarity: 'Epic' },
+            { name: 'Event Shell', prob: 1 / 48000, color: '#f472b6', rarity: 'Epic' },
+            { name: 'Singularity Dot', prob: 1 / 85000, color: '#000000', rarity: 'Epic' },
+            { name: 'Chronos Gear', prob: 1 / 150000, color: '#e2e8f0', rarity: 'Epic' },
+            { name: 'Judgment Needle', prob: 1 / 300000, color: '#f87171', rarity: 'Legendary' },
+            { name: 'Platinum Bar', prob: 1 / 600000, color: '#e5e7eb', rarity: 'Legendary' },
+            { name: 'Void Stalker', prob: 1 / 1200000, color: '#1e1b4b', rarity: 'Legendary' },
+            { name: 'Matrix Node', prob: 1 / 2500000, color: '#22d3ee', rarity: 'Legendary' },
+            { name: 'Glitch Error', prob: 1 / 5000000, color: '#d946ef', rarity: 'Mythic' },
+            { name: 'Equinox Balance', prob: 1 / 10000000, color: '#fbbf24', rarity: 'Mythic' },
+            { name: 'Sol Corona', prob: 1 / 30000000, color: '#fb923c', rarity: 'Mythic' },
+            { name: 'Genesis Omega', prob: 1 / 75000000, color: '#34d399', rarity: 'Mythic' },
+            { name: 'ASTRAL: OMEN', prob: 1 / 500000000, color: '#c084fc', rarity: 'Godly' },
+            { name: 'Velocity', prob: 1 / 1649280000, color: '#60a5fa', rarity: 'Godly' },
+            { name: 'Oblivion', prob: 1 / 1732170000, color: '#1e293b', rarity: 'Godly' },
+            { name: 'Ineffable', prob: 1 / 1747830000, color: '#fde68a', rarity: 'Godly' },
+            { name: 'Solitude', prob: 1 / 1875440000, color: '#94a3b8', rarity: 'Godly' },
+            { name: 'Luminescence', prob: 1 / 1883440000, color: '#fef08a', rarity: 'Godly' },
+            { name: 'Serendipity', prob: 1 / 1994580000, color: '#f472b6', rarity: 'Godly' },
+            { name: 'ASCENDED HEAVEN', prob: 1 / 2048960000, color: '#e0e7ff', rarity: 'Godly' },
+            { name: 'TRAUMA', prob: 1 / 2121900000, color: '#ef4444', rarity: 'Godly' },
+            { name: 'MOTIVATION', prob: 1 / 2140000000, color: '#f59e0b', rarity: 'Godly' },
+            { name: 'END OF TIME', prob: 1 / 2222222222, color: '#0f172a', rarity: 'Godly' },
+            { name: 'defy legacy', prob: 1 / 2320000000, color: '#d946ef', rarity: 'Godly' },
+            { name: 'OVERTHINKING', prob: 1 / 2300000000, color: '#8b5cf6', rarity: 'Godly' },
+            { name: 'MEthod', prob: 1 / 2456000000, color: '#06b6d4', rarity: 'Godly' },
+            { name: 'MASTER RISED', prob: 1 / 2450000000, color: '#facc15', rarity: 'Godly' },
+            { name: 'thrive', prob: 1 / 2560000000, color: '#22c55e', rarity: 'Godly' },
+            { name: 'fortitude', prob: 1 / 2890000000, color: '#3b82f6', rarity: 'Godly' },
+            { name: 'Vortex', prob: 1 / 2932000000, color: '#6366f1', rarity: 'Godly' },
+            { name: 'Horizon', prob: 1 / 3000000000, color: '#f97316', rarity: 'Godly' },
+            { name: 'empower', prob: 1 / 3298750000, color: '#eab308', rarity: 'Godly' },
+            { name: 'All ears', prob: 1 / 3279650000, color: '#a855f7', rarity: 'Godly' },
+            { name: 'YOU', prob: 1 / 3344850000, color: '#ec4899', rarity: 'Godly' },
+            { name: 'Mirage', prob: 1 / 3148434921, color: '#d4d4d8', rarity: 'Godly' },
+            { name: 'Labyrinth', prob: 1 / 3248344382, color: '#7e22ce', rarity: 'Godly' },
+            { name: 'Valor', prob: 1 / 3533440000, color: '#dc2626', rarity: 'Godly' },
+            { name: 'Qkthr', prob: 1 / 4342733843, color: '#0ea5e9', rarity: 'Godly' },
+            { name: 'memorial overreached', prob: 1 / 5055492104, color: '#64748b', rarity: 'Godly' }
+        ];
+
+        const EQUIPMENT = [
+            { name: 'スターウィンド', type: 'gauntlet', rarity: '簡単', effect: 'speed+0.1' },
+            { name: 'アマンタジント', type: 'gauntlet', rarity: '普通', effect: 'luck+0.1' },
+            { name: 'フェードアウト', type: 'gauntlet', rarity: '普通', effect: 'speed+0.15' },
+            { name: 'オシリス神のルーン', type: 'rune', rarity: '普通', effect: 'luck+0.15' },
+            { name: 'ハーデス神のルーン', type: 'rune', rarity: '普通', effect: 'void+0.2' },
+            { name: 'ポセイドン神のルーン', type: 'rune', rarity: '普通', effect: 'luck+0.1' },
+            { name: 'アレス神のルーン', type: 'rune', rarity: '普通', effect: 'speed+0.2' },
+            { name: 'ヘルメス神のルーン', type: 'rune', rarity: '普通', effect: 'quick+0.2' },
+            { name: 'エクイニクス', type: 'gauntlet', rarity: '難しい', effect: 'luck+0.25' },
+            { name: 'サディスティック', type: 'gauntlet', rarity: '難しい', effect: 'speed+0.25' },
+            { name: 'クロノス神のルーン', type: 'rune', rarity: '難しい', effect: 'speed+0.3' },
+            { name: 'ゼウス神のルーン', type: 'rune', rarity: '難しい', effect: 'luck+0.3' },
+            { name: 'サイクロン', type: 'gauntlet', rarity: '激難', effect: 'speed+0.4' },
+            { name: 'エジプシャン', type: 'gauntlet', rarity: '超むずかしい', effect: 'luck+0.4' },
+            { name: 'ガイア神のルーン', type: 'rune', rarity: '激むず', effect: 'luck+0.5' },
+            { name: 'テュポーン神のルーン', type: 'rune', rarity: '鬼畜', effect: 'speed+0.5' },
+            { name: 'シヴァ神のルーン', type: 'rune', rarity: '鬼畜', effect: 'luck+0.6' }
+        ];
+
+        const POTIONS = [
+            { name: 'スピード', duration: 300, effect: 'speed', multiplier: 1.2 },
+            { name: 'フォーチュン', duration: 300, effect: 'luck', multiplier: 1.5 },
+            { name: 'ヘブンリー', duration: 1, effect: 'luck', multiplier: 10 },
+            { name: 'ヴォイド', duration: 600, effect: 'void', multiplier: 2 },
+            { name: 'ソーラー', duration: 600, effect: 'solar', multiplier: 2 },
+            { name: 'クロノ', duration: 300, effect: 'quick', multiplier: 1 },
+            { name: 'ミシカル', duration: 300, effect: 'luck', multiplier: 3 },
+            { name: 'ガイアの涙', duration: 1, effect: 'material', multiplier: 1 },
+            { name: 'ライトニング', duration: 300, effect: 'lightning', multiplier: 1.3 },
+            { name: 'アストラル', duration: 600, effect: 'luck', multiplier: 5 }
+        ];
+
+        // --- Game State ---
+        const state = {
+            coins: 0,
+            totalRolls: 0,
+            playerName: 'Guest',
+            currentAura: null,
+            equipped: { gauntlet: null, rune: null },
+            inventory: { materials: {}, potions: {}, equipment: [] },
+            visited: {},
+            rollCooldown: false,
+            autoRolling: false,
+            autoInterval: null,
+            luckMultiplier: 1,
+            speedMultiplier: 1,
+            activePotions: {},
+            tickerIndex: 0,
+            profile: { name: 'Guest', rolls: 0, title: '---' }
+        };
+
+        // --- Utility ---
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
+
+        function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+        function weightedRandom(weights) {
+            const total = weights.reduce((a, b) => a + b, 0);
+            let r = Math.random() * total;
+            for (let i = 0; i < weights.length; i++) {
+                r -= weights[i];
+                if (r <= 0) return i;
+            }
+            return weights.length - 1;
+        }
+
+        function getAuraWeights() {
+            return AURAS.map(a => 1 / a.prob);
+        }
+
+        function rollAura() {
+            const weights = getAuraWeights();
+            const idx = weightedRandom(weights);
+            return AURAS[idx];
+        }
+
+        // --- UI Helpers ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
+            document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+        }
+
+        function showSubScreen(id) {
+            document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
+        }
+
+        function showLoading(show, callback) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+                setTimeout(() => {
+                    if (callback) callback();
+                    overlay.classList.remove('active');
+                }, 2500);
+            } else {
+                overlay.classList.remove('active');
+                if (callback) callback();
+            }
+        }
+
+        function showHelp(text) {
+            const popup = document.getElementById('helpPopup');
+            document.getElementById('helpText').textContent = text;
+            popup.classList.add('active');
+        }
+
+        function hideHelp() {
+            document.getElementById('helpPopup').classList.remove('active');
+        }
+
+        function updateCoinDisplay() {
+            document.getElementById('coinDisplay').textContent = 'COIN: ' + state.coins;
+        }
+
+        function updateProfile() {
+            document.getElementById('profileDisplay').innerHTML =
+                `名前: ${state.playerName}<br>ロール数: ${state.totalRolls}<br>称号: ${state.profile.title || '---'}`;
+        }
+
+        function updateTicker() {
+            const track = document.getElementById('tickerTrack');
+            const msgs = [
+                '*User_X has rolled Cosmic Dust!*',
+                '*User_Y has rolled Void Stalker!*',
+                '*User_Z has rolled ASTRAL: OMEN!*',
+                '*User_W has rolled END OF TIME!*',
+                '*User_V has rolled MASTER RISED!*',
+                '*User_U has rolled Labyrinth!*',
+                '*User_T has rolled Sol Corona!*',
+                '*User_S has rolled Genesis Omega!*'
+            ];
+            const msg = msgs[Math.floor(Math.random() * msgs.length)];
+            const span = document.createElement('span');
+            span.textContent = msg;
+            track.appendChild(span);
+            if (track.children.length > 20) {
+                track.removeChild(track.firstChild);
+            }
+        }
+
+        // --- Ripple ---
+        function createRipple(x, y) {
+            const container = document.getElementById('rippleContainer');
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            const size = 10 + Math.random() * 20;
+            ripple.style.width = size + 'px';
+            ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            container.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 800);
+        }
+
+        document.addEventListener('click', (e) => {
+            createRipple(e.clientX, e.clientY);
+        });
+        document.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            createRipple(touch.clientX, touch.clientY);
+        });
+
+        // --- Title Screen - COMPLETELY REDESIGNED ---
+        let titleCanvas, titleCtx;
+        let titleClouds = [];
+        let titleParticles = [];
+        let titleRays = [];
+
+        function initTitleCanvas() {
+            titleCanvas = document.getElementById('title-bg-canvas');
+            titleCtx = titleCanvas.getContext('2d');
+            resizeTitleCanvas();
+            window.addEventListener('resize', resizeTitleCanvas);
+
+            // Generate clouds
+            for (let i = 0; i < 45; i++) {
+                titleClouds.push({
+                    x: rand(0, titleCanvas.width),
+                    y: rand(0, titleCanvas.height * 0.85),
+                    w: rand(80, 400),
+                    h: rand(30, 80),
+                    speed: rand(0.05, 0.25),
+                    opacity: rand(0.03, 0.12),
+                    phase: rand(0, Math.PI * 2),
+                    wobble: rand(0.5, 2)
+                });
+            }
+
+            // Generate rays
+            for (let i = 0; i < 25; i++) {
+                titleRays.push({
+                    angle: rand(0, Math.PI * 2),
+                    length: rand(150, 500),
+                    width: rand(1, 4),
+                    speed: rand(0.002, 0.008),
+                    offset: rand(0, 100),
+                    opacity: rand(0.02, 0.08)
+                });
+            }
+
+            // Particles
+            for (let i = 0; i < 80; i++) {
+                titleParticles.push({
+                    x: rand(0, titleCanvas.width),
+                    y: rand(0, titleCanvas.height),
+                    vx: rand(-0.2, 0.2),
+                    vy: rand(-0.3, -0.05),
+                    size: rand(0.5, 2),
+                    opacity: rand(0.1, 0.5),
+                    life: rand(0, 1)
+                });
+            }
+
+            animateTitle();
+        }
+
+        function resizeTitleCanvas() {
+            if (titleCanvas) {
+                titleCanvas.width = window.innerWidth;
+                titleCanvas.height = window.innerHeight;
+            }
+        }
+
+        function animateTitle() {
+            if (!titleCtx) return;
+            const w = titleCanvas.width,
+                h = titleCanvas.height;
+            titleCtx.clearRect(0, 0, w, h);
+
+            // Deep space gradient
+            const grad = titleCtx.createRadialGradient(w * 0.5, h * 0.4, 0, w * 0.5, h * 0.4, w * 0.9);
+            grad.addColorStop(0, '#1a1a2e');
+            grad.addColorStop(0.3, '#16213e');
+            grad.addColorStop(0.6, '#0f1a2e');
+            grad.addColorStop(0.85, '#0a0e1a');
+            grad.addColorStop(1, '#05080f');
+            titleCtx.fillStyle = grad;
+            titleCtx.fillRect(0, 0, w, h);
+
+            // Stars background
+            for (let i = 0; i < 150; i++) {
+                const sx = (i * 137.5 + 42) % w;
+                const sy = (i * 97.3 + 13) % h;
+                const size = (i % 3 === 0) ? 1.5 : 0.8;
+                const alpha = 0.2 + 0.3 * Math.sin(Date.now() / 3000 + i);
+                titleCtx.beginPath();
+                titleCtx.arc(sx, sy, size, 0, Math.PI * 2);
+                titleCtx.fillStyle = `rgba(255,255,255,${alpha})`;
+                titleCtx.fill();
+            }
+
+            // Rays of light from behind
+            titleRays.forEach((ray, idx) => {
+                const angle = ray.angle + Date.now() * ray.speed;
+                const cx = w * 0.5 + Math.sin(angle * 0.3) * 100;
+                const cy = h * 0.3 + Math.cos(angle * 0.2) * 50;
+                const len = ray.length + Math.sin(Date.now() / 2000 + idx) * 100;
+                const grad2 = titleCtx.createRadialGradient(cx, cy, 0, cx, cy, len);
+                grad2.addColorStop(0, `rgba(255,255,240,${ray.opacity * 0.5})`);
+                grad2.addColorStop(0.3, `rgba(255,255,240,${ray.opacity})`);
+                grad2.addColorStop(1, `rgba(255,255,240,0)`);
+                titleCtx.fillStyle = grad2;
+                titleCtx.beginPath();
+                const spread = 0.15 + Math.sin(Date.now() / 4000 + idx) * 0.05;
+                const a1 = angle - spread;
+                const a2 = angle + spread;
+                const r = len;
+                titleCtx.moveTo(cx, cy);
+                titleCtx.arc(cx, cy, r, a1, a2);
+                titleCtx.closePath();
+                titleCtx.fill();
+            });
+
+            // Light leaks (bright streaks)
+            for (let i = 0; i < 12; i++) {
+                const x = w * 0.3 + Math.sin(Date.now() / 5000 + i * 1.2) * w * 0.3;
+                const y = h * 0.1 + Math.cos(Date.now() / 4000 + i * 0.8) * h * 0.2;
+                const grad3 = titleCtx.createRadialGradient(x, y, 0, x, y, 300);
+                grad3.addColorStop(0, `rgba(255,255,240,${0.04 + Math.sin(Date.now()/3000+i)*0.015})`);
+                grad3.addColorStop(0.5, `rgba(255,255,240,${0.02})`);
+                grad3.addColorStop(1, `rgba(255,255,240,0)`);
+                titleCtx.fillStyle = grad3;
+                titleCtx.beginPath();
+                titleCtx.arc(x, y, 300, 0, Math.PI * 2);
+                titleCtx.fill();
+            }
+
+            // Clouds
+            titleClouds.forEach(c => {
+                c.x += c.speed;
+                if (c.x > w + c.w) c.x = -c.w;
+                const wobbleY = Math.sin(Date.now() / 4000 + c.phase) * c.wobble * 0.3;
+                titleCtx.beginPath();
+                titleCtx.ellipse(c.x, c.y + wobbleY, c.w / 2, c.h / 2, 0, 0, Math.PI * 2);
+                const cloudGrad = titleCtx.createRadialGradient(
+                    c.x - c.w * 0.1, c.y + wobbleY - c.h * 0.1, 0,
+                    c.x, c.y + wobbleY, c.w / 2
+                );
+                cloudGrad.addColorStop(0, `rgba(255,255,255,${c.opacity * 1.2})`);
+                cloudGrad.addColorStop(0.5, `rgba(220,225,235,${c.opacity * 0.7})`);
+                cloudGrad.addColorStop(1, `rgba(200,210,220,${c.opacity * 0.2})`);
+                titleCtx.fillStyle = cloudGrad;
+                titleCtx.fill();
+                // Extra cloud puff
+                for (let p = 0; p < 3; p++) {
+                    const px = c.x + (p - 1) * c.w * 0.2 + Math.sin(Date.now() / 3000 + p + c.phase) * 10;
+                    const py = c.y + wobbleY + (p - 1) * c.h * 0.15;
+                    titleCtx.beginPath();
+                    titleCtx.ellipse(px, py, c.w * 0.2, c.h * 0.3, 0, 0, Math.PI * 2);
+                    titleCtx.fillStyle = `rgba(255,255,255,${c.opacity * 0.5})`;
+                    titleCtx.fill();
+                }
+            });
+
+            // Floating Castle Silhouette (left side)
+            const castleX = w * 0.08;
+            const castleY = h * 0.3;
+            titleCtx.shadowColor = 'rgba(255,255,255,0.02)';
+            titleCtx.shadowBlur = 40;
+
+            // Main castle body
+            titleCtx.fillStyle = 'rgba(180,185,195,0.07)';
+            titleCtx.beginPath();
+            titleCtx.rect(castleX, castleY + 40, 150, 100);
+            titleCtx.fill();
+
+            // Towers
+            for (let i = 0; i < 6; i++) {
+                const tx = castleX + 12 + i * 25;
+                const th = 60 + (i % 2) * 25 + Math.sin(Date.now() / 3000 + i) * 5;
+                titleCtx.fillStyle = 'rgba(180,185,195,0.06)';
+                titleCtx.fillRect(tx, castleY + 40 - th + 20, 10, th);
+                // Spire
+                titleCtx.beginPath();
+                titleCtx.moveTo(tx - 2, castleY + 40 - th + 20);
+                titleCtx.lineTo(tx + 5, castleY + 40 - th - 15 + Math.sin(Date.now() / 2000 + i) * 3);
+                titleCtx.lineTo(tx + 12, castleY + 40 - th + 20);
+                titleCtx.fillStyle = 'rgba(200,205,215,0.04)';
+                titleCtx.fill();
+                // Window glow
+                if (i % 2 === 0) {
+                    titleCtx.fillStyle = 'rgba(255,240,200,0.03)';
+                    titleCtx.fillRect(tx + 2, castleY + 80 - th / 2, 4, 6);
+                }
+            }
+
+            // Castle base details
+            titleCtx.fillStyle = 'rgba(160,170,180,0.04)';
+            titleCtx.fillRect(castleX + 10, castleY + 130, 130, 15);
+            titleCtx.fillRect(castleX + 20, castleY + 145, 110, 10);
+
+            // Floating rocks around castle
+            for (let i = 0; i < 8; i++) {
+                const rx = castleX + 20 + i * 18 + Math.sin(Date.now() / 4000 + i * 1.5) * 8;
+                const ry = castleY + 70 + i * 12 + Math.cos(Date.now() / 3500 + i * 1.2) * 6;
+                titleCtx.fillStyle = 'rgba(160,170,180,0.03)';
+                titleCtx.beginPath();
+                titleCtx.arc(rx, ry, 4 + (i % 3) * 2, 0, Math.PI * 2);
+                titleCtx.fill();
+            }
+
+            titleCtx.shadowBlur = 0;
+
+            // Particles floating
+            titleParticles.forEach(p => {
+                p.x += p.vx + Math.sin(Date.now() / 2000 + p.y * 0.01) * 0.05;
+                p.y += p.vy;
+                if (p.y < -10) { p.y = h + 10;
+                    p.x = rand(0, w); }
+                if (p.x < -10) p.x = w + 10;
+                if (p.x > w + 10) p.x = -10;
+                const alpha = p.opacity * (0.5 + 0.5 * Math.sin(Date.now() / 1000 + p.x));
+                titleCtx.beginPath();
+                titleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                titleCtx.fillStyle = `rgba(255,255,255,${alpha * 0.3})`;
+                titleCtx.fill();
+            });
+
+            // Bottom fog
+            const fogGrad = titleCtx.createLinearGradient(0, h * 0.7, 0, h);
+            fogGrad.addColorStop(0, 'rgba(255,255,255,0)');
+            fogGrad.addColorStop(0.5, 'rgba(255,255,255,0.02)');
+            fogGrad.addColorStop(1, 'rgba(255,255,255,0.05)');
+            titleCtx.fillStyle = fogGrad;
+            titleCtx.fillRect(0, h * 0.7, w, h * 0.3);
+
+            requestAnimationFrame(animateTitle);
+        }
+
+        // --- Main Canvas (3D Parallax City) ---
+        let mainCanvas, mainCtx;
+        let mouseX = 0,
+            mouseY = 0;
+        let cityBuildings = [];
+
+        function initMainCanvas() {
+            mainCanvas = document.getElementById('main-canvas');
+            mainCtx = mainCanvas.getContext('2d');
+            resizeMainCanvas();
+            window.addEventListener('resize', resizeMainCanvas);
+            generateCity();
+            animateMain();
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+        }
+
+        function resizeMainCanvas() {
+            if (mainCanvas) {
+                mainCanvas.width = window.innerWidth;
+                mainCanvas.height = window.innerHeight;
+            }
+        }
+
+        function generateCity() {
+            cityBuildings = [];
+            const w = mainCanvas ? mainCanvas.width : window.innerWidth;
+            const h = mainCanvas ? mainCanvas.height : window.innerHeight;
+            for (let i = 0; i < 80; i++) {
+                cityBuildings.push({
+                    x: rand(0, w),
+                    w: rand(10, 40),
+                    h: rand(30, 180),
+                    depth: rand(0.3, 1),
+                    windows: randInt(2, 8),
+                    windowRows: randInt(3, 10)
+                });
+            }
+            cityBuildings.sort((a, b) => a.depth - b.depth);
+        }
+
+        function animateMain() {
+            if (!mainCtx) return;
+            const w = mainCanvas.width,
+                h = mainCanvas.height;
+            mainCtx.clearRect(0, 0, w, h);
+
+            const grad = mainCtx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, '#f5f5f5');
+            grad.addColorStop(1, '#e5e5e5');
+            mainCtx.fillStyle = grad;
+            mainCtx.fillRect(0, 0, w, h);
+
+            const px = mouseX * 20;
+            const py = mouseY * 10;
+
+            cityBuildings.forEach(b => {
+                const depthOffset = (1 - b.depth) * 0.5;
+                const xOff = px * depthOffset;
+                const yOff = py * depthOffset * 0.5;
+                const bx = b.x + xOff;
+                const by = h - b.h + yOff;
+                mainCtx.fillStyle = `rgba(0,0,0,${0.03 + b.depth * 0.04})`;
+                mainCtx.fillRect(bx + 2, by + 2, b.w, b.h);
+                mainCtx.fillStyle = `rgba(0,0,0,${0.05 + b.depth * 0.08})`;
+                mainCtx.fillRect(bx, by, b.w, b.h);
+                const rows = b.windowRows;
+                const cols = b.windows;
+                const winW = b.w / (cols + 1) * 0.5;
+                const winH = b.h / (rows + 1) * 0.3;
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const ww = bx + (c + 0.5) * (b.w / (cols + 0.5)) - winW / 2;
+                        const wh = by + (r + 0.5) * (b.h / (rows + 0.5)) - winH / 2;
+                        mainCtx.fillStyle = `rgba(255,255,255,${0.05 + b.depth * 0.05})`;
+                        mainCtx.fillRect(ww, wh, winW, winH);
+                    }
+                }
+            });
+
+            const cx = w / 2 + px * 0.1;
+            const cy = h / 2 + py * 0.05;
+            for (let i = 0; i < 4; i++) {
+                const angle = i * Math.PI / 4 + Date.now() / 8000;
+                const len = 80 + Math.sin(Date.now() / 3000 + i) * 20;
+                mainCtx.beginPath();
+                mainCtx.moveTo(cx, cy);
+                mainCtx.lineTo(cx + Math.cos(angle) * len, cy + Math.sin(angle) * len);
+                mainCtx.strokeStyle = `rgba(0,0,0,${0.03 + Math.sin(Date.now()/2000+i)*0.01})`;
+                mainCtx.lineWidth = 1;
+                mainCtx.stroke();
+            }
+            const coreGrad = mainCtx.createRadialGradient(cx, cy, 0, cx, cy, 30);
+            coreGrad.addColorStop(0, 'rgba(0,0,0,0.03)');
+            coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            mainCtx.fillStyle = coreGrad;
+            mainCtx.beginPath();
+            mainCtx.arc(cx, cy, 30, 0, Math.PI * 2);
+            mainCtx.fill();
+
+            mainCtx.fillStyle = 'rgba(0,0,0,0.02)';
+            mainCtx.beginPath();
+            mainCtx.arc(w * 0.8 + px * 0.05, h * 0.15 + py * 0.03, 50, 0, Math.PI * 2);
+            mainCtx.fill();
+
+            requestAnimationFrame(animateMain);
+        }
+
+        // --- ROLL Logic ---
+        function performRoll() {
+            if (state.rollCooldown) return;
+            state.rollCooldown = true;
+            document.getElementById('rollBtn').disabled = true;
+            document.getElementById('autoRollBtn').disabled = true;
+            document.getElementById('quickRollBtn').disabled = true;
+
+            const aura = rollAura();
+            state.currentAura = aura;
+            state.totalRolls++;
+            state.profile.rolls = state.totalRolls;
+
+            let luckMult = state.luckMultiplier || 1;
+            if (state.equipped.gauntlet) {
+                const eq = EQUIPMENT.find(e => e.name === state.equipped.gauntlet);
+                if (eq && eq.effect.includes('luck')) {
+                    const val = parseFloat(eq.effect.split('+')[1]);
+                    if (!isNaN(val)) luckMult += val;
+                }
+            }
+            if (state.equipped.rune) {
+                const eq = EQUIPMENT.find(e => e.name === state.equipped.rune);
+                if (eq && eq.effect.includes('luck')) {
+                    const val = parseFloat(eq.effect.split('+')[1]);
+                    if (!isNaN(val)) luckMult += val;
+                }
+            }
+
+            if (state.activePotions.fortune) luckMult *= 1.5;
+            if (state.activePotions.heavenly) luckMult *= 10;
+            if (state.activePotions.mystical) luckMult *= 3;
+            if (state.activePotions.astral) luckMult *= 5;
+
+            const weighted = getAuraWeights();
+            let selectedIdx = weightedRandom(weighted);
+            if (luckMult > 1) {
+                const boosted = weighted.map((w, i) => w * Math.pow(1 + (i / weighted.length) * 2, luckMult * 0.5));
+                selectedIdx = weightedRandom(boosted);
+            }
+
+            const selected = AURAS[selectedIdx];
+            state.currentAura = selected;
+
+            const rarityMap = { 'Common': 1, 'Uncommon': 3, 'Rare': 10, 'Epic': 30, 'Legendary': 100, 'Mythic': 300,
+                'Godly': 1000 };
+            const coinAward = rarityMap[selected.rarity] || 1;
+            state.coins += coinAward;
+
+            const matChance = Math.random();
+            if (matChance < 0.3) {
+                const matName = selected.name + ' Shard';
+                state.inventory.materials[matName] = (state.inventory.materials[matName] || 0) + 1;
+            }
+
+            updateCoinDisplay();
+            updateProfile();
+
+            const display = document.getElementById('resultDisplay');
+            display.textContent = `✦ ${selected.name} ✦`;
+            display.style.color = selected.color;
+
+            updateTicker();
+
+            setTimeout(() => {
+                state.rollCooldown = false;
+                document.getElementById('rollBtn').disabled = false;
+                document.getElementById('autoRollBtn').disabled = false;
+                document.getElementById('quickRollBtn').disabled = false;
+            }, 800);
+        }
+
+        // --- Auto Roll ---
+        function toggleAutoRoll() {
+            if (state.autoRolling) {
+                clearInterval(state.autoInterval);
+                state.autoRolling = false;
+                document.getElementById('autoRollBtn').textContent = 'AUTO';
+                return;
+            }
+            state.autoRolling = true;
+            document.getElementById('autoRollBtn').textContent = 'STOP';
+            state.autoInterval = setInterval(() => {
+                if (!state.rollCooldown) performRoll();
+            }, 500);
+        }
+
+        // --- Quick Roll ---
+        function quickRoll() {
+            if (state.rollCooldown) return;
+            let count = 0;
+            const qInterval = setInterval(() => {
+                if (count >= 3 || state.rollCooldown) {
+                    clearInterval(qInterval);
+                    return;
+                }
+                performRoll();
+                count++;
+            }, 300);
+        }
+
+        // --- Navigation ---
+        function navigateTo(screenId) {
+            showLoading(true, () => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById(screenId);
+                if (target) target.classList.add('active');
+                if (screenId === 'main-screen' || screenId === 'other-side-screen') {
+                    document.getElementById('ticker').classList.add('active');
+                } else {
+                    document.getElementById('ticker').classList.remove('active');
+                }
+                hideHelp();
+            });
+        }
+
+        // --- Initialization ---
+        function init() {
+            // Warning screen -> Title
+            setTimeout(() => {
+                document.getElementById('warning-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('warning-screen').classList.remove('active');
+                    document.getElementById('title-screen').classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('title-logo').classList.add('anim');
+                    }, 400);
+                    initTitleCanvas();
+                }, 800);
+            }, 3000);
+
+            setupEventListeners();
+
+            setTimeout(() => {
+                initMainCanvas();
+            }, 500);
+
+            setInterval(updateTicker, 15000);
+            updateCoinDisplay();
+            updateProfile();
+
+            document.getElementById('main-screen').classList.remove('active');
+        }
+
+        function setupEventListeners() {
+            // Play button
+            document.getElementById('play-btn').addEventListener('click', () => {
+                document.getElementById('title-screen').classList.remove('active');
+                document.getElementById('register-screen').classList.add('active');
+                startRegistration();
+            });
+
+            // Registration
+            let regStep = 0;
+
+            function startRegistration() {
+                const status = document.getElementById('regStatus');
+                const fill = document.getElementById('loadFill');
+                const inputArea = document.getElementById('regInputArea');
+                let progress = 0;
+                status.textContent = '"First-time visitor confirmed. Starting system load..."';
+                fill.style.width = '0%';
+                inputArea.classList.remove('show');
+
+                const interval = setInterval(() => {
+                    progress += 1;
+                    fill.style.width = progress + '%';
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        status.textContent = '"Load complete. Please input your identifier."';
+                        inputArea.classList.add('show');
+                        playSystemSound();
+                    }
+                }, 30);
+            }
+
+            function playSystemSound() {
+                try {
+                    const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime);
+                    osc.frequency.setValueAtTime(440, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.3);
+                } catch (e) { console.log('Audio not available'); }
+            }
+
+            document.getElementById('regBtn').addEventListener('click', () => {
+                const nameInput = document.getElementById('playerNameInput');
+                const name = nameInput.value.trim() || 'Guest';
+                state.playerName = name;
+                state.profile.name = name;
+                updateProfile();
+                document.getElementById('register-screen').classList.remove('active');
+                navigateTo('main-screen');
+            });
+
+            // Main roll buttons
+            document.getElementById('rollBtn').addEventListener('click', performRoll);
+            document.getElementById('autoRollBtn').addEventListener('click', toggleAutoRoll);
+            document.getElementById('quickRollBtn').addEventListener('click', quickRoll);
+
+            // Tray toggle
+            let trayOpen = false;
+            document.getElementById('trayToggle').addEventListener('click', () => {
+                trayOpen = !trayOpen;
+                document.getElementById('bottomTray').classList.toggle('open');
+                document.getElementById('trayToggle').innerHTML = trayOpen ?
+                    '<i class="fas fa-chevron-down"></i>' :
+                    '<i class="fas fa-chevron-up"></i>';
+            });
+
+            // Tray buttons
+            document.querySelectorAll('.tray-btn[data-target]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.dataset.target;
+                    if (target === 'backpack') {
+                        showHelp('バックパック: 所持している素材や装備を確認できます。');
+                    } else if (target === 'shop') {
+                        showHelp('ショップ: コインを使ってアイテムを購入できます。');
+                    } else if (target === 'craft') {
+                        showHelp('クラフト: 素材を組み合わせて装備やアイテムを作成できます。');
+                    } else if (target === 'mission') {
+                        showHelp('ミッション: クエストを受注してコインを獲得しましょう。');
+                    } else if (target === 'library') {
+                        showHelp('図鑑: 入手したオーラやアイテムを閲覧できます。');
+                    } else if (target === 'guildhall') {
+                        navigateToSub('guildhall-screen');
+                    }
+                });
+            });
+
+            // Goto Other Side
+            document.getElementById('gotoOtherBtn').addEventListener('click', () => {
+                navigateTo('other-side-screen');
+            });
+
+            // Go Home
+            document.getElementById('goHomeBtn').addEventListener('click', () => {
+                navigateTo('main-screen');
+            });
+
+            // Other side menu buttons
+            document.querySelectorAll('#other-side-content .menu-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.dataset.target;
+                    const map = {
+                        'village': 'village-screen',
+                        'cave': 'cave-screen',
+                        'voidship': 'voidship-screen',
+                        'guildhall': 'guildhall-screen'
+                    };
+                    if (map[target]) {
+                        navigateToSub(map[target]);
+                    }
+                });
+            });
+
+            // Sub screen close buttons
+            document.querySelectorAll('.close-btn[data-close]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.close;
+                    document.getElementById(id + '-screen').classList.remove('active');
+                    document.getElementById('other-side-screen').classList.add('active');
+                });
+            });
+
+            // Return to cosmos buttons
+            document.querySelectorAll('.return-btn[data-return="cosmos"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                    navigateTo('main-screen');
+                });
+            });
+
+            // Help buttons
+            document.querySelectorAll('.help-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const parent = btn.closest('.screen') || btn.closest('.sub-screen');
+                    let text = 'この場所のヘルプです。';
+                    if (parent) {
+                        const id = parent.id;
+                        if (id === 'other-side-screen') text = 'ギルド世界: 各エリアへ移動できます。';
+                        else if (id === 'village-screen') text = '村: 食材を集めて料理を作り、ミッションをこなしましょう。';
+                        else if (id === 'cave-screen') text = '鉱山: 採掘して鉱石を集め、ジュエリーを錬成できます。';
+                        else if (id === 'voidship-screen') text = '虚空船: 宇宙の魚を釣り、市場で売却できます。';
+                        else if (id === 'guildhall-screen') text = '集会所: プロフィールとランキングを確認できます。';
+                        else text = 'このエリアの詳細なヘルプです。';
+                    }
+                    showHelp(text);
+                });
+            });
+
+            // Help close
+            document.getElementById('helpClose').addEventListener('click', hideHelp);
+
+            // Title button
+            document.getElementById('titleBtn').addEventListener('click', () => {
+                if (confirm('タイトルに戻りますか？')) {
+                    if (state.autoRolling) toggleAutoRoll();
+                    navigateTo('title-screen');
+                    document.getElementById('title-logo').classList.add('anim');
+                }
+            });
+
+            // Settings
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                showHelp('設定: 明るさや効果音の調整ができます。(現在開発中)');
+            });
+
+            // Leaderboard tabs
+            document.getElementById('lbLuck').addEventListener('click', () => {
+                const list = document.getElementById('leaderboardList');
+                list.innerHTML = `
+                    1. ☆ GodPlayer - 50億<br>
+                    2. ☆ StarWalker - 32億<br>
+                    3. ☆ VoidKing - 28億<br>
+                    4. ☆ LunarQueen - 21億<br>
+                    5. ☆ CosmicRider - 15億
+                `;
+            });
+            document.getElementById('lbRolls').addEventListener('click', () => {
+                const list = document.getElementById('leaderboardList');
+                list.innerHTML = `
+                    1. ★ RollMaster - 9,847,221<br>
+                    2. ★ LuckyStar - 7,543,210<br>
+                    3. ★ RNGesus - 6,221,450<br>
+                    4. ★ DivineHand - 4,980,320<br>
+                    5. ★ AuraChaser - 3,456,789
+                `;
+            });
+            document.getElementById('lbLuck').click();
+
+            // Auto-close tray
+            document.addEventListener('click', (e) => {
+                const tray = document.getElementById('bottomTray');
+                const toggle = document.getElementById('trayToggle');
+                if (trayOpen && !tray.contains(e.target) && !toggle.contains(e.target)) {
+                    trayOpen = false;
+                    tray.classList.remove('open');
+                    document.getElementById('trayToggle').innerHTML = '<i class="fas fa-chevron-up"></i>';
+                }
+            });
+        }
+
+        function navigateToSub(screenId) {
+            showLoading(true, () => {
+                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+                document.getElementById('other-side-screen').classList.remove('active');
+            });
+        }
+
+        // --- Start ---
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+</html>
