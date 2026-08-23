@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASTRAL</title>
+    <title>ASTRAL - RNG RESONANCE</title>
     <!-- Google Fonts: Cinzel & Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,7 +66,23 @@
                 radial-gradient(circle at 15% 30%, rgba(245, 158, 11, 0.4) 0%, transparent 45%),
                 radial-gradient(circle at 85% 70%, rgba(253, 224, 71, 0.25) 0%, transparent 45%),
                 radial-gradient(circle at 50% 85%, rgba(217, 119, 6, 0.3) 0%, transparent 50%);
-            animation: auroraShift 18s ease-in-out infinite alternate;
+            transition: background 0.8s ease, opacity 0.8s ease;
+        }
+
+        /* 2秒前フライング演出時のオーロラ発狂モード */
+        .cosmic-aurora.ultra-rare-frenzy {
+            opacity: 0.75;
+            filter: blur(50px);
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 85, 0.7) 0%, transparent 55%),
+                radial-gradient(circle at 80% 70%, rgba(253, 224, 71, 0.85) 0%, transparent 55%),
+                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.75) 0%, transparent 60%);
+            animation: auroraFrenzy 0.35s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes auroraFrenzy {
+            0% { transform: scale(1) translate(-2%, 2%) rotate(0deg); }
+            100% { transform: scale(1.15) translate(2%, -2%) rotate(5deg); }
         }
 
         @keyframes auroraShift {
@@ -141,12 +157,6 @@
             transform: rotate(-25deg);
             filter: blur(10px);
             opacity: 0.75;
-            animation: tailPulse 3s ease-in-out infinite alternate;
-        }
-
-        @keyframes tailPulse {
-            0% { opacity: 0.45; transform: rotate(-25deg) scaleX(0.9); }
-            100% { opacity: 0.85; transform: rotate(-25deg) scaleX(1.25); }
         }
 
         .planet-sub {
@@ -168,20 +178,12 @@
             color: rgba(253, 224, 71, 0.45);
             z-index: 25;
             pointer-events: none;
-            animation: uiFlicker 4s ease-in-out infinite;
         }
 
         .ui-top-left { top: 25px; left: 35px; }
         .ui-top-right { top: 25px; right: 35px; text-align: right; }
         .ui-bottom-left { bottom: 25px; left: 35px; }
         .ui-bottom-right { bottom: 25px; right: 35px; text-align: right; }
-
-        @keyframes uiFlicker {
-            0%, 100% { opacity: 0.45; }
-            50% { opacity: 0.8; }
-            52% { opacity: 0.2; }
-            54% { opacity: 0.6; }
-        }
 
         /* === 5. ヘッダータイトル === */
         .header-area {
@@ -230,10 +232,10 @@
             }
         }
 
-        /* === 6. 巨大太陽魔法陣コア（【波線（フレア波動）復活版】） === */
+        /* === 6. 巨大太陽魔法陣コア（フレア波動復活版） === */
         .magic-circle-container {
             position: absolute;
-            top: 50%;
+            top: 48%;
             left: 50%;
             width: 800px;
             height: 800px;
@@ -252,6 +254,15 @@
             50% { transform: scale(1.08); }
         }
 
+        .magic-circle-container.frenzy-pulse {
+            animation: frenzyPulseCore 0.25s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes frenzyPulseCore {
+            0% { transform: scale(0.92); }
+            100% { transform: scale(1.35); }
+        }
+
         .sun-core {
             position: absolute;
             width: 140px;
@@ -263,22 +274,10 @@
                 0 0 60px #ffffff,
                 0 0 120px #fef08a,
                 0 0 220px #f59e0b,
-                0 0 350px rgba(245, 158, 11, 0.85),
-                0 0 500px rgba(251, 191, 36, 0.5);
+                0 0 350px rgba(245, 158, 11, 0.85);
             z-index: 10;
-            animation: coreAberration 4s ease-in-out infinite;
         }
 
-        @keyframes coreAberration {
-            0%, 100% {
-                box-shadow: 0 0 25px #ffffff, 0 0 60px #ffffff, 0 0 120px #fef08a, 0 0 220px #f59e0b;
-            }
-            50% {
-                box-shadow: 0 0 45px #ffffff, 0 0 95px #fde047, 0 0 170px #f59e0b, 0 0 320px rgba(245,158,11,0.8), 0 0 480px rgba(253,224,71,0.7);
-            }
-        }
-
-        /* 太陽から全方位に伸びて優雅にウネウネ波打つゴールドフレア波動（復活） */
         .flare-wave-ring {
             position: absolute;
             width: 320px;
@@ -317,7 +316,6 @@
             border: 1px solid rgba(253, 224, 71, 0.85);
             border-radius: 50%;
             z-index: 9;
-            box-shadow: 0 0 20px rgba(253, 224, 71, 0.5), inset 0 0 20px rgba(253, 224, 71, 0.5);
             animation: gravityWaveExpand 3.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
         }
         .gravity-wave:nth-child(4) { animation-delay: 1.75s; }
@@ -362,17 +360,8 @@
         }
 
         @keyframes runePulseBurst {
-            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; filter: drop-shadow(0 0 5px rgba(253,224,71,0.5)); }
-            50% { transform: scale(1.18) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 25px rgba(253,224,71,0.9)); }
-        }
-
-        .inner-rune-ring::before {
-            content: '';
-            position: absolute;
-            inset: -12px;
-            border: 1px dashed rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            background: repeating-conic-gradient(from 0deg, rgba(253,224,71,0.3) 0deg 15deg, transparent 15deg 30deg);
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            50% { transform: scale(1.18) rotate(180deg); opacity: 1; }
         }
 
         .corona-halo-layer {
@@ -395,10 +384,7 @@
             filter: blur(2px);
         }
 
-        @keyframes coronaRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes coronaRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .outer-sigil-system {
             position: absolute;
@@ -414,19 +400,10 @@
             inset: 15px;
             border: 1.5px solid rgba(245, 158, 11, 0.7);
             border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
-            box-shadow: 0 0 35px rgba(245, 158, 11, 0.35), inset 0 0 35px rgba(245, 158, 11, 0.35);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.35);
         }
 
-        .sigil-wing::before {
-            content: '';
-            position: absolute;
-            inset: -40px;
-            border: 1px solid rgba(253, 224, 71, 0.45);
-            border-radius: 60% 40% 50% 50% / 40% 60% 50% 50%;
-            transform: rotate(25deg);
-        }
-
-        /* === 7. フッター：PLAYボタン === */
+        /* === 7. フッター：初期PLAYボタン === */
         .footer-area {
             position: relative;
             z-index: 20;
@@ -458,7 +435,6 @@
             outline: none;
             backdrop-filter: blur(4px);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
-            animation: btnPulse 3s ease-in-out infinite alternate;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             padding-left: calc(45px + 0.5em);
         }
@@ -466,41 +442,17 @@
         .play-btn:hover {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(253, 224, 71, 0.9);
-            box-shadow: 0 0 30px rgba(253, 224, 71, 0.6), inset 0 0 15px rgba(253, 224, 71, 0.3);
+            box-shadow: 0 0 30px rgba(253, 224, 71, 0.6);
             letter-spacing: 0.6em;
             transform: translateY(-2px);
         }
 
-        @keyframes btnPulse {
-            0% { border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
-            100% { border-color: rgba(253, 224, 71, 0.7); box-shadow: 0 0 25px rgba(253, 224, 71, 0.35); }
-        }
-
-        /* === 8. ブラックホール黒フェードアウト連動演出 === */
         .screen-container.is-triggered {
             opacity: 0;
             transition: opacity 1.5s ease-in-out;
         }
 
-        .screen-container.is-triggered .sun-core,
-        .screen-container.is-triggered .magic-circle-container {
-            transform: scale(0) !important;
-            transition: transform 1.2s cubic-bezier(0.5, 0, 0.8, 0.2) !important;
-        }
-
-        .screen-container.is-triggered .header-area,
-        .screen-container.is-triggered .footer-area,
-        .screen-container.is-triggered .holo-ui,
-        .screen-container.is-triggered .planet,
-        .screen-container.is-triggered .parallax-layer,
-        .screen-container.is-triggered .planet-tail,
-        .screen-container.is-triggered .cosmic-aurora,
-        .screen-container.is-triggered .corona-halo-layer {
-            opacity: 0 !important;
-            transition: opacity 0.5s ease-out;
-        }
-
-        /* === 9. ローディング画面 ＆ ゲーム本編ダミー画面 === */
+        /* === 8. ローディング＆本編ゲーム画面 === */
         .loading-screen, .game-main-screen {
             position: absolute;
             inset: 0;
@@ -535,25 +487,15 @@
             animation: spinnerRotate 1s linear infinite;
         }
 
-        @keyframes spinnerRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spinnerRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .loading-text {
             font-family: 'Cinzel', serif;
             font-size: 0.85rem;
             letter-spacing: 0.35em;
             color: rgba(255, 255, 255, 0.7);
-            animation: textFlicker 2s ease-in-out infinite alternate;
         }
 
-        @keyframes textFlicker {
-            0% { opacity: 0.4; }
-            100% { opacity: 0.9; }
-        }
-
-        /* ゲーム本編ダミー画面（メイン） */
         .game-main-screen {
             justify-content: center;
             align-items: center;
@@ -564,27 +506,196 @@
 
         .game-welcome-title {
             font-family: 'Cinzel', serif;
-            font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+            font-size: clamp(1.2rem, 2.2vw, 1.8rem);
             font-weight: 500;
-            letter-spacing: 0.6em;
-            padding-left: 0.6em;
+            letter-spacing: 0.5em;
             color: #fde047;
             text-shadow: 0 0 25px rgba(253, 224, 71, 0.6);
-            text-align: center;
             position: absolute;
-            top: 45px;
+            top: 35px;
             left: 50%;
             transform: translateX(-50%);
-            animation: welcomePulse 3s ease-in-out infinite alternate;
             z-index: 160;
         }
 
-        @keyframes welcomePulse {
-            0% { opacity: 0.75; }
-            100% { opacity: 1; text-shadow: 0 0 35px rgba(253, 224, 71, 0.9); }
+        /* === 9. RNGコントロール＆横スクロール・ルーレットシステム === */
+        .rng-control-panel {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.5s;
         }
 
-        /* === 10. 左下：コレクション図鑑（Aura Collections）UI === */
+        .game-main-screen.active .rng-control-panel {
+            opacity: 1;
+        }
+
+        .rng-btn {
+            font-family: 'Cinzel', serif;
+            background: rgba(10, 10, 18, 0.85);
+            border: 1px solid rgba(253, 224, 71, 0.6);
+            color: #fde047;
+            padding: 14px 38px;
+            font-size: 0.85rem;
+            letter-spacing: 0.35em;
+            cursor: pointer;
+            outline: none;
+            backdrop-filter: blur(10px);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(253, 224, 71, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .rng-btn:hover:not(:disabled) {
+            background: rgba(253, 224, 71, 0.2);
+            border-color: #ffffff;
+            box-shadow: 0 0 30px rgba(253, 224, 71, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .rng-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .rng-btn.auto-active {
+            background: rgba(245, 158, 11, 0.35);
+            border-color: #f59e0b;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.7);
+            animation: autoGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes autoGlow {
+            0% { box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+            100% { box-shadow: 0 0 35px rgba(253,224,71,0.8); }
+        }
+
+        /* 横スクロール・ルーレットコンテナ */
+        .roulette-viewport {
+            position: absolute;
+            bottom: 125px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 680px;
+            height: 95px;
+            background: rgba(6, 6, 12, 0.82);
+            border: 1px solid rgba(253, 224, 71, 0.35);
+            backdrop-filter: blur(12px);
+            border-radius: 6px;
+            overflow: hidden;
+            z-index: 195;
+            opacity: 0;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 15px rgba(253,224,71,0.1);
+            transition: opacity 0.8s ease 0.3s;
+        }
+
+        .game-main-screen.active .roulette-viewport {
+            opacity: 1;
+        }
+
+        /* 中央の照準ターゲットライン */
+        .roulette-target-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: #fde047;
+            box-shadow: 0 0 15px #fde047;
+            z-index: 10;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .roulette-track {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            will-change: transform;
+        }
+
+        .roulette-card {
+            width: 130px;
+            height: 75px;
+            margin: 0 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .roulette-card-name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 115px;
+        }
+
+        .roulette-card-odds {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.05em;
+        }
+
+        /* 当選結果ポップアップ表示 */
+        .result-banner {
+            position: absolute;
+            top: 22%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            text-align: center;
+            z-index: 220;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .result-banner.show {
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+        }
+
+        .result-sub {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.4em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .result-aura-name {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+            letter-spacing: 0.3em;
+            margin-bottom: 5px;
+            text-shadow: 0 0 25px currentColor;
+        }
+
+        .result-aura-odds {
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* === 10. 左下：コレクション図鑑システム（ロック対応） === */
         .collections-btn-wrapper {
             position: absolute;
             bottom: 40px;
@@ -623,25 +734,24 @@
             transform: scale(1.03);
         }
 
-        /* 図鑑ボード（ホログラムパネル） */
         .collections-panel {
             position: absolute;
-            top: 100px;
+            top: 85px;
             left: 50px;
             width: 380px;
-            height: calc(100vh - 180px);
-            background: rgba(8, 8, 14, 0.82);
+            height: calc(100vh - 150px);
+            background: rgba(8, 8, 14, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
-            z-index: 190;
-            padding: 25px;
+            z-index: 230;
+            padding: 22px;
             display: flex;
             flex-direction: column;
             transform: scale(0.9) skewX(-2deg);
             opacity: 0;
             pointer-events: none;
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.03);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
         }
 
         .collections-panel.open {
@@ -650,7 +760,6 @@
             pointer-events: auto;
         }
 
-        /* 四隅のL字型ホワイトブラケット（画像忠実再現） */
         .bracket-tl, .bracket-tr, .bracket-bl, .bracket-br {
             position: absolute;
             width: 12px;
@@ -690,29 +799,23 @@
         }
         .panel-close-btn:hover { color: #ffffff; }
 
-        /* レアリティリスト（スクロールエリア） */
         .rarity-scroll-container {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             padding-right: 5px;
         }
 
-        .rarity-scroll-container::-webkit-scrollbar {
-            width: 3px;
-        }
-        .rarity-scroll-container::-webkit-scrollbar-thumb {
-            background: rgba(253, 224, 71, 0.4);
-            border-radius: 2px;
-        }
+        .rarity-scroll-container::-webkit-scrollbar { width: 3px; }
+        .rarity-scroll-container::-webkit-scrollbar-thumb { background: rgba(253, 224, 71, 0.4); border-radius: 2px; }
 
         .rarity-item {
             position: relative;
-            padding: 12px 15px;
+            padding: 10px 14px;
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 3px;
             display: flex;
             justify-content: space-between;
@@ -720,60 +823,29 @@
             transition: all 0.3s ease;
         }
 
-        .rarity-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateX(4px);
+        .rarity-item.locked {
+            border-left: 3px solid #333333 !important;
+            opacity: 0.55;
+        }
+
+        .rarity-item.locked .rarity-name {
+            color: #666666 !important;
+            text-shadow: none !important;
         }
 
         .rarity-name {
             font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
         }
 
-        .rarity-status {
-            font-size: 0.65rem;
-            letter-spacing: 0.1em;
-            font-weight: 300;
+        .rarity-odds-label {
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        /* 8種のレアリティ専用スタイル仕様 */
-        .rarity-common { border-left: 3px solid #ffffff; }
-        .rarity-common .rarity-name { color: #ffffff; }
-
-        .rarity-uncommon { border-left: 3px solid #84cc16; }
-        .rarity-uncommon .rarity-name { color: #84cc16; }
-
-        .rarity-rare { border-left: 3px solid #38bdf8; }
-        .rarity-rare .rarity-name { color: #38bdf8; text-shadow: 0 0 8px rgba(56,189,248,0.4); }
-
-        .rarity-divinus { border-left: 3px solid #fde047; }
-        .rarity-divinus .rarity-name { color: #fde047; text-shadow: 0 0 10px rgba(253,224,71,0.6); }
-
-        .rarity-forbidden { border-left: 4px solid #a855f7; box-shadow: inset 0 0 10px rgba(168,85,247,0.15); animation: forbiddenGlow 3s ease-in-out infinite alternate; }
-        .rarity-forbidden .rarity-name { color: #c084fc; text-shadow: 0 0 12px rgba(192,132,252,0.8); }
-
-        @keyframes forbiddenGlow {
-            0% { border-color: rgba(168,85,247,0.5); box-shadow: inset 0 0 5px rgba(168,85,247,0.1); }
-            100% { border-color: rgba(192,132,252,1); box-shadow: inset 0 0 15px rgba(192,132,252,0.35); }
-        }
-
-        .rarity-gilded { border-left: 3px solid #f97316; }
-        .rarity-gilded .rarity-name { color: #fb923c; text-shadow: 0 0 10px rgba(249,115,22,0.6); }
-
-        .rarity-glacier { border-left: 3px solid #67e8f9; }
-        .rarity-glacier .rarity-name { color: #a5f3fc; text-shadow: 0 0 10px rgba(103,232,249,0.7); }
-
-        .rarity-diaboli { border-left: 4px solid #ef4444; animation: diaboliFire 2s ease-in-out infinite alternate; }
-        .rarity-diaboli .rarity-name { color: #f87171; text-shadow: 0 0 12px rgba(239,68,68,0.9); }
-
-        @keyframes diaboliFire {
-            0% { box-shadow: inset 0 0 8px rgba(239,68,68,0.2); }
-            100% { box-shadow: inset 0 0 20px rgba(239,68,68,0.5); }
-        }
-
-
-        /* === 11. 右側：マスター・アーティファクト（獲得実績：神話の星盤）UI === */
+        /* === 11. 右側：マスター・アーティファクト（神話の星盤） === */
         .artifact-system-wrapper {
             position: absolute;
             top: 50%;
@@ -795,7 +867,6 @@
             pointer-events: auto;
         }
 
-        /* 神話の星盤（天球儀）CSS & Canvas構造 */
         .celestial-sphere {
             position: relative;
             width: 260px;
@@ -817,10 +888,7 @@
             border-color: rgba(253, 224, 71, 0.8);
         }
 
-        @keyframes sphereRotateYaw {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes sphereRotateYaw { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .sphere-ring-inner {
             position: absolute;
@@ -831,10 +899,7 @@
             animation: sphereRotatePitch 18s linear infinite reverse;
         }
 
-        @keyframes sphereRotatePitch {
-            0% { transform: rotateX(0deg) rotate(0deg); }
-            100% { transform: rotateX(60deg) rotate(360deg); }
-        }
+        @keyframes sphereRotatePitch { 0% { transform: rotateX(0deg) rotate(0deg); } 100% { transform: rotateX(60deg) rotate(360deg); } }
 
         .sphere-core-gem {
             position: absolute;
@@ -843,15 +908,8 @@
             background: radial-gradient(circle at 30% 30%, #ffffff 0%, #fde047 50%, #f59e0b 100%);
             border-radius: 50%;
             box-shadow: 0 0 20px #fde047, 0 0 40px #f59e0b;
-            animation: coreGemPulse 3s ease-in-out infinite alternate;
         }
 
-        @keyframes coreGemPulse {
-            0% { transform: scale(0.9); box-shadow: 0 0 15px #fde047; }
-            100% { transform: scale(1.1); box-shadow: 0 0 35px #ffffff, 0 0 55px #f59e0b; }
-        }
-
-        /* 公転する魔石（クリスタルサテライト） */
         .orbiting-crystal {
             position: absolute;
             width: 10px;
@@ -881,10 +939,7 @@
             transform-origin: 100px 0;
         }
 
-        @keyframes crystalOrbit {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes crystalOrbit { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .artifact-label {
             position: absolute;
@@ -901,32 +956,29 @@
 <body>
 
     <div class="screen-container" id="screenContainer">
-        <!-- ホログラム風宇宙ステータスUI -->
-        <div class="holo-ui ui-top-left">SYS_STATUS: CONNECTED // ASTRAL_NET</div>
-        <div class="holo-ui ui-top-right">CORE_ENERGY: 99.8% DIVINE</div>
+        <!-- ホログラムステータスUI -->
+        <div class="holo-ui ui-top-left">SYS_STATUS: CONNECTED // RNG_CORE</div>
+        <div class="holo-ui ui-top-right">RESONANCE: ACTIVE</div>
         <div class="holo-ui ui-bottom-left">COORDINATES: SEC-09 // V-A</div>
-        <div class="holo-ui ui-bottom-right">RNG_SEED: 0x9F4A7B_AX</div>
+        <div class="holo-ui ui-bottom-right">SEED: 0x9F4A7B_AX</div>
 
         <div class="deep-space-bg"></div>
-        <div class="cosmic-aurora"></div>
+        <div class="cosmic-aurora" id="cosmicAurora"></div>
 
-        <!-- Canvas統合背景（星雲・星くず吸い込み・ゴールドソーラーフレア粒子） -->
         <canvas id="universe-canvas"></canvas>
 
-        <!-- 惑星レイヤー（彗星テイル付き中景） -->
-        <div class="parallax-layer" id="planetLayer" data-depth="0.02">
+        <div class="parallax-layer" id="planetLayer">
             <div class="planet-tail"></div>
             <div class="planet planet-main"></div>
             <div class="planet planet-sub"></div>
         </div>
 
-        <!-- ヘッダータイトル（ホログラム覚醒イントロ） -->
-        <header class="header-area" id="headerArea" data-depth="0.06">
+        <header class="header-area" id="headerArea">
             <h1 class="game-title">ASTRAL</h1>
         </header>
 
-        <!-- 巨大太陽魔法陣コア（【波線（フレア波動）復活版】） -->
-        <div class="magic-circle-container" id="magicCore" data-depth="-0.03">
+        <!-- 巨大太陽魔法陣コア（フレア波動復活版） -->
+        <div class="magic-circle-container" id="magicCore">
             <div class="corona-halo-layer">
                 <script>
                     for(let c=0; c<12; c++) {
@@ -936,7 +988,6 @@
                 </script>
             </div>
 
-            <!-- 太陽から伸びる流動的な波線（フレア波動）の完全復活 -->
             <div class="flare-wave-ring"></div>
             <div class="flare-wave-ring"></div>
             <div class="flare-wave-ring"></div>
@@ -950,8 +1001,7 @@
             <div class="sun-core"></div>
         </div>
 
-        <!-- フッター：PLAYボタン -->
-        <footer class="footer-area" id="footerArea" data-depth="0.04">
+        <footer class="footer-area" id="footerArea">
             <button class="play-btn" id="playBtn">PLAY</button>
         </footer>
     </div>
@@ -960,20 +1010,38 @@
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <div class="loading-text">Loading...</div>
+            <div class="loading-text">Loading Quantum RNG...</div>
         </div>
     </div>
 
-    <!-- ゲーム本編ダミー画面 -->
+    <!-- ゲーム本編ダミー＆RNG画面 -->
     <div class="game-main-screen" id="gameMainScreen">
-        <h2 class="game-welcome-title">WELCOME TO ASTRAL RESONANCE</h2>
+        <h2 class="game-welcome-title">ASTRAL RNG RESONANCE</h2>
+
+        <!-- 当選結果ポップアップバナー -->
+        <div class="result-banner" id="resultBanner">
+            <div class="result-sub">RESONANCE ACQUIRED</div>
+            <div class="result-aura-name" id="resultName">GALAXY</div>
+            <div class="result-aura-odds" id="resultOdds">1 / 10</div>
+        </div>
+
+        <!-- 横スクロール・ルーレット枠 -->
+        <div class="roulette-viewport" id="rouletteViewport">
+            <div class="roulette-target-line"></div>
+            <div class="roulette-track" id="rouletteTrack"></div>
+        </div>
+
+        <!-- RNG コントロールボタン -->
+        <div class="rng-control-panel">
+            <button class="rng-btn" id="rollBtn">ROLL</button>
+            <button class="rng-btn" id="autoRollBtn">AUTO ROLL</button>
+        </div>
 
         <!-- 左下：コレクション図鑑システム -->
         <div class="collections-btn-wrapper">
             <button class="collections-trigger-btn" id="collectionsBtn">COLLECTIONS</button>
         </div>
 
-        <!-- 図鑑ボードパネル（L字型ブラケット付きグラスモフィズム） -->
         <div class="collections-panel" id="collectionsPanel">
             <div class="bracket-tl"></div>
             <div class="bracket-tr"></div>
@@ -985,39 +1053,8 @@
                 <button class="panel-close-btn" id="panelCloseBtn">&times;</button>
             </div>
 
-            <div class="rarity-scroll-container">
-                <div class="rarity-item rarity-common">
-                    <span class="rarity-name">Common</span>
-                    <span class="rarity-status" style="color: #ffffff;">UNLOCKED (100%)</span>
-                </div>
-                <div class="rarity-item rarity-uncommon">
-                    <span class="rarity-name">Uncommon</span>
-                    <span class="rarity-status" style="color: #84cc16;">UNLOCKED (85%)</span>
-                </div>
-                <div class="rarity-item rarity-rare">
-                    <span class="rarity-name">Rare</span>
-                    <span class="rarity-status" style="color: #38bdf8;">UNLOCKED (42%)</span>
-                </div>
-                <div class="rarity-item rarity-divinus">
-                    <span class="rarity-name">Divinus</span>
-                    <span class="rarity-status" style="color: #fde047;">UNLOCKED (12%)</span>
-                </div>
-                <div class="rarity-item rarity-forbidden">
-                    <span class="rarity-name">Forbidden</span>
-                    <span class="rarity-status" style="color: #c084fc;">DISCOVERED (3%)</span>
-                </div>
-                <div class="rarity-item rarity-gilded">
-                    <span class="rarity-name">Gilded</span>
-                    <span class="rarity-status" style="color: #fb923c;">UNLOCKED (20%)</span>
-                </div>
-                <div class="rarity-item rarity-glacier">
-                    <span class="rarity-name">Glacier</span>
-                    <span class="rarity-status" style="color: #a5f3fc;">UNLOCKED (35%)</span>
-                </div>
-                <div class="rarity-item rarity-diaboli">
-                    <span class="rarity-name">Diaboli</span>
-                    <span class="rarity-status" style="color: #f87171;">LOCKED (0.1%)</span>
-                </div>
+            <div class="rarity-scroll-container" id="collectionsListContainer">
+                <!-- JSで50個の図鑑リストを動的生成してロック管理 -->
             </div>
         </div>
 
@@ -1036,17 +1073,134 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 50個のオリジナルオーラ配列データ ---
+            const AURAS = [
+                { id: 1, name: "Common", odds: 2, color: "#ffffff", border: "#ffffff" },
+                { id: 2, name: "Stardust", odds: 4, color: "#fef08a", border: "#fef08a" },
+                { id: 3, name: "Nebula", odds: 8, color: "#a5f3fc", border: "#67e8f9" },
+                { id: 4, name: "Uncommon", odds: 15, color: "#84cc16", border: "#84cc16" },
+                { id: 5, name: "Solar", odds: 25, color: "#f97316", border: "#f97316" },
+                { id: 6, name: "Lunar", odds: 40, color: "#cbd5e1", border: "#94a3b8" },
+                { id: 7, name: "Galaxy", odds: 75, color: "#38bdf8", border: "#38bdf8" },
+                { id: 8, name: "Rare", odds: 100, color: "#38bdf8", border: "#38bdf8" },
+                { id: 9, name: "Comet", odds: 150, color: "#ffffff", border: "#38bdf8" },
+                { id: 10, name: "Supernova", odds: 250, color: "#fde047", border: "#fde047" },
+                { id: 11, name: "Meteor", odds: 400, color: "#fb923c", border: "#f97316" },
+                { id: 12, name: "Pulsar", odds: 600, color: "#c084fc", border: "#c084fc" },
+                { id: 13, name: "Quasar", odds: 850, color: "#f43f5e", border: "#f43f5e" },
+                { id: 14, name: "Eclipse", odds: 1000, color: "#a855f7", border: "#a855f7" }, // 1/1000閾値（フライング演出対象）
+                { id: 15, name: "Zenith", odds: 1500, color: "#fde047", border: "#fde047" },
+                { id: 16, name: "Nadir", odds: 2200, color: "#3b82f6", border: "#3b82f6" },
+                { id: 17, name: "Divinus", odds: 3500, color: "#fde047", border: "#fde047" },
+                { id: 18, name: "Valkyrie", odds: 5000, color: "#ffffff", border: "#fde047" },
+                { id: 19, name: "Titan", odds: 7500, color: "#f97316", border: "#f97316" },
+                { id: 20, name: "Gilded", odds: 10000, color: "#fb923c", border: "#fb923c" },
+                { id: 21, name: "Glacier", odds: 15000, color: "#67e8f9", border: "#67e8f9" },
+                { id: 22, name: "Abyss", odds: 22000, color: "#1e1b4b", border: "#4338ca" },
+                { id: 23, name: "Void", odds: 35000, color: "#818cf8", border: "#6366f1" },
+                { id: 24, name: "Eternity", odds: 50000, color: "#e879f9", border: "#d946ef" },
+                { id: 25, name: "Infinity", odds: 75000, color: "#38bdf8", border: "#0284c7" },
+                { id: 26, name: "Genesis", odds: 100000, color: "#fde047", border: "#ca8a04" },
+                { id: 27, name: "Apocalypse", odds: 150000, color: "#ef4444", border: "#dc2626" },
+                { id: 28, name: "Forbidden", odds: 250000, color: "#a855f7", border: "#7e22ce" },
+                { id: 29, name: "Diaboli", odds: 400000, color: "#b91c1c", border: "#7f1d1d" },
+                { id: 30, name: "Seraphim", odds: 600000, color: "#fef08a", border: "#eab308" },
+                { id: 31, name: "Chronos", odds: 1000000, color: "#06b6d4", border: "#0e7490" },
+                { id: 32, name: "ASTRAL", odds: 2000000, color: "#ffffff", border: "#fde047" },
+                { id: 33, name: "Omni", odds: 3500000, color: "#f472b6", border: "#db2777" },
+                { id: 34, name: "Singularity", odds: 5000000, color: "#000000", border: "#ffffff" },
+                { id: 35, name: "Aether", odds: 7500000, color: "#93c5fd", border: "#3b82f6" },
+                { id: 36, name: "Valhalla", odds: 10000000, color: "#fde047", border: "#eab308" },
+                { id: 37, name: "Ragnarok", odds: 15000000, color: "#dc2626", border: "#991b1b" },
+                { id: 38, name: "Nirvana", odds: 25000000, color: "#6ee7b7", border: "#10b981" },
+                { id: 39, name: "Exodus", odds: 40000000, color: "#fbbf24", border: "#d97706" },
+                { id: 40, name: "Prometheus", odds: 60000000, color: "#f97316", border: "#c2410c" },
+                { id: 41, name: "Pandora", odds: 85000000, color: "#a855f7", border: "#6b21a8" },
+                { id: 42, name: "Hyperion", odds: 120000000, color: "#60a5fa", border: "#2563eb" },
+                { id: 43, name: "Hypernova", odds: 180000000, color: "#f43f5e", border: "#be123c" },
+                { id: 44, name: "Solstice", odds: 250000000, color: "#fde047", border: "#ca8a04" },
+                { id: 45, name: "Equinox", odds: 350000000, color: "#38bdf8", border: "#0284c7" },
+                { id: 46, name: "Paradox", odds: 500000000, color: "#c084fc", border: "#9333ea" },
+                { id: 47, name: "Dimension", odds: 750000000, color: "#34d399", border: "#059669" },
+                { id: 48, name: "Nexus", odds: 1000000000, color: "#ffffff", border: "#ffffff" },
+                { id: 49, name: "Ouroboros", odds: 2500000000, color: "#fb7185", border: "#e11d48" },
+                { id: 50, name: "Deity", odds: 10000000000, color: "#ffdf00", border: "#ffaa00" }
+            ];
+
+            // プレイヤーの図鑑ロック状態（true = 解放済み）
+            const unlockedAuras = {};
+
+            // --- 図鑑リストの動的生成 ---
+            const collectionsListContainer = document.getElementById('collectionsListContainer');
+            function renderCollections() {
+                collectionsListContainer.innerHTML = '';
+                AURAS.forEach(aura => {
+                    const isUnlocked = unlockedAuras[aura.id] === true;
+                    const item = document.createElement('div');
+                    item.className = `rarity-item ${isUnlocked ? '' : 'locked'}`;
+                    if (isUnlocked) {
+                        item.style.borderLeft = `3px solid ${aura.border}`;
+                    }
+
+                    item.innerHTML = `<span class="rarity-name" style="color: ${isUnlocked ? aura.color : '#666'};">${isUnlocked ? aura.name : '🔒 ???'}</span>
+                                      <span class="rarity-odds-label">1 / ${aura.odds.toLocaleString()}</span>`;
+                    collectionsListContainer.appendChild(item);
+                });
+            }
+            renderCollections();
+
+            // --- Web Audio API システム ---
+            let audioCtx = null;
+            let isAudioInitialized = false;
+
+            function initAudioSystem() {
+                if (isAudioInitialized) return;
+                isAudioInitialized = true;
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const padFreqs = [55.0, 110.0, 164.81, 220.0];
+                    padFreqs.forEach(freq => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        const filter = audioCtx.createBiquadFilter();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(350, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.0, audioCtx.currentTime);
+                        gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 4.0);
+                        osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                        osc.start();
+                    });
+                } catch (e) { console.log(e); }
+            }
+
+            function playChime(pitchMultiplier = 1.0) {
+                if (!audioCtx || audioCtx.state !== 'running') return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const baseFreqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                    const freq = baseFreqs[Math.floor(Math.random() * baseFreqs.length)] * pitchMultiplier;
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.0, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.02 * pitchMultiplier, audioCtx.currentTime + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 2.6);
+                } catch(e) {}
+            }
+
+            window.addEventListener('pointerdown', initAudioSystem, { once: true });
+
+            // --- Canvas演出（星屑・星雲・ソーラーフレア） ---
             const canvas = document.getElementById('universe-canvas');
             const ctx = canvas.getContext('2d');
-            const container = document.getElementById('screenContainer');
-            const playBtn = document.getElementById('playBtn');
-            const loadingScreen = document.getElementById('loadingScreen');
-            const gameMainScreen = document.getElementById('gameMainScreen');
-
-            const collectionsBtn = document.getElementById('collectionsBtn');
-            const collectionsPanel = document.getElementById('collectionsPanel');
-            const panelCloseBtn = document.getElementById('panelCloseBtn');
-
             let width = canvas.width = window.innerWidth;
             let height = canvas.height = window.innerHeight;
 
@@ -1055,179 +1209,35 @@
                 height = canvas.height = window.innerHeight;
             });
 
-            // --- Web Audio API による神秘的アンビエント音楽 ---
-            let audioCtx = null;
-            let isAudioInitialized = false;
-
-            function initAudioSystem() {
-                if (isAudioInitialized) return;
-                isAudioInitialized = true;
-
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-                    const padFreqs = [55.0, 110.0, 164.81, 220.0];
-                    padFreqs.forEach(freq => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        const filter = audioCtx.createBiquadFilter();
-
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(350, audioCtx.currentTime);
-
-                        gain.gain.setValueAtTime(0.0, audioCtx.currentTime);
-                        gain.gain.linearRampToValueAtTime(0.045, audioCtx.currentTime + 4.0);
-
-                        osc.connect(filter);
-                        filter.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.start();
-                    });
-
-                    const chimeFreqs = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
-                    setInterval(() => {
-                        if (!audioCtx || audioCtx.state !== 'running') return;
-                        if (Math.random() > 0.4) return;
-
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-
-                        const freq = chimeFreqs[Math.floor(Math.random() * chimeFreqs.length)];
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-                        gain.gain.setValueAtTime(0.0, audioCtx.currentTime);
-                        gain.gain.linearRampToValueAtTime(0.018, audioCtx.currentTime + 0.3);
-                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.5);
-
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.start();
-                        osc.stop(audioCtx.currentTime + 3.6);
-                    }, 2200);
-
-                } catch (e) {
-                    console.log("Web Audio API not supported or restricted.", e);
-                }
-            }
-
-            window.addEventListener('pointerdown', initAudioSystem, { once: true });
-            playBtn.addEventListener('mouseenter', initAudioSystem, { once: true });
-
-            // --- クリック時の神聖な波動（リップル効果） ---
-            const ripples = [];
-            window.addEventListener('pointerdown', (e) => {
-                if (isTransitioning) return;
-                ripples.push({
-                    x: e.clientX,
-                    y: e.clientY,
-                    radius: 10,
-                    maxRadius: Math.max(width, height) * 0.6,
-                    alpha: 0.85
-                });
-            });
-
-            // --- 1. 星雲ガス ---
-            const nebulaClouds = [];
-            for(let i = 0; i < 5; i++) {
-                nebulaClouds.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    radius: Math.random() * 300 + 200,
-                    color: i % 2 === 0 ? 'rgba(245, 158, 11, 0.035)' : 'rgba(253, 224, 71, 0.025)',
-                    vx: (Math.random() - 0.5) * 0.2,
-                    vy: (Math.random() - 0.5) * 0.2
-                });
-            }
-
-            // --- 2. スターダスト・ストリーム（1600個の星） ---
-            const STAR_COUNT = 1600;
             const stars = [];
-            let isTransitioning = false;
-
-            for (let i = 0; i < STAR_COUNT; i++) {
+            for (let i = 0; i < 1500; i++) {
                 stars.push({
                     x: (Math.random() - 0.5) * width * 2,
                     y: (Math.random() - 0.5) * height * 2,
                     z: Math.random() * width,
                     size: Math.random() * 1.1 + 0.3,
                     color: Math.random() > 0.75 ? '#fde047' : '#ffffff',
-                    speed: Math.random() * 2.2 + 1.2
+                    speed: Math.random() * 2.0 + 1.0
                 });
             }
 
-            // --- 3. ソーラーフレア粒子 ---
-            const solarFlares = [];
-            function spawnSolarFlare() {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 2.5 + 1.5;
-                solarFlares.push({
-                    x: width / 2,
-                    y: height / 2,
-                    vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 1.2,
-                    vy: Math.sin(angle) * speed + (Math.random() - 0.5) * 1.2,
-                    size: Math.random() * 4.5 + 2.0,
-                    alpha: 0.95,
-                    decay: Math.random() * 0.012 + 0.008
-                });
-            }
+            let isTransitioning = false;
+            let isRolling = false;
+            let isAutoRolling = false;
+            let autoRollTimer = null;
 
-            // --- 彗星管理 ---
-            let comets = [];
-            let cometTimer = 0;
-
-            function spawnComet() {
-                comets.push({
-                    x: Math.random() * width,
-                    y: -50,
-                    vx: (Math.random() - 0.5) * 8 - 6,
-                    vy: Math.random() * 8 + 6,
-                    length: Math.random() * 120 + 80,
-                    alpha: 0.85
-                });
-            }
-
-            // --- 60fpsアニメーションループ ---
             function animateUniverse() {
                 ctx.clearRect(0, 0, width, height);
                 const centerX = width / 2;
                 const centerY = height / 2;
 
-                // A. 星雲ガス
-                for(let i = 0; i < nebulaClouds.length; i++) {
-                    let cloud = nebulaClouds[i];
-                    cloud.x += cloud.vx;
-                    cloud.y += cloud.vy;
-                    if(cloud.x < -cloud.radius) cloud.x = width + cloud.radius;
-                    if(cloud.x > width + cloud.radius) cloud.x = -cloud.radius;
-                    if(cloud.y < -cloud.radius) cloud.y = height + cloud.radius;
-                    if(cloud.y > height + cloud.radius) cloud.y = -cloud.radius;
-
-                    const grad = ctx.createRadialGradient(cloud.x, cloud.y, 10, cloud.x, cloud.y, cloud.radius);
-                    grad.addColorStop(0, cloud.color);
-                    grad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(cloud.x, cloud.y, cloud.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // B. スターダスト（クリック時は超高速で中央へ吸い込まれる）
                 for (let i = 0; i < stars.length; i++) {
                     let star = stars[i];
-
                     if (!isTransitioning) {
                         star.z -= star.speed;
-                        if (star.z <= 0) {
-                            star.z = width;
-                            star.x = (Math.random() - 0.5) * width * 2;
-                            star.y = (Math.random() - 0.5) * height * 2;
-                        }
+                        if (star.z <= 0) { star.z = width; star.x = (Math.random() - 0.5) * width * 2; star.y = (Math.random() - 0.5) * height * 2; }
                     } else {
-                        star.z -= star.speed * 28;
+                        star.z -= star.speed * 35;
                         if (star.z <= 0) star.z = 1;
                     }
 
@@ -1236,121 +1246,29 @@
                     const py = star.y * k + centerY;
 
                     if (px >= 0 && px <= width && py >= 0 && py <= height) {
-                        const pSize = Math.max(0.1, star.size * k * (isTransitioning ? 2.2 : 1));
-                        const opacity = Math.min(1, (width - star.z) / width);
-
                         ctx.fillStyle = star.color;
-                        ctx.globalAlpha = Math.max(0, opacity);
+                        ctx.globalAlpha = Math.min(1, (width - star.z) / width);
                         ctx.beginPath();
-                        ctx.arc(px, py, pSize, 0, Math.PI * 2);
+                        ctx.arc(px, py, star.size * k * (isTransitioning ? 2.5 : 1), 0, Math.PI * 2);
                         ctx.fill();
                     }
                 }
                 ctx.globalAlpha = 1.0;
-
-                // C. ソーラーフレア粒子
-                if (Math.random() < 0.45 && !isTransitioning) {
-                    spawnSolarFlare();
-                }
-
-                for (let i = solarFlares.length - 1; i >= 0; i--) {
-                    let f = solarFlares[i];
-                    f.x += f.vx;
-                    f.y += f.vy;
-                    f.alpha -= f.decay;
-
-                    if (f.alpha <= 0) {
-                        solarFlares.splice(i, 1);
-                        continue;
-                    }
-
-                    ctx.fillStyle = `rgba(253, 224, 71, ${f.alpha})`;
-                    ctx.shadowBlur = 12;
-                    ctx.shadowColor = '#f59e0b';
-                    ctx.beginPath();
-                    ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-
-                // D. リップル
-                for (let i = ripples.length - 1; i >= 0; i--) {
-                    let rip = ripples[i];
-                    rip.radius += 5.5;
-                    rip.alpha -= 0.022;
-
-                    if (rip.alpha <= 0 || rip.radius >= rip.maxRadius) {
-                        ripples.splice(i, 1);
-                        continue;
-                    }
-
-                    ctx.strokeStyle = `rgba(253, 224, 71, ${rip.alpha})`;
-                    ctx.lineWidth = 2.0;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = '#fde047';
-                    ctx.beginPath();
-                    ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-                }
-
-                // E. 彗星
-                cometTimer++;
-                if (cometTimer > 700 && Math.random() < 0.02 && !isTransitioning) {
-                    spawnComet();
-                    cometTimer = 0;
-                }
-
-                for (let i = comets.length - 1; i >= 0; i--) {
-                    let c = comets[i];
-                    c.x += c.vx;
-                    c.y += c.vy;
-                    c.alpha -= 0.008;
-
-                    if (c.alpha <= 0 || c.x < 0 || c.y > height) {
-                        comets.splice(i, 1);
-                        continue;
-                    }
-
-                    const cometGrad = ctx.createLinearGradient(c.x, c.y, c.x - c.vx * 15, c.y - c.vy * 15);
-                    cometGrad.addColorStop(0, `rgba(255, 255, 255, ${c.alpha})`);
-                    cometGrad.addColorStop(0.5, `rgba(253, 224, 71, ${c.alpha * 0.7})`);
-                    cometGrad.addColorStop(1, 'transparent');
-
-                    ctx.strokeStyle = cometGrad;
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    ctx.moveTo(c.x, c.y);
-                    ctx.lineTo(c.x - c.vx * 12, c.y - c.vy * 12);
-                    ctx.stroke();
-                }
-
                 requestAnimationFrame(animateUniverse);
             }
             animateUniverse();
 
-            // --- 4. 3Dマウスパララックス効果 ---
-            let mouseX = 0;
-            let mouseY = 0;
-            let currentX = 0;
-            let currentY = 0;
-
+            // --- マウスパララックス ---
+            let mouseX = 0, mouseY = 0, currentX = 0, currentY = 0;
             window.addEventListener('mousemove', (e) => {
                 mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
                 mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
             });
 
-            window.addEventListener('deviceorientation', (e) => {
-                if (e.gamma !== null && e.beta !== null) {
-                    mouseX = Math.max(-1, Math.min(1, e.gamma / 30));
-                    mouseY = Math.max(-1, Math.min(1, e.beta / 30));
-                }
-            });
-
             function updateParallax() {
                 currentX += (mouseX - currentX) * 0.08;
                 currentY += (mouseY - currentY) * 0.08;
-
+                const container = document.getElementById('screenContainer');
                 const header = document.getElementById('headerArea');
                 const magicCore = document.getElementById('magicCore');
                 const footer = document.getElementById('footerArea');
@@ -1361,40 +1279,190 @@
                 if(planetLayer) planetLayer.style.transform = `translate(${currentX * 8}px, ${currentY * 8}px)`;
                 if(magicCore && !isTransitioning) magicCore.style.transform = `translate(${-currentX * 22}px, ${-currentY * 22}px) scale(1)`;
                 if(footer) footer.style.transform = `translate(${currentX * 12}px, ${currentY * 12}px)`;
-
                 requestAnimationFrame(updateParallax);
             }
             updateParallax();
 
-            // --- 5. 画面遷移システム（PLAYクリック → ブラックホール収縮黒フェード → ローディング → 本編） ---
+            // --- 画面遷移（PLAY → ローディング → ゲーム本編） ---
+            const playBtn = document.getElementById('playBtn');
+            const loadingScreen = document.getElementById('loadingScreen');
+            const gameMainScreen = document.getElementById('gameMainScreen');
+
             playBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (isTransitioning) return;
                 isTransitioning = true;
-
-                container.classList.add('is-triggered');
+                document.getElementById('screenContainer').classList.add('is-triggered');
 
                 setTimeout(() => {
                     loadingScreen.classList.add('active');
-
                     setTimeout(() => {
                         loadingScreen.classList.remove('active');
                         gameMainScreen.classList.add('active');
                     }, 3000);
-
                 }, 1500);
             });
 
-            // --- 6. 図鑑ボード（Collections）の開閉イベント ---
+            // --- RNG ガチャ抽選ロジック（確率計算） ---
+            function rollAura() {
+                // 累積確率による厳密な抽選
+                const totalWeight = AURAS.reduce((sum, a) => sum + (1 / a.odds), 0);
+                let rand = Math.random() * totalWeight;
+                let cumulative = 0;
+                let selected = AURAS[0];
+
+                for (let i = 0; i < AURAS.length; i++) {
+                    cumulative += (1 / AURAS[i].odds);
+                    if (rand <= cumulative) {
+                        selected = AURAS[i];
+                        break;
+                    }
+                }
+                return selected;
+            }
+
+            // --- 横スクロール・ルーレット実装 ＆ 2秒前フライング演出 ---
+            const rollBtn = document.getElementById('rollBtn');
+            const autoRollBtn = document.getElementById('autoRollBtn');
+            const rouletteTrack = document.getElementById('rouletteTrack');
+            const resultBanner = document.getElementById('resultBanner');
+            const resultName = document.getElementById('resultName');
+            const resultOdds = document.getElementById('resultOdds');
+            const cosmicAurora = document.getElementById('cosmicAurora');
+            const magicCore = document.getElementById('magicCore');
+
+            function executeRoll() {
+                if (isRolling) return;
+                isRolling = true;
+                rollBtn.disabled = true;
+                resultBanner.classList.remove('show');
+
+                // 1. 当選オーラの決定
+                const winningAura = rollAura();
+                const isUltraRare = winningAura.odds >= 1000; // 1/1000以上の超レア
+
+                // 2. ルーレット用カード列の構築（全40枚、35枚目に当選カードを配置）
+                rouletteTrack.innerHTML = '';
+                const totalCards = 40;
+                const targetIndex = 35;
+                const cardsData = [];
+
+                for (let i = 0; i < totalCards; i++) {
+                    if (i === targetIndex) {
+                        cardsData.push(winningAura);
+                    } else {
+                        // ダミーカードはランダムに選出
+                        cardsData.push(AURAS[Math.floor(Math.random() * 12)]);
+                    }
+                }
+
+                cardsData.forEach(aura => {
+                    const card = document.createElement('div');
+                    card.className = 'roulette-card';
+                    card.style.borderColor = aura.border;
+                    card.innerHTML = `<span class="roulette-card-name" style="color: ${aura.color};">${aura.name}</span>
+                                      <span class="roulette-card-odds">1/${aura.odds.toLocaleString()}</span>`;
+                    rouletteTrack.appendChild(card);
+                });
+
+                // 3. アニメーション計算（1枚のカード幅130px + マージン16px = 146px）
+                const cardWidth = 146;
+                const viewportCenter = 340; // ルーレット幅680pxの中央
+                const targetPosition = (targetIndex * cardWidth) + (cardWidth / 2) - viewportCenter;
+                const jitter = (Math.random() - 0.5) * 40; // 微小なズレ
+                const finalTranslateX = -(targetPosition + jitter);
+
+                // 初期位置
+                rouletteTrack.style.transition = 'none';
+                rouletteTrack.style.transform = `translateX(0px)`;
+                void rouletteTrack.offsetWidth;
+
+                // 高速回転開始
+                const rollDuration = 4.0; // 4秒間回転
+                rouletteTrack.style.transition = `transform ${rollDuration}s cubic-bezier(0.08, 0.85, 0.15, 1.0)`;
+                rouletteTrack.style.transform = `translateX(${finalTranslateX}px)`;
+
+                // 定期的なチャイム音
+                const chimeInterval = setInterval(() => {
+                    playChime(1.0);
+                }, 120);
+
+                // === 【最重要】レア当選時の「2秒前フライング演出」 ===
+                let frenzyTimeout = null;
+                if (isUltraRare) {
+                    // 停停止の約2秒前（rollDuration - 2.0 = 2.0秒後）に発動
+                    frenzyTimeout = setTimeout(() => {
+                        cosmicAurora.classList.add('ultra-rare-frenzy');
+                        magicCore.classList.add('frenzy-pulse');
+                        // ピッチが上がる高揚感音響
+                        playChime(1.8);
+                        setTimeout(() => playChime(2.2), 300);
+                        setTimeout(() => playChime(2.8), 600);
+                    }, (rollDuration - 2.0) * 1000);
+                }
+
+                // 4. ルーレット停止後の処理
+                setTimeout(() => {
+                    clearInterval(chimeInterval);
+                    if (frenzyTimeout) clearTimeout(frenzyTimeout);
+
+                    // フライング演出解除
+                    cosmicAurora.classList.remove('ultra-rare-frenzy');
+                    magicCore.classList.remove('frenzy-pulse');
+
+                    // 図鑑ロック解除判定
+                    if (!unlockedAuras[winningAura.id]) {
+                        unlockedAuras[winningAura.id] = true;
+                        renderCollections();
+                    }
+
+                    // 結果表示バナー更新
+                    resultName.textContent = winningAura.name;
+                    resultName.style.color = winningAura.color;
+                    resultOdds.textContent = `1 / ${winningAura.odds.toLocaleString()}`;
+                    resultBanner.classList.add('show');
+                    playChime(3.2);
+
+                    isRolling = false;
+                    rollBtn.disabled = false;
+
+                    // AUTO ROLLがONなら1秒後に次をトリガー
+                    if (isAutoRolling) {
+                        autoRollTimer = setTimeout(() => {
+                            if (isAutoRolling) executeRoll();
+                        }, 1000);
+                    }
+
+                }, rollDuration * 1000);
+            }
+
+            rollBtn.addEventListener('click', executeRoll);
+
+            // --- AUTO ROLL 切り替えロジック ---
+            autoRollBtn.addEventListener('click', () => {
+                isAutoRolling = !isAutoRolling;
+                if (isAutoRolling) {
+                    autoRollBtn.classList.add('auto-active');
+                    autoRollBtn.textContent = 'STOP AUTO';
+                    if (!isRolling) executeRoll();
+                } else {
+                    autoRollBtn.classList.remove('auto-active');
+                    autoRollBtn.textContent = 'AUTO ROLL';
+                    if (autoRollTimer) clearTimeout(autoRollTimer);
+                }
+            });
+
+            // --- 左下：図鑑ボード開閉イベント ---
+            const collectionsBtn = document.getElementById('collectionsBtn');
+            const collectionsPanel = document.getElementById('collectionsPanel');
+            const panelCloseBtn = document.getElementById('panelCloseBtn');
+
             collectionsBtn.addEventListener('click', () => {
                 collectionsPanel.classList.toggle('open');
             });
-
             panelCloseBtn.addEventListener('click', () => {
                 collectionsPanel.classList.remove('open');
             });
-
-            // パネル外クリックで閉じる
             window.addEventListener('click', (e) => {
                 if (!collectionsPanel.contains(e.target) && !collectionsBtn.contains(e.target)) {
                     collectionsPanel.classList.remove('open');
