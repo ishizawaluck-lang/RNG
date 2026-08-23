@@ -39,6 +39,7 @@
             padding: 35px 40px;
             transform-style: preserve-3d;
             cursor: pointer;
+            transition: opacity 1.5s ease-in-out;
         }
 
         /* === 1. 漆黒の背景 ＆ コズミック・ゴールド・オーロラ === */
@@ -229,7 +230,7 @@
             }
         }
 
-        /* === 6. 巨大太陽魔法陣コア（完全ゴールド統一・後光・パルスバースト） === */
+        /* === 6. 巨大太陽魔法陣コア（静謐な神聖美：波線削除版） === */
         .magic-circle-container {
             position: absolute;
             top: 50%;
@@ -243,7 +244,7 @@
             align-items: center;
             pointer-events: none;
             animation: deepPulse 4s ease-in-out infinite;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.1s ease-out, opacity 1s ease-in-out;
         }
 
         @keyframes deepPulse {
@@ -317,7 +318,6 @@
         @keyframes orbitRotateClockwise { 0% { transform: rotate(25deg); } 100% { transform: rotate(385deg); } }
         @keyframes orbitRotateCounter { 0% { transform: rotate(-35deg); } 100% { transform: rotate(-395deg); } }
 
-        /* ② 古代の契約：ルーン文字二重円のパルスバースト連動 */
         .inner-rune-ring {
             position: absolute;
             width: 260px;
@@ -343,7 +343,6 @@
             background: repeating-conic-gradient(from 0deg, rgba(253,224,71,0.3) 0deg 15deg, transparent 15deg 30deg);
         }
 
-        /* ① 神の降臨：天啓の後光（ソーラー・コロナ・レイ：60秒で1周の荘厳な回転） */
         .corona-halo-layer {
             position: absolute;
             inset: -150px;
@@ -367,34 +366,6 @@
         @keyframes coronaRotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        /* 完全にゴールドのみで構成された波線フレア波動 */
-        .sun-spikes-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 6;
-            animation: rotateCounter 45s linear infinite;
-        }
-
-        .wave-spike {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 680px;
-            background: linear-gradient(to top, transparent, rgba(245,158,11,0.7) 30%, rgba(253,224,71,0.95) 70%, #ffffff 100%);
-            transform-origin: top center;
-            clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
-            filter: blur(1px);
-            opacity: 0.85;
-            animation: waveFlow var(--duration, 3s) ease-in-out infinite alternate;
-        }
-
-        @keyframes waveFlow {
-            0% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(0.4) skewX(-5deg); opacity: 0.5; }
-            50% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(1.8) skewX(8deg); opacity: 0.95; }
-            100% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(0.8) skewX(-3deg); opacity: 0.7; }
         }
 
         .outer-sigil-system {
@@ -424,7 +395,6 @@
         }
 
         @keyframes rotateClockwise { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes rotateCounter { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
         /* === 7. フッター：PLAYボタン === */
         .footer-area {
@@ -434,7 +404,7 @@
             margin-bottom: 10px;
             opacity: 0;
             animation: btnFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.1s ease-out, opacity 1s ease-in-out;
         }
 
         @keyframes btnFadeIn {
@@ -476,13 +446,16 @@
             100% { border-color: rgba(253, 224, 71, 0.7); box-shadow: 0 0 25px rgba(253, 224, 71, 0.35); }
         }
 
-        /* === 8. 超新星爆発（ホワイトアウト）連動演出 === */
-        .screen-container.is-triggered .sun-core {
-            animation: supernovaCore 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+        /* === 8. ブラックホール黒フェードアウト連動演出 === */
+        .screen-container.is-triggered {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
         }
 
+        .screen-container.is-triggered .sun-core,
         .screen-container.is-triggered .magic-circle-container {
-            animation: supernovaCore 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+            transform: scale(0) !important;
+            transition: transform 1.2s cubic-bezier(0.5, 0, 0.8, 0.2) !important;
         }
 
         .screen-container.is-triggered .header-area,
@@ -493,36 +466,92 @@
         .screen-container.is-triggered .planet-tail,
         .screen-container.is-triggered .cosmic-aurora,
         .screen-container.is-triggered .corona-halo-layer {
-            transition: opacity 0.4s ease-out;
             opacity: 0 !important;
+            transition: opacity 0.5s ease-out;
         }
 
-        @keyframes supernovaCore {
-            0% { transform: scale(1); }
-            30% { transform: scale(2.2); filter: brightness(1.5); }
-            100% { transform: scale(45); filter: brightness(4); opacity: 1; }
-        }
-
-        .flash-overlay {
+        /* === 9. ローディング画面 ＆ ゲーム本編ダミー画面 === */
+        .loading-screen, .game-main-screen {
             position: absolute;
             inset: 0;
-            background: #ffffff;
+            background: #000000;
+            z-index: 150;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 50px 60px;
             opacity: 0;
-            z-index: 100;
             pointer-events: none;
-            transition: opacity 1.2s ease-in-out;
+            transition: opacity 1s ease-in-out;
         }
-        .screen-container.is-triggered .flash-overlay {
+
+        .loading-screen.active, .game-main-screen.active {
             opacity: 1;
-            transition-delay: 0.3s;
+            pointer-events: auto;
+        }
+
+        .loading-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(253, 224, 71, 0.2);
+            border-top-color: rgba(253, 224, 71, 0.9);
+            border-radius: 50%;
+            animation: spinnerRotate 1s linear infinite;
+        }
+
+        @keyframes spinnerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.35em;
+            color: rgba(255, 255, 255, 0.7);
+            animation: textFlicker 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textFlicker {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.9; }
+        }
+
+        /* ゲーム本編ダミー画面 */
+        .game-main-screen {
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: radial-gradient(circle at 50% 50%, #05050f 0%, #000000 85%);
+        }
+
+        .game-welcome-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 500;
+            letter-spacing: 0.8em;
+            padding-left: 0.8em;
+            color: #fde047;
+            text-shadow: 0 0 25px rgba(253, 224, 71, 0.6);
+            text-align: center;
+            animation: welcomePulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes welcomePulse {
+            0% { opacity: 0.7; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
         }
     </style>
 </head>
 <body>
 
     <div class="screen-container" id="screenContainer">
-        <div class="flash-overlay"></div>
-
         <!-- ホログラム風宇宙ステータスUI -->
         <div class="holo-ui ui-top-left">SYS_STATUS: CONNECTED // ASTRAL_NET</div>
         <div class="holo-ui ui-top-right">CORE_ENERGY: 99.8% DIVINE</div>
@@ -547,9 +576,8 @@
             <h1 class="game-title">ASTRAL</h1>
         </header>
 
-        <!-- 巨大太陽魔法陣コア（完全ゴールド統一・後光・パルスバースト） -->
+        <!-- 巨大太陽魔法陣コア（静謐な神聖美：波線排除版） -->
         <div class="magic-circle-container" id="magicCore" data-depth="-0.03">
-            <!-- ① 天啓の後光（ソーラー・コロナ・レイ：12方向に均等配置） -->
             <div class="corona-halo-layer">
                 <script>
                     for(let c=0; c<12; c++) {
@@ -564,18 +592,6 @@
             <div class="gravity-wave"></div>
             <div class="gravity-wave"></div>
             <div class="outer-sigil-system"><div class="sigil-wing"></div></div>
-            
-            <div class="sun-spikes-layer">
-                <!-- 32本の完全ゴールド波線フレア波動 -->
-                <script>
-                    for(let i=0; i<32; i++) {
-                        const rot = i * (360/32);
-                        const duration = (2.0 + (i % 5) * 0.4).toFixed(1);
-                        document.write(`<div class="wave-spike" style="--rot: ${rot}deg; --duration: ${duration}s;"></div>`);
-                    }
-                </script>
-            </div>
-
             <div class="inner-rune-ring"></div>
             <div class="sun-core"></div>
         </div>
@@ -586,12 +602,27 @@
         </footer>
     </div>
 
+    <!-- ローディング画面 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- ゲーム本編ダミー画面 -->
+    <div class="game-main-screen" id="gameMainScreen">
+        <h2 class="game-welcome-title">WELCOME TO ASTRAL RESONANCE</h2>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('universe-canvas');
             const ctx = canvas.getContext('2d');
             const container = document.getElementById('screenContainer');
             const playBtn = document.getElementById('playBtn');
+            const loadingScreen = document.getElementById('loadingScreen');
+            const gameMainScreen = document.getElementById('gameMainScreen');
 
             let width = canvas.width = window.innerWidth;
             let height = canvas.height = window.innerHeight;
@@ -612,7 +643,6 @@
                 try {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-                    // 低音パッド音（宇宙の鳴動：コード和音 110Hz, 164.81Hz, 220Hz）
                     const padFreqs = [55.0, 110.0, 164.81, 220.0];
                     padFreqs.forEach(freq => {
                         const osc = audioCtx.createOscillator();
@@ -634,7 +664,6 @@
                         osc.start();
                     });
 
-                    // 高音チャイム音（星の瞬きを不定期に奏でるプロシージャル・シンセ）
                     const chimeFreqs = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
                     setInterval(() => {
                         if (!audioCtx || audioCtx.state !== 'running') return;
@@ -662,13 +691,13 @@
                 }
             }
 
-            // 初回インタラクション時に音声を有効化
             window.addEventListener('pointerdown', initAudioSystem, { once: true });
             playBtn.addEventListener('mouseenter', initAudioSystem, { once: true });
 
-            // --- クリック/タップ時の神聖な波動（リップル効果）の管理 ---
+            // --- クリック時の神聖な波動（リップル効果）の管理 ---
             const ripples = [];
             window.addEventListener('pointerdown', (e) => {
+                if (isTransitioning) return;
                 ripples.push({
                     x: e.clientX,
                     y: e.clientY,
@@ -694,7 +723,7 @@
             // --- 2. スターダスト・ストリーム（1600個の星） ---
             const STAR_COUNT = 1600;
             const stars = [];
-            let isSupernova = false;
+            let isTransitioning = false;
 
             for (let i = 0; i < STAR_COUNT; i++) {
                 stars.push({
@@ -707,7 +736,7 @@
                 });
             }
 
-            // --- ③ 終末の予兆：ゴールド・ソーラー・フレア（神の炎の粒子）システム ---
+            // --- 3. ゴールド・ソーラー・フレア粒子システム ---
             const solarFlares = [];
             function spawnSolarFlare() {
                 const angle = Math.random() * Math.PI * 2;
@@ -723,7 +752,7 @@
                 });
             }
 
-            // --- 不定期な彗星（シューティングスター）の管理 ---
+            // --- 不定期な彗星の管理 ---
             let comets = [];
             let cometTimer = 0;
 
@@ -744,7 +773,7 @@
                 const centerX = width / 2;
                 const centerY = height / 2;
 
-                // A. 星雲ガスの描画と変形
+                // A. 星雲ガス
                 for(let i = 0; i < nebulaClouds.length; i++) {
                     let cloud = nebulaClouds[i];
                     cloud.x += cloud.vx;
@@ -763,11 +792,11 @@
                     ctx.fill();
                 }
 
-                // B. スターダストの吸い込み・吹き飛び処理
+                // B. スターダスト（クリック時は超高速で中央に吸い込まれる）
                 for (let i = 0; i < stars.length; i++) {
                     let star = stars[i];
 
-                    if (!isSupernova) {
+                    if (!isTransitioning) {
                         star.z -= star.speed;
                         if (star.z <= 0) {
                             star.z = width;
@@ -775,7 +804,9 @@
                             star.y = (Math.random() - 0.5) * height * 2;
                         }
                     } else {
-                        star.z += star.speed * 14;
+                        // ブラックホールのように中心へ吸い込まれる超高速移動
+                        star.z -= star.speed * 28;
+                        if (star.z <= 0) star.z = 1;
                     }
 
                     const k = 300 / star.z;
@@ -783,7 +814,7 @@
                     const py = star.y * k + centerY;
 
                     if (px >= 0 && px <= width && py >= 0 && py <= height) {
-                        const pSize = Math.max(0.1, star.size * k * (isSupernova ? 2.8 : 1));
+                        const pSize = Math.max(0.1, star.size * k * (isTransitioning ? 2.2 : 1));
                         const opacity = Math.min(1, (width - star.z) / width);
 
                         ctx.fillStyle = star.color;
@@ -795,8 +826,8 @@
                 }
                 ctx.globalAlpha = 1.0;
 
-                // C. ゴールド・ソーラー・フレア粒子の生成と描画
-                if (Math.random() < 0.45 && !isSupernova) {
+                // C. ソーラーフレア粒子
+                if (Math.random() < 0.45 && !isTransitioning) {
                     spawnSolarFlare();
                 }
 
@@ -820,7 +851,7 @@
                     ctx.shadowBlur = 0;
                 }
 
-                // D. クリック時の神聖な波動（リップル効果）の描画
+                // D. クリック時の神聖な波動
                 for (let i = ripples.length - 1; i >= 0; i--) {
                     let rip = ripples[i];
                     rip.radius += 5.5;
@@ -841,9 +872,9 @@
                     ctx.shadowBlur = 0;
                 }
 
-                // E. 10〜15秒に一度の不定期な彗星の生成・描画
+                // E. 彗星
                 cometTimer++;
-                if (cometTimer > 700 && Math.random() < 0.02) {
+                if (cometTimer > 700 && Math.random() < 0.02 && !isTransitioning) {
                     spawnComet();
                     cometTimer = 0;
                 }
@@ -876,7 +907,7 @@
             }
             animateUniverse();
 
-            // --- 4. 3Dマウスパララックス効果（マウス＆スマホジャイロ） ---
+            // --- 4. 3Dマウスパララックス効果 ---
             let mouseX = 0;
             let mouseY = 0;
             let currentX = 0;
@@ -906,23 +937,32 @@
                 container.style.transform = `rotateY(${currentX * 3.5}deg) rotateX(${-currentY * 3.5}deg)`;
                 if(header) header.style.transform = `translate(${currentX * 18}px, ${currentY * 18}px)`;
                 if(planetLayer) planetLayer.style.transform = `translate(${currentX * 8}px, ${currentY * 8}px)`;
-                if(magicCore) magicCore.style.transform = `translate(${-currentX * 22}px, ${-currentY * 22}px) scale(1)`;
+                if(magicCore && !isTransitioning) magicCore.style.transform = `translate(${-currentX * 22}px, ${-currentY * 22}px) scale(1)`;
                 if(footer) footer.style.transform = `translate(${currentX * 12}px, ${currentY * 12}px)`;
 
                 requestAnimationFrame(updateParallax);
             }
             updateParallax();
 
-            // --- 5. 超新星爆発（ホワイトアウト）連動トリガー ---
+            // --- 5. 完璧な画面遷移システム（クリック → 黒フェード → ローディング → 本編） ---
             playBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // リップルと重複させないためのバブリング停止
-                if (isSupernova) return;
-                isSupernova = true;
+                e.stopPropagation();
+                if (isTransitioning) return;
+                isTransitioning = true;
+
+                // ① 太陽のブラックホール収縮 ＆ 星くずの超高速吸い込み ＆ 1.5秒黒フェードアウト開始
                 container.classList.add('is-triggered');
 
+                // ② 黒フェード完了後（1.5秒後）、ローディング画面へ切り替え
                 setTimeout(() => {
-                    console.log("超新星爆発：ゲーム本編へ遷移します");
-                    // window.location.href = "game_main.html";
+                    loadingScreen.classList.add('active');
+
+                    // ③ ローディング開始から約3秒後、ゲーム本編ダミー画面へ移行
+                    setTimeout(() => {
+                        loadingScreen.classList.remove('active');
+                        gameMainScreen.classList.add('active');
+                    }, 3000);
+
                 }, 1500);
             });
         });
