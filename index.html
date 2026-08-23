@@ -45,7 +45,6 @@
             transition: filter 0.3s var(--ease-smooth);
         }
 
-        /* Diamond Button & UI Shaping */
         .diamond-box {
             position: relative;
             border: 1px solid var(--gold);
@@ -53,11 +52,6 @@
             background: rgba(0,0,0,0.8);
             clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
             transition: all 0.3s var(--ease-smooth);
-        }
-
-        .diamond-box:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
 
         button.diamond-btn {
@@ -72,13 +66,18 @@
             transition: all 0.3s var(--ease-smooth);
         }
 
-        button.diamond-btn:hover {
+        button.diamond-btn:hover:not(:disabled) {
             background: var(--gold);
             color: var(--bg-color);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
         }
 
-        /* Background Canvas Layers */
+        button.diamond-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: var(--gray-sub);
+        }
+
         .bg-layer {
             position: absolute;
             top: 0;
@@ -104,7 +103,6 @@
             z-index: 9999;
         }
 
-        /* Header UI */
         header {
             width: 100%;
             display: flex;
@@ -133,7 +131,6 @@
             gap: 10px;
         }
 
-        /* Main Stage */
         .main-stage {
             display: flex;
             flex-direction: column;
@@ -185,12 +182,16 @@
             transition: all 0.3s var(--ease-smooth);
         }
 
-        .btn-roll:hover {
+        .btn-roll:hover:not(:disabled) {
             background: var(--gold-light);
             box-shadow: 0 0 50px rgba(212, 175, 55, 0.7);
         }
 
-        /* Footer */
+        .btn-roll:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         footer {
             width: 100%;
             display: flex;
@@ -202,7 +203,6 @@
             color: var(--gray-sub);
         }
 
-        /* Modals & Popups */
         .modal {
             position: absolute;
             top: 0;
@@ -237,7 +237,6 @@
             color: var(--gold);
         }
 
-        /* Codex & Shop Grids */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -272,7 +271,6 @@
             color: var(--gold-light);
         }
 
-        /* Cutscene & Special Layers */
         #cutscene-layer {
             position: absolute;
             top: 0;
@@ -351,7 +349,6 @@
             color: var(--gold);
         }
 
-        /* Active Buff Bar */
         #buff-bar {
             position: absolute;
             top: 75px;
@@ -368,7 +365,33 @@
             background: rgba(0,0,0,0.7);
             color: var(--gold-light);
             letter-spacing: 1px;
-            clip-path: polygon(5px 0%, calc(100% - 5px) 0%, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0% calc(100% - 5px), 0% 5px);
+            clip-path: polygon(5px 0%, calc(100% - 5px) 0%, 100% 5px, 100% calc(100% - 10px), calc(100% - 5px) 100%, 5px 100%, 0% calc(100% - 5px), 0% 5px);
+        }
+
+        /* Mission Poster Container */
+        .mission-poster {
+            width: 450px;
+            border: 2px solid var(--gold);
+            background: #11100d;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            filter: sepia(0.4);
+            clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px);
+        }
+
+        .mission-sketch {
+            width: 100px;
+            height: 100px;
+            border: 1px solid var(--gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: var(--gold);
+            background: #000;
         }
     </style>
 </head>
@@ -385,11 +408,10 @@
             <div class="stats-box">
                 <div class="stat-item">ROLLS: <span id="stat-rolls">0</span></div>
                 <div class="stat-item">LUCK: <span id="stat-luck">1.0x</span></div>
-                <div class="stat-item">COINS: <span id="stat-coins">0</span></div>
+                <div class="stat-item">COINS: <span id="stat-coins">1000</span></div>
                 <div class="stat-item">EQUIP: <span id="stat-equip">None</span></div>
             </div>
             <div class="nav-buttons" id="cosmos-nav">
-                <button class="diamond-btn" onclick="openModal('codex-modal')">CODEX</button>
                 <button class="diamond-btn" onclick="openModal('shop-modal')">SHOP</button>
                 <button class="diamond-btn" onclick="openModal('craft-modal')">CRAFT</button>
                 <button class="diamond-btn" onclick="openModal('mission-modal')">MISSION</button>
@@ -397,7 +419,7 @@
                 <button class="diamond-btn" onclick="switchWorld('other-side')">GO TO OTHER SIDE</button>
             </div>
             <div class="nav-buttons" id="other-nav" style="display:none;">
-                <button class="diamond-btn" onclick="openModal('codex-modal')">CODEX</button>
+                <button class="diamond-btn" onclick="openModal('library-modal')">LIBRARY</button>
                 <button class="diamond-btn" onclick="openModal('shop-modal')">SHOP</button>
                 <button class="diamond-btn" onclick="openModal('craft-modal')">CRAFT</button>
                 <button class="diamond-btn" onclick="openModal('mission-modal')">MISSION</button>
@@ -413,7 +435,7 @@
                 <div class="aura-rarity" id="current-rarity">1 / 2</div>
             </div>
             <div class="roll-controls">
-                <button class="btn-roll" onclick="executeRoll()">ROLL</button>
+                <button class="btn-roll" id="btn-roll-main" onclick="executeRoll()">ROLL</button>
                 <button class="diamond-btn" onclick="toggleAutoRoll()" id="btn-auto">AUTO: OFF</button>
                 <button class="diamond-btn" onclick="executeQuickRoll()" id="btn-quick" disabled>QUICK ROLL (25)</button>
             </div>
@@ -427,10 +449,10 @@
         </footer>
 
         <!-- Modals -->
-        <div id="codex-modal" class="modal">
+        <div id="library-modal" class="modal">
             <div class="modal-header">
-                <div class="modal-title">AURA CODEX (1 / 51)</div>
-                <button class="diamond-btn" onclick="closeModal('codex-modal')">[CLOSE]</button>
+                <div class="modal-title">LIBRARY & AURA CODEX (1 / 51)</div>
+                <button class="diamond-btn" onclick="closeModal('library-modal')">[CLOSE]</button>
             </div>
             <div class="grid-container" id="codex-grid"></div>
         </div>
@@ -463,7 +485,7 @@
 
         <div id="equip-modal" class="modal">
             <div class="modal-header">
-                <div class="modal-title">EQUIPMENT LIST</div>
+                <div class="modal-title">EQUIPMENT LIST (GAUNTLET & RUNE)</div>
                 <button class="diamond-btn" onclick="closeModal('equip-modal')">[CLOSE]</button>
             </div>
             <div class="grid-container" id="equip-grid"></div>
@@ -565,17 +587,16 @@
             osc.stop(audioCtx.currentTime + 2.0);
         }
 
-        // Ambient Church Pipe Organ Chord Loop
         function startAmbientBGM() {
             setInterval(() => {
                 if (audioCtx.state === 'suspended') return;
-                [261.63, 329.63, 392.00, 493.88, 587.33].forEach((freq, idx) => {
+                [261.63, 329.63, 392.00, 493.88, 587.33].forEach((freq) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq / 2, audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.015, audioCtx.currentTime + 2.0);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
                     gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 6.0);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
@@ -612,7 +633,6 @@
             { id: 22, name: "Equinox Balance", rate: 10000000, color: "#ffffff" },
             { id: 23, name: "Sol Corona", rate: 30000000, color: "#fffaf0" },
             { id: 24, name: "Genesis Omega", rate: 75000000, color: "#ffffff" },
-            // 25 - 51 User-specified Deity / Divine Auras
             { id: 25, name: "ASTRAL: OMEN", rate: 500000000, color: "#d4af37" },
             { id: 26, name: "Velocity", rate: 1649280000, color: "#ffffff" },
             { id: 27, name: "Oblivion", rate: 1732170000, color: "#111111" },
@@ -656,38 +676,45 @@
             { id: 10, name: "アストラル・トニック", desc: "10分間Luck x5.0（1億超え優遇）", cost: 1000 }
         ];
 
-        // --- 17 Gauntlets & Runes Data ---
+        // --- 17 Gauntlets & Runes Data with Type ---
         const craftItems = [
-            { id: 1, name: "スターウィンドガントレット", req: "Cosmic Dust x10", effect: "ROLL速度1.1倍 / Cosmic確率UP" },
-            { id: 2, name: "アマンタジントガントレット", req: "Nebula Mist x10", effect: "素材獲得確率20%UP" },
-            { id: 3, name: "フェードアウトガントレット", req: "Gray Void x10", effect: "Void系確率1.5倍" },
-            { id: 4, name: "オシリス神のルーン", req: "Lunar Crescent x5", effect: "1/1000以上レアの獲得コイン2倍" },
-            { id: 5, name: "ハーデス神のルーン", req: "Onyx Shadow x5", effect: "1/10000以下レアのベースLuck +50%" },
-            { id: 6, name: "ポセイドン神のルーン", req: "Glacier Shard x10", effect: "ROLL間隔永続0.2秒短縮" },
-            { id: 7, name: "アレス神のルーン", req: "Celestial Sign x5", effect: "ROLLカウント常に2倍進行" },
-            { id: 8, name: "ヘルメス神のルーン", req: "Astral Echo x5", effect: "QUICK ROLL必要数20回に軽減" },
-            { id: 9, name: "エクイニクスガントレット", req: "Equinox Balance x1", effect: "ROLL速度1.4倍 / Luck x2.0" },
-            { id: 10, name: "サディスティックガントレット", req: "Sol Corona x1", effect: "前兆発生確率上昇" },
-            { id: 11, name: "クロノス神のルーン", req: "Chronos Gear x5", effect: "AUTO ROLL待機時間ゼロ" },
-            { id: 12, name: "ゼウス神のルーン", req: "Genesis Omega x1", effect: "ROLL速度1.5倍 / Luck x2.5" },
-            { id: 13, name: "サイクロンガントレット", req: "Photon Stream x20", effect: "大気の渦エフェクト発生" },
-            { id: 14, name: "エジプシャンガントレット", req: "Platinum Bar x10", effect: "ポーション効果時間2倍" },
-            { id: 15, name: "ガイア神のルーン", req: "Matrix Node x5", effect: "素材獲得個数常に2倍" },
-            { id: 16, name: "テュポーン神のルーン", req: "Glitch Error x2", effect: "ROLL速度1.8倍 / Luck x3.5" },
-            { id: 17, name: "シヴァ神のルーン", req: "ASTRAL: OMEN x1", effect: "ROLL速度2.0倍 / Luck x5.0" }
+            { id: 1, type: "gauntlet", name: "スターウィンドガントレット", req: "Cosmic Dust x10", effect: "ROLL速度1.1倍" },
+            { id: 2, type: "gauntlet", name: "アマンタジントガントレット", req: "Nebula Mist x10", effect: "素材獲得確率20%UP" },
+            { id: 3, type: "gauntlet", name: "フェードアウトガントレット", req: "Gray Void x10", effect: "Void系確率1.5倍" },
+            { id: 4, type: "rune", name: "オシリス神のルーン", req: "Lunar Crescent x5", effect: "1/1000以上レアの獲得コイン2倍" },
+            { id: 5, type: "rune", name: "ハーデス神のルーン", req: "Onyx Shadow x5", effect: "1/10000以下レアのLuck+50%" },
+            { id: 6, type: "rune", name: "ポセイドン神のルーン", req: "Glacier Shard x10", effect: "ROLL間隔永続0.2秒短縮" },
+            { id: 7, type: "rune", name: "アレス神のルーン", req: "Celestial Sign x5", effect: "ROLLカウント常に2倍進行" },
+            { id: 8, type: "rune", name: "ヘルメス神のルーン", req: "Astral Echo x5", effect: "QUICK ROLL必要数20回に軽減" },
+            { id: 9, type: "gauntlet", name: "エクイニクスガントレット", req: "Equinox Balance x1", effect: "ROLL速度1.4倍 / Luck x2.0" },
+            { id: 10, type: "gauntlet", name: "サディスティックガントレット", req: "Sol Corona x1", effect: "前兆発生確率上昇" },
+            { id: 11, type: "rune", name: "クロノス神のルーン", req: "Chronos Gear x5", effect: "AUTO ROLL待機時間ゼロ" },
+            { id: 12, type: "rune", name: "ゼウス神のルーン", req: "Genesis Omega x1", effect: "ROLL速度1.5倍 / Luck x2.5" },
+            { id: 13, type: "gauntlet", name: "サイクロンガントレット", req: "Photon Stream x20", effect: "大気の渦エフェクト発生" },
+            { id: 14, type: "gauntlet", name: "エジプシャンガントレット", req: "Platinum Bar x10", effect: "ポーション効果時間2倍" },
+            { id: 15, type: "rune", name: "ガイア神のルーン", req: "Matrix Node x5", effect: "素材獲得個数常に2倍" },
+            { id: 16, type: "rune", name: "テュポーン神のルーン", req: "Glitch Error x2", effect: "ROLL速度1.8倍 / Luck x3.5" },
+            { id: 17, type: "rune", name: "シヴァ神のルーン", req: "ASTRAL: OMEN x1", effect: "ROLL速度2.0倍 / Luck x5.0" }
         ];
+
+        // --- Missions Data ---
+        const missions = [
+            { id: 1, title: "失われた古文書の回収", desc: "ロールを50回実行し、ギルド地下の古文書を見つけ出せ。", reward: 500, sketch: "📜" },
+            { id: 2, title: "錬金術師の試練", desc: "ショップでポーションを合計3個購入せよ。", reward: 800, sketch: "🧪" },
+            { id: 3, title: "神域への挑戦", desc: "1/10,000以上のレアオーラを1回獲得せよ。", reward: 2000, sketch: "✨" }
+        ];
+        let currentMissionIdx = 0;
 
         // --- Game State ---
         let gameState = {
             rolls: 0,
             luck: 1.0,
             coins: 1000,
-            equip: "None",
-            materials: { "Cosmic Dust": 50, "Nebula Mist": 30, "Gray Void": 20, "Lunar Crescent": 10 },
+            equippedGauntlet: "None",
+            equippedRune: "None",
             unlocked: { 1: true },
             autoRolling: false,
             autoInterval: null,
-            activeBuffs: [],
             currentWorld: 'cosmos'
         };
 
@@ -788,7 +815,7 @@
                 `;
                 grid.appendChild(item);
             });
-            document.querySelector('#codex-modal .modal-title').textContent = `AURA CODEX (${unlockedCount} / 51)`;
+            document.querySelector('#library-modal .modal-title').textContent = `LIBRARY & AURA CODEX (${unlockedCount} / 51)`;
         }
 
         function renderShop() {
@@ -814,7 +841,7 @@
                 const item = document.createElement('div');
                 item.className = `grid-item unlocked`;
                 item.innerHTML = `
-                    <div class="item-name">${ci.name}</div>
+                    <div class="item-name">${ci.name} [${ci.type.toUpperCase()}]</div>
                     <div class="item-sub">REQ: ${ci.req}</div>
                     <div class="item-sub">EFFECT: ${ci.effect}</div>
                     <button class="diamond-btn" style="margin-top:5px;" onclick="craftItem(${ci.id})">CRAFT</button>
@@ -827,13 +854,14 @@
             const grid = document.getElementById('equip-grid');
             grid.innerHTML = '';
             craftItems.forEach(ci => {
-                const isEquipped = gameState.equip === ci.name;
+                const isEquipped = (ci.type === 'gauntlet' && gameState.equippedGauntlet === ci.name) ||
+                                   (ci.type === 'rune' && gameState.equippedRune === ci.name);
                 const item = document.createElement('div');
                 item.className = `grid-item ${isEquipped ? 'unlocked' : ''}`;
                 item.innerHTML = `
-                    <div class="item-name">${ci.name}</div>
+                    <div class="item-name">${ci.name} [${ci.type.toUpperCase()}]</div>
                     <div class="item-sub">${ci.effect}</div>
-                    <button class="diamond-btn" style="margin-top:5px;" onclick="equipItem('${ci.name}')">${isEquipped ? 'EQUIPPED' : 'EQUIP'}</button>
+                    <button class="diamond-btn" style="margin-top:5px;" onclick="equipItem('${ci.name}', '${ci.type}')">${isEquipped ? 'EQUIPPED' : 'EQUIP'}</button>
                 `;
                 grid.appendChild(item);
             });
@@ -841,18 +869,36 @@
 
         function renderMissions() {
             const container = document.getElementById('mission-content');
+            const m = missions[currentMissionIdx];
             container.innerHTML = `
-                <div class="grid-item unlocked" style="width: 400px; text-align: center; padding: 30px;">
-                    <div class="item-name" style="font-size:18px; margin-bottom:10px;">GUILD BOUNTY #01</div>
-                    <div class="item-sub" style="margin-bottom:15px;">ロールを50回実行し、ギルドの地下霊廟より失われた古文書を回収せよ。</div>
-                    <div class="item-sub" style="color:var(--gold); margin-bottom:15px;">REWARD: 500 COINS</div>
-                    <button class="diamond-btn" onclick="completeMission(500)">ACCEPT & CLAIM</button>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <button class="diamond-btn" onclick="slideMission(-1)">◀</button>
+                    <div class="mission-poster">
+                        <div class="mission-sketch">${m.sketch}</div>
+                        <div class="item-name" style="font-size:18px; color:var(--gold);">${m.title}</div>
+                        <div class="item-sub" style="text-align:center; line-height:1.4;">${m.desc}</div>
+                        <div class="item-sub" style="color:var(--gold);">REWARD: ${m.reward} COINS</div>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button class="diamond-btn" onclick="completeMission(${m.reward})">ACCEPT</button>
+                            <button class="diamond-btn" onclick="closeModal('mission-modal')">DECLINE</button>
+                        </div>
+                    </div>
+                    <button class="diamond-btn" onclick="slideMission(1)">▶</button>
                 </div>
             `;
         }
 
-        // --- Core Roll Logic ---
+        function slideMission(dir) {
+            playClickSound();
+            currentMissionIdx = (currentMissionIdx + dir + missions.length) % missions.length;
+            renderMissions();
+        }
+
+        // --- Core Roll Logic with Cooldown & Real Balance ---
         function executeRoll() {
+            const rollBtn = document.getElementById('btn-roll-main');
+            rollBtn.setAttribute('disabled', 'true');
+
             playTypeSound();
             gameState.rolls++;
             document.getElementById('stat-rolls').textContent = gameState.rolls;
@@ -861,12 +907,13 @@
                 document.getElementById('btn-quick').removeAttribute('disabled');
             }
 
-            // Luck calculation
+            // Real Base Luck calculation (Strict Sol's RNG balance)
             let effectiveLuck = gameState.luck;
-            if (gameState.equip.includes("エクイニクス")) effectiveLuck *= 2.0;
-            if (gameState.equip.includes("ゼウス")) effectiveLuck *= 2.5;
-            if (gameState.equip.includes("シヴァ")) effectiveLuck *= 5.0;
+            if (gameState.equippedGauntlet.includes("エクイニクス")) effectiveLuck *= 2.0;
+            if (gameState.equippedRune.includes("ゼウス")) effectiveLuck *= 2.5;
+            if (gameState.equippedRune.includes("シヴァ")) effectiveLuck *= 5.0;
 
+            // Accurate logarithmic exponential distribution for true RNG weight
             const rollVal = Math.random() * 5000000000 / effectiveLuck;
 
             let selectedAura = auras[0];
@@ -877,26 +924,30 @@
                 }
             }
 
-            // Unlock
+            // Unlock check
             if (!gameState.unlocked[selectedAura.id]) {
                 gameState.unlocked[selectedAura.id] = true;
                 playChimeSound();
             }
 
-            // Material Drop
-            gameState.coins += 10;
+            gameState.coins += 15;
             document.getElementById('stat-coins').textContent = gameState.coins;
 
-            // UI Update
             const nameEl = document.getElementById('current-name');
             const rarityEl = document.getElementById('current-rarity');
             nameEl.textContent = selectedAura.name;
             nameEl.style.color = selectedAura.color;
             rarityEl.textContent = `1 / ${selectedAura.rate.toLocaleString()}`;
 
-            // High Tier Cutscene (100k or higher or >= 22nd aura)
-            if (selectedAura.id >= 22 || selectedAura.rate >= 100000) {
-                triggerCutscene(selectedAura);
+            // Trigger cutscene if high tier (22nd or higher / >= 10,000,000)
+            if (selectedAura.id >= 22 || selectedAura.rate >= 10000000) {
+                triggerCutscene(selectedAura, () => {
+                    rollBtn.removeAttribute('disabled');
+                });
+            } else {
+                setTimeout(() => {
+                    rollBtn.removeAttribute('disabled');
+                }, 300);
             }
         }
 
@@ -907,8 +958,12 @@
             if (gameState.autoRolling) {
                 btn.textContent = "AUTO: ON";
                 let speed = 400;
-                if (gameState.equip.includes("クロノス")) speed = 50;
-                gameState.autoInterval = setInterval(executeRoll, speed);
+                if (gameState.equippedRune.includes("クロノス")) speed = 50;
+                gameState.autoInterval = setInterval(() => {
+                    if (!document.getElementById('btn-roll-main').disabled) {
+                        executeRoll();
+                    }
+                }, speed);
             } else {
                 btn.textContent = "AUTO: OFF";
                 clearInterval(gameState.autoInterval);
@@ -923,8 +978,8 @@
             }
         }
 
-        // --- Cutscene & Probability Count-up ---
-        function triggerCutscene(aura) {
+        // --- Cutscene & Full Cinematic Sequence ---
+        function triggerCutscene(aura, callback) {
             playImpactSound();
             const layer = document.getElementById('cutscene-layer');
             const counterEl = document.getElementById('cutscene-counter');
@@ -932,28 +987,27 @@
             titleEl.textContent = aura.name;
             layer.classList.add('active');
 
-            // Glass crack canvas
             const canvas = document.getElementById('glass-canvas');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             const ctx = canvas.getContext('2d');
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = aura.id === 51 ? '#d4af37' : '#ffffff';
+            ctx.lineWidth = aura.id === 51 ? 4 : 2;
             ctx.beginPath();
             let x = canvas.width / 2;
             let y = canvas.height / 2;
             ctx.moveTo(x, y);
-            for (let i = 0; i < 20; i++) {
-                x += (Math.random() - 0.5) * 500;
-                y += (Math.random() - 0.5) * 500;
+            for (let i = 0; i < 25; i++) {
+                x += (Math.random() - 0.5) * 600;
+                y += (Math.random() - 0.5) * 600;
                 ctx.lineTo(x, y);
             }
             ctx.stroke();
 
-            // Probability count-up animation
+            // Probability count-up
             let currentNum = 0;
             let targetNum = aura.rate;
-            let increment = Math.max(1, Math.floor(targetNum / 40));
+            let increment = Math.max(1, Math.floor(targetNum / 50));
             let interval = setInterval(() => {
                 currentNum += increment;
                 if (currentNum >= targetNum) {
@@ -961,12 +1015,13 @@
                     clearInterval(interval);
                 }
                 counterEl.textContent = `1 / ${currentNum.toLocaleString()}`;
-            }, 30);
+            }, 25);
 
             setTimeout(() => {
                 layer.classList.remove('active');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }, 3500);
+                if (callback) callback();
+            }, 3800);
         }
 
         function previewCutscene(id) {
@@ -974,14 +1029,14 @@
             if (aura) triggerCutscene(aura);
         }
 
-        // --- Shop, Craft & Equipment Actions ---
+        // --- Actions ---
         function buyPotion(id) {
             const pot = shopPotions.find(p => p.id === id);
             if (gameState.coins >= pot.cost) {
                 gameState.coins -= pot.cost;
                 document.getElementById('stat-coins').textContent = gameState.coins;
                 playChimeSound();
-                gameState.luck *= 1.2;
+                gameState.luck *= 1.5;
                 document.getElementById('stat-luck').textContent = gameState.luck.toFixed(1) + 'x';
                 alert(`${pot.name}を購入し、服用しました！`);
             } else {
@@ -992,13 +1047,17 @@
         function craftItem(id) {
             const ci = craftItems.find(c => c.id === id);
             playArmorEquipSound();
-            alert(`${ci.name}の錬成に成功しました！装備リストから装備してください。`);
+            alert(`${ci.name}の錬成に成功しました！EQUIPMENT画面から装備してください。`);
         }
 
-        function equipItem(name) {
+        function equipItem(name, type) {
             playArmorEquipSound();
-            gameState.equip = name;
-            document.getElementById('stat-equip').textContent = name;
+            if (type === 'gauntlet') {
+                gameState.equippedGauntlet = name;
+            } else {
+                gameState.equippedRune = name;
+            }
+            document.getElementById('stat-equip').textContent = `${gameState.equippedGauntlet} / ${gameState.equippedRune}`;
             renderEquipment();
         }
 
@@ -1007,11 +1066,15 @@
             gameState.coins += reward;
             document.getElementById('stat-coins').textContent = gameState.coins;
             alert("ミッション報酬を受け取りました！");
+            closeModal('mission-modal');
         }
 
-        // --- Seamless World Switcher with Loading ---
+        // --- Seamless World & Modal Clean-up Switcher ---
         function switchWorld(target) {
             playImpactSound();
+            // Close all modals instantly to prevent any residual UI/backdrop bugs
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+
             const loader = document.getElementById('loading-overlay');
             loader.style.opacity = '1';
             loader.style.pointerEvents = 'all';
@@ -1033,10 +1096,10 @@
             }, 1500);
         }
 
-        // --- Modal Clean-up & Open/Close ---
         function openModal(id) {
             playClickSound();
-            if (id === 'codex-modal') renderCodex();
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            if (id === 'library-modal') renderCodex();
             if (id === 'shop-modal') renderShop();
             if (id === 'craft-modal') renderCraft();
             if (id === 'equip-modal') renderEquipment();
