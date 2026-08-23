@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LULLABY</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
@@ -322,12 +322,14 @@
             }
         }
         #title-screen {
-            background: #000;
+            background: #0a0a12;
             z-index: 100;
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
         }
         #title-screen.active {
             display: flex !important;
@@ -353,50 +355,73 @@
         #title-logo {
             font-family: 'Cinzel', serif;
             font-weight: 100;
-            font-size: clamp(50px, 10vw, 120px);
+            font-size: clamp(5rem, 10vw, 12rem);
             color: #fff;
             letter-spacing: 1.2em;
-            position: absolute;
-            top: 12%;
-            right: 8%;
-            transition: letter-spacing 2s ease;
-            text-shadow: 0 0 80px rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 80px rgba(255, 255, 255, 0.15), 0 0 160px rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: letter-spacing 2s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-bottom: 60px;
+            z-index: 3;
         }
         #title-logo.anim {
             letter-spacing: 0.4em;
         }
-        #play-btn {
+        #title-logo::after {
+            content: '';
             position: absolute;
-            bottom: 18%;
+            bottom: -20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 120px;
-            height: 120px;
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+        #play-btn {
+            position: relative;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.02);
             color: #fff;
             font-family: 'Cinzel', serif;
             font-weight: 300;
-            font-size: 20px;
+            font-size: 22px;
             letter-spacing: 0.3em;
             cursor: pointer;
-            transition: all 0.6s ease;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10;
             pointer-events: auto;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.02);
         }
         #play-btn .ring {
             position: absolute;
-            width: 140px;
-            height: 140px;
+            width: 155px;
+            height: 155px;
             border-radius: 50%;
             border: 1px solid transparent;
-            border-top-color: rgba(255, 255, 255, 0.6);
-            border-right-color: rgba(255, 255, 255, 0.2);
-            animation: spin-ring 4s linear infinite;
+            border-top-color: rgba(255, 255, 255, 0.5);
+            border-right-color: rgba(255, 255, 255, 0.15);
+            animation: spin-ring 4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #play-btn .ring::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+            border-left-color: rgba(255, 255, 255, 0.05);
+            animation: spin-ring 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite reverse;
         }
         @keyframes spin-ring {
             to {
@@ -406,13 +431,37 @@
         #play-btn:hover {
             background: rgba(255, 255, 255, 0.95);
             color: #000;
-            box-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 80px rgba(255, 255, 255, 0.2), inset 0 0 80px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.02);
         }
         #play-btn:hover .ring {
-            animation-duration: 1s;
+            animation-duration: 0.8s;
             border-top-color: rgba(255, 255, 255, 0.9);
-            border-right-color: rgba(255, 255, 255, 0.6);
+            border-right-color: rgba(255, 255, 255, 0.5);
         }
+        #play-btn:hover .ring::before {
+            animation-duration: 0.6s;
+            border-bottom-color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(255, 255, 255, 0.3);
+        }
+        #play-btn:active {
+            transform: scale(0.95);
+        }
+        #play-btn .btn-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+        #play-btn:hover .btn-glow {
+            opacity: 1;
+        }
+        /* Register Screen */
         #register-screen {
             background: #ffffff;
             z-index: 90;
@@ -547,6 +596,7 @@
             color: #fff;
             border-color: #000;
         }
+        /* Main Screen */
         #main-screen {
             background: #f5f5f5;
             z-index: 50;
@@ -975,68 +1025,4 @@
             font-size: 12px;
             letter-spacing: 0.2em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-        }
-        .help-popup .close-help:hover {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.2);
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(10px);
-            z-index: 500;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 30px;
-        }
-        .loading-overlay.active {
-            display: flex !important;
-        }
-        .loading-overlay .loader-ring {
-            position: relative;
-            width: 120px;
-            height: 120px;
-        }
-        .loading-overlay .loader-ring .ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid transparent;
-        }
-        .loading-overlay .loader-ring .ring.r1 {
-            width: 120px;
-            height: 120px;
-            border-top-color: rgba(0, 0, 0, 0.2);
-            border-right-color: rgba(0, 0, 0, 0.05);
-            animation: spin-ring 2s linear infinite;
-        }
-        .loading-overlay .loader-ring .ring.r2 {
-            width: 90px;
-            height: 90px;
-            top: 15px;
-            left: 15px;
-            border-bottom-color: rgba(0, 0, 0, 0.15);
-            border-left-color: rgba(0, 0, 0, 0.05);
-            animation: spin-ring 3s linear infinite reverse;
-        }
-        .loading-overlay .loader-ring .ring.r3 {
-            width: 60px;
-            height: 60px;
-            top: 30px;
-            left: 30px;
-            border-top-color: rgba(0, 0, 0, 0.1);
-            border-right-color: rgba(0, 0, 0, 0.05);
-            animation: spin-ring 1.5s linear infinite;
-        }
-        .loading-overlay .loader-ring .center-dot {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%
+            transition
