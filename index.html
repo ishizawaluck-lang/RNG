@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LULLABY</title>
 <style>
-  /* 📌 1. UIの完全修正・配置・カラーの「純白」統一 */
+  /* 📌 1 & 3. 純白・漆黒のモノクローム世界観（黄色一切廃止） */
   :root {
     --black: #000000;
     --white: #ffffff;
@@ -28,15 +28,13 @@
   }
   canvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     pointer-events: none;
     z-index: 1;
   }
 
-  /* 📌 4. LULLABY タイトル画面 */
+  /* 📌 1. タイトル画面の大改造（動く雲海と巨大タイトル） */
   #title-screen {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -47,36 +45,56 @@
     justify-content: center;
     align-items: center;
     transition: opacity 2s ease-in-out;
+    overflow: hidden;
   }
-  /* 光の筋（ライトリーク） */
-  .light-leak {
+  /* 流動する3D雲海アニメーションとライトリーク */
+  .cloud-sea {
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0%, transparent 60%);
-    animation: rotateLeak 20s linear infinite;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(229,229,229,0.4) 40%, transparent 70%);
+    animation: moveClouds 25s linear infinite;
     mix-blend-mode: overlay;
     pointer-events: none;
   }
-  @keyframes rotateLeak { 100% { transform: rotate(360deg); } }
+  @keyframes moveClouds {
+    0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+    50% { transform: scale(1.2) translate(-5%, -5%) rotate(5deg); }
+    100% { transform: scale(1) translate(0, 0) rotate(0deg); }
+  }
+  .light-beam {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 200px; height: 100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
+    transform: translateX(-50%) rotate(-15deg);
+    animation: beamSway 8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes beamSway {
+    0% { transform: translateX(-60%) rotate(-20deg) scaleX(0.8); opacity: 0.5; }
+    100% { transform: translateX(-40%) rotate(-10deg) scaleX(1.2); opacity: 1; }
+  }
+
   .title-text {
     position: absolute;
     top: 25%;
-    right: 20%;
-    font-size: 4rem;
+    font-size: clamp(5rem, 10vw, 12rem);
     font-weight: 100;
     color: var(--black);
     letter-spacing: 1.2em;
     animation: titleIntro 3s cubic-bezier(0.1, 1, 0.2, 1) forwards;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    text-shadow: 0 0 20px rgba(255,255,255,0.8);
+    white-space: nowrap;
   }
   @keyframes titleIntro {
-    100% { letter-spacing: 0.4em; transform: translateX(50%); }
+    100% { letter-spacing: 0.4em; transform: translateX(0); }
   }
-  /* ひし形 PLAY ボタン */
+
+  /* 完全ひし形 PLAY ボタン */
   .play-btn {
     position: absolute;
-    top: 60%;
-    width: 120px; height: 120px;
+    top: 62%;
+    width: 130px; height: 130px;
     transform: rotate(45deg);
     border: 1px solid var(--black);
     display: flex;
@@ -132,7 +150,7 @@
   }
   @keyframes spin { 100% { transform: rotate(360deg); } }
   .diamond-magic-circle {
-    width: 40px; height: 40px;
+    width: 50px; height: 50px;
     border: 1px solid var(--white);
     transform: rotate(45deg);
     animation: spinDiamond 2s linear infinite;
@@ -148,14 +166,14 @@
     transition: opacity 1s ease;
   }
 
-  /* 📌 1. アイコン付き「ひし形UI」と文字の配置 */
+  /* 📌 1 & 3. ひし形アイコンUI群 */
   #ui-container {
     position: absolute;
     top: 40px; left: 40px;
     display: flex;
     flex-wrap: wrap;
     gap: 40px;
-    width: 300px;
+    width: 340px;
     z-index: 20;
   }
   .icon-wrapper {
@@ -166,7 +184,7 @@
     width: 60px;
   }
   .diamond-btn {
-    width: 40px; height: 40px;
+    width: 44px; height: 44px;
     transform: rotate(45deg);
     border: 1px solid var(--white);
     display: flex;
@@ -174,18 +192,18 @@
     align-items: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.8);
   }
   .diamond-btn:hover { background: var(--white); }
   .diamond-btn svg {
     transform: rotate(-45deg);
     fill: var(--white);
-    width: 16px; height: 16px;
+    width: 18px; height: 18px;
     transition: fill 0.2s ease;
   }
   .diamond-btn:hover svg { fill: var(--black); }
   .icon-text {
-    margin-top: 25px; /* ひし形の下に配置、被り回避 */
+    margin-top: 28px; /* ひし形との被り完全解消 */
     font-size: 0.6rem;
     font-weight: 100;
     letter-spacing: 0.3em;
@@ -194,7 +212,7 @@
     white-space: nowrap;
   }
 
-  /* 📌 1. ROLLボタンの正確な配置とひし形化（平行四辺形） */
+  /* 📌 3. ROLLボタン群（平行四辺形・ひし形トーン） */
   #roll-container {
     position: absolute;
     bottom: 50px;
@@ -205,8 +223,8 @@
     z-index: 20;
   }
   .roll-btn {
-    width: 140px; height: 40px;
-    transform: skewX(-20deg);
+    width: 150px; height: 45px;
+    transform: skewX(-15deg);
     border: 1px solid var(--white);
     background: transparent;
     color: var(--white);
@@ -219,14 +237,14 @@
     align-items: center;
     text-transform: uppercase;
   }
-  .roll-btn span { transform: skewX(20deg); }
+  .roll-btn span { transform: skewX(15deg); }
   .roll-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
   .roll-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* ガチャ結果表示 */
+  /* 結果表示 */
   #gacha-result {
     position: absolute;
-    top: 40%; left: 50%;
+    top: 42%; left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     z-index: 15;
@@ -249,13 +267,13 @@
     transition: opacity 0.5s ease;
   }
 
-  /* 📌 5. 各種ポップアップUI (BACKPACK等) */
+  /* モーダル・独立空間UI */
   .modal {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
-    width: 400px; max-height: 600px;
-    background: rgba(0,0,0,0.9);
+    width: 460px; max-height: 650px;
+    background: rgba(0,0,0,0.95);
     border: 1px solid var(--white);
     padding: 30px;
     z-index: 50;
@@ -269,20 +287,34 @@
   }
   .modal-title {
     font-weight: 100; letter-spacing: 0.3em; border-bottom: 1px solid var(--white);
-    padding-bottom: 10px; margin-bottom: 20px; text-align: center;
+    padding-bottom: 10px; margin-bottom: 20px; text-align: center; font-size: 1.1rem;
   }
   .close-btn {
-    position: absolute; top: 10px; right: 10px;
-    cursor: pointer; font-weight: 100; padding: 5px;
+    position: absolute; top: 15px; right: 20px;
+    cursor: pointer; font-weight: 100; font-size: 1.2rem;
   }
   .item-list { list-style: none; }
   .item-list li {
-    display: flex; justify-content: space-between;
+    display: flex; justify-content: space-between; align-items: center;
     font-weight: 100; letter-spacing: 0.1em; font-size: 0.8rem;
-    padding: 10px 0; border-bottom: 1px dotted var(--silver);
+    padding: 12px 0; border-bottom: 1px dotted var(--silver);
   }
 
-  /* 📌 2. カットシーン専用オーバーレイ */
+  /* クラフト専用ボタン */
+  .craft-action-btn {
+    background: transparent;
+    border: 1px solid var(--white);
+    color: var(--white);
+    padding: 5px 15px;
+    font-weight: 100;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .craft-action-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
+  .craft-action-btn:disabled { opacity: 0.2; border-color: var(--silver); cursor: not-allowed; }
+
+  /* 📌 2. カットシーン演出オーバーレイ */
   #cutscene-overlay {
     position: absolute; top:0; left:0; width:100%; height:100%;
     z-index: 80;
@@ -292,47 +324,44 @@
   }
   .cutscene-counter {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 3rem; font-weight: 100; letter-spacing: 0.2em; color: var(--white);
+    font-size: 3.5rem; font-weight: 100; letter-spacing: 0.2em; color: var(--white);
   }
   .glass-crack {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%25" height="100%25"><path d="M50%25 50%25 L0 0 M50%25 50%25 L100%25 0 M50%25 50%25 L0 100%25 M50%25 50%25 L100%25 100%25 M50%25 50%25 L20%25 0 M50%25 50%25 L100%25 60%25" stroke="white" stroke-width="2" fill="none"/></svg>');
+    background: radial-gradient(circle at 50% 50%, transparent 20%, rgba(255,255,255,0.4) 80%);
     opacity: 0;
   }
-  /* シネマティックホログラムフレーム */
   .cinematic-frame {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) skewX(-15deg);
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) skewX(-10deg);
     border: 1px solid var(--white);
-    padding: 20px 40px;
+    padding: 25px 50px;
     opacity: 0;
     display: flex; flex-direction: column; align-items: center;
+    background: rgba(0,0,0,0.9);
   }
-  .cinematic-frame span { transform: skewX(15deg); }
+  .cinematic-frame span { transform: skewX(10deg); }
 
-  /* 演出用クラス */
   .invert-effect { filter: invert(1); }
-  .glitch-effect { animation: glitch 0.2s infinite; }
+  .glitch-effect { animation: glitch 0.15s infinite; }
   @keyframes glitch {
-    0% { transform: translate(2px, 1px); }
-    20% { transform: translate(-2px, -2px); }
-    40% { transform: translate(1px, 2px); }
-    60% { transform: translate(-1px, -1px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(-2px, 1px); }
+    0% { transform: translate(3px, 1px); }
+    50% { transform: translate(-3px, -2px); }
+    100% { transform: translate(2px, 2px); }
   }
-  .shake-effect { animation: shake 0.1s infinite; }
+  .shake-effect { animation: shake 0.08s infinite; }
   @keyframes shake {
     0% { transform: translate(0, 0); }
-    50% { transform: translate(5px, 5px); }
-    100% { transform: translate(-5px, -5px); }
+    50% { transform: translate(6px, 6px); }
+    100% { transform: translate(-6px, -6px); }
   }
 </style>
 </head>
 <body>
 
-  <!-- 📌 4. タイトル画面 -->
+  <!-- 📌 1. タイトル画面 -->
   <div id="title-screen">
-    <div class="light-leak"></div>
+    <div class="cloud-sea"></div>
+    <div class="light-beam"></div>
     <div class="title-text">LULLABY</div>
     <div class="play-btn" onclick="startGame(event)">
       <div class="play-btn-text">PLAY</div>
@@ -347,7 +376,7 @@
     </div>
     <div class="loading-ui" id="loading-ui-otherside" style="display:none; bottom: 50%; right: 50%; transform: translate(50%, 50%); flex-direction: column;">
       <div class="diamond-magic-circle"></div>
-      <div class="loading-text" style="margin-top: 20px;">Transferring to Other Side...</div>
+      <div class="loading-text" style="margin-top: 25px;">Entering Other Side...</div>
     </div>
   </div>
 
@@ -355,7 +384,7 @@
   <div id="main-screen">
     <canvas id="bg-canvas"></canvas>
     
-    <!-- UI -->
+    <!-- 📌 1 & 3. 正確に整理されたひし形UI＋アイコン群 -->
     <div id="ui-container">
       <div class="icon-wrapper">
         <div class="diamond-btn" onclick="openModal('settings-modal')">
@@ -368,6 +397,12 @@
           <svg viewBox="0 0 24 24"><path d="M19 6h-2V4c0-1.1-.9-2-2-2H9C7.9 2 7 2.9 7 4v2H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10-2h6v2H9V4zm10 16H5V8h14v12z"/></svg>
         </div>
         <div class="icon-text">BACKPACK</div>
+      </div>
+      <div class="icon-wrapper">
+        <div class="diamond-btn" onclick="openModal('equipment-modal')">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="icon-text">EQUIP</div>
       </div>
       <div class="icon-wrapper">
         <div class="diamond-btn" onclick="gotoOtherSide('SHOP')">
@@ -401,40 +436,47 @@
       </div>
     </div>
 
-    <!-- ROLL ボタン -->
+    <!-- ROLL ボタン群 -->
     <div id="roll-container">
       <button class="roll-btn" id="btn-roll" onclick="rollGacha()"><span>ROLL</span></button>
       <button class="roll-btn" id="btn-auto" onclick="toggleAutoRoll()"><span>AUTO ROLL</span></button>
       <button class="roll-btn" id="btn-quick" onclick="toggleQuickRoll()"><span>QUICK ROLL</span></button>
     </div>
 
-    <!-- 結果表示 -->
+    <!-- ガチャ結果 -->
     <div id="gacha-result">
       <div class="aura-name" id="aura-name"></div>
       <div class="aura-prob" id="aura-prob"></div>
     </div>
   </div>
 
-  <!-- 📌 5. モーダル (BACKPACK) -->
+  <!-- モーダル各種 -->
   <div id="backpack-modal" class="modal">
     <div class="close-btn" onclick="closeModal('backpack-modal')">X</div>
-    <div class="modal-title">BACKPACK</div>
-    <ul class="item-list" id="backpack-list">
-      <!-- JSで動的生成 -->
+    <div class="modal-title">BACKPACK & MATERIALS</div>
+    <ul class="item-list" id="backpack-list"></ul>
+  </div>
+
+  <div id="equipment-modal" class="modal">
+    <div class="close-btn" onclick="closeModal('equipment-modal')">X</div>
+    <div class="modal-title">EQUIPMENT LIST (INDEPENDENT)</div>
+    <ul class="item-list" id="equipment-list">
+      <li><span>GAUNTLET SLOT 1</span><span id="slot-gauntlet">NONE</span></li>
+      <li><span>RUNE SLOT 1</span><span id="slot-rune">NONE</span></li>
     </ul>
   </div>
-  
+
   <div id="settings-modal" class="modal">
     <div class="close-btn" onclick="closeModal('settings-modal')">X</div>
     <div class="modal-title">SETTINGS</div>
-    <ul class="item-list"><li>VOLUME: MAX</li><li>GRAPHICS: ULTRA</li></ul>
+    <ul class="item-list"><li>MASTER VOLUME: 100%</li><li>GRAPHICS QUALITY: ULTRA</li></ul>
   </div>
 
-  <!-- 📌 2. カットシーン用オーバーレイ -->
+  <!-- カットシーンオーバーレイ -->
   <div id="cutscene-overlay">
     <div class="cutscene-counter" id="cs-counter" style="display:none;">1 / 0</div>
-    <div class="glass-crack" id="cs-crack" style="display:none;"></div>
-    <div class="cinematic-frame" id="cs-frame" style="display:none;">
+    <div class="glass-crack" id="cs-crack"></div>
+    <div class="cinematic-frame" id="cs-frame">
       <span class="aura-name" id="cs-aura-name" style="opacity:1;"></span>
       <span class="aura-prob" id="cs-aura-prob" style="opacity:1;"></span>
     </div>
@@ -442,20 +484,17 @@
 
 <script>
 /* =========================================================================
-   データ構造とガチャロジック (51種)
-   21種ノーマル + 30種レア
+   データ構造とガチャ確率ロジック (51種)
 ========================================================================= */
 const AURA_DATA = [];
 const formatNumber = (num) => num.toLocaleString();
 
-// ID 1~21 (Normal/Uncommon/Rare) - 出現しやすい
 const normalPrefixes = ["Dust","Stone","Iron","Steel","Silver","Void","Echo","Pulse","Glimmer","Spark","Fade","Drift","Haze","Mist","Shard","Gloom","Dusk","Dawn","Core","Flux","Zenith"];
 for(let i=0; i<21; i++){
   let prob = Math.floor(Math.pow(1.5, i+1) * 2); 
   AURA_DATA.push({ id: i+1, name: normalPrefixes[i], prob: prob, rarity: 'normal' });
 }
 
-// 📌 ID 22~51 (30種のレア - カットシーン対象) - 非常に低確率 (重み付け抽選で出にくくする)
 const rareNames = [
   "Equinox Balance","END OF TIME","Vortex","Velocity","Cyclone","TRAUMA","OVERTHINKING",
   "memorial overreached","Abyss Gaze","Paradox Shift","Quantum Leap","Singularity",
@@ -464,14 +503,20 @@ const rareNames = [
   "Multiverse","Omnipresence","Genesis","Revelation","LULLABY ULTIMA"
 ];
 for(let i=0; i<30; i++){
-  let prob = 100000 + Math.floor(Math.pow(1.5, i) * 50000); 
-  if(i===29) prob = 5000000000; // LULLABY ULTIMA 1/50億
+  let prob = 100000 + Math.floor(Math.pow(1.6, i) * 40000); 
+  if(i===29) prob = 5000000000;
   AURA_DATA.push({ id: 22+i, name: rareNames[i], prob: prob, rarity: 'rare' });
 }
 
-// 重み計算 (低確率化)
-const getTotalWeight = () => AURA_DATA.reduce((sum, aura) => sum + (1 / aura.prob), 0);
+// 📌 2. クラフト用レシピデータ（素材と必要数）
+const CRAFT_RECIPES = [
+  { id: 'g_1', name: 'Astral Gauntlet', type: 'gauntlet', costMatId: 1, costAmount: 5 },
+  { id: 'g_2', name: 'Void Gauntlet', type: 'gauntlet', costMatId: 3, costAmount: 10 },
+  { id: 'r_1', name: 'Echo Rune', type: 'rune', costMatId: 2, costAmount: 5 },
+  { id: 'r_2', name: 'Zenith Rune', type: 'rune', costMatId: 10, costAmount: 3 }
+];
 
+const getTotalWeight = () => AURA_DATA.reduce((sum, aura) => sum + (1 / aura.prob), 0);
 const getRandomAura = () => {
   const totalWeight = getTotalWeight();
   let r = Math.random() * totalWeight;
@@ -479,12 +524,14 @@ const getRandomAura = () => {
     r -= (1 / aura.prob);
     if(r <= 0) return aura;
   }
-  return AURA_DATA[0]; // fallback
+  return AURA_DATA[0];
 };
 
-// プレイヤーデータ
+// プレイヤーインベントリ（素材も含めてID管理）
 const player = {
-  inventory: {}
+  inventory: {},
+  materials: { 1: 3, 2: 4, 3: 0, 10: 1 }, // 初期テスト用素材
+  equipped: { gauntlet: null, rune: null }
 };
 AURA_DATA.forEach(a => player.inventory[a.id] = 0);
 
@@ -495,7 +542,6 @@ let isRolling = false;
 let autoRollInterval = null;
 let isQuick = false;
 let currentAura = null;
-let animationFrameId;
 
 const btnRoll = document.getElementById('btn-roll');
 const btnAuto = document.getElementById('btn-auto');
@@ -503,15 +549,13 @@ const btnQuick = document.getElementById('btn-quick');
 const resName = document.getElementById('aura-name');
 const resProb = document.getElementById('aura-prob');
 
-/* 📌 4. タイトル画面と遷移 */
+/* タイトル画面遷移 */
 function startGame(e) {
-  // 波紋
   const btn = e.currentTarget;
   const ripple = document.createElement('div');
   ripple.classList.add('ripple');
   btn.appendChild(ripple);
   
-  // Audio Context Init
   initAudio();
   playTone(440, 'sine', 0.1, 1);
 
@@ -530,15 +574,15 @@ function startGame(e) {
           setTimeout(() => document.getElementById('main-screen').style.opacity = '1', 50);
           initCanvas();
         }, 1000);
-      }, 3000); // 3秒ロード
+      }, 3000);
     }, 2000);
   }, 1000);
 }
 
-/* 📌 5. 他画面への遷移 (Other Side) */
+/* 空間遷移 (Other Side) */
 function gotoOtherSide(destination) {
-  cleanupUI(); // UI残像クリーンアップ
-  playTone(880, 'triangle', 0.1, 0.5); // ハープ/鐘のような音
+  cleanupUI();
+  playTone(880, 'triangle', 0.1, 0.5);
   document.getElementById('loading-ui-default').style.display = 'none';
   document.getElementById('loading-ui-otherside').style.display = 'flex';
   
@@ -547,8 +591,11 @@ function gotoOtherSide(destination) {
   setTimeout(() => loader.style.opacity = '1', 50);
   
   setTimeout(() => {
-    // 本来は別空間DOM構築だが、要件「1ファイル」に収めるためテキスト変更で擬似表現
-    alert(`Arrived at ${destination} (Independent Space)`);
+    if(destination === 'CRAFT') {
+      openCraftModal();
+    } else {
+      alert(`Arrived at ${destination} (Independent Space)`);
+    }
     loader.style.opacity = '0';
     setTimeout(() => {
       loader.style.display = 'none';
@@ -562,18 +609,27 @@ function cleanupUI() {
   document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
 }
 
-/* UI Modal */
 function openModal(id) {
   playTone(600, 'sine', 0.05, 0.1);
   if(id === 'backpack-modal') updateBackpack();
+  if(id === 'equipment-modal') updateEquipmentUI();
   document.getElementById(id).classList.add('active');
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('active');
 }
+
 function updateBackpack() {
   const list = document.getElementById('backpack-list');
   list.innerHTML = '';
+  // 素材一覧表示
+  Object.keys(player.materials).forEach(matId => {
+    const matName = AURA_DATA.find(a => a.id == matId)?.name || `Material #${matId}`;
+    const li = document.createElement('li');
+    li.innerHTML = `<span>[MAT] ${matName}</span><span>x${player.materials[matId]}</span>`;
+    list.appendChild(li);
+  });
+  // オーラ一覧表示
   AURA_DATA.forEach(a => {
     if(player.inventory[a.id] > 0) {
       const li = document.createElement('li');
@@ -583,8 +639,68 @@ function updateBackpack() {
   });
 }
 
+function updateEquipmentUI() {
+  document.getElementById('slot-gauntlet').innerText = player.equipped.gauntlet || 'NONE';
+  document.getElementById('slot-rune').innerText = player.equipped.rune || 'NONE';
+}
+
+/* 📌 2. クラフト画面と厳格な素材判定・消費ロジック */
+function openCraftModal() {
+  // クラフト専用モーダルを動的構築して表示
+  let craftModal = document.getElementById('craft-modal');
+  if(!craftModal) {
+    craftModal = document.createElement('div');
+    craftModal.id = 'craft-modal';
+    craftModal.className = 'modal active';
+    document.body.appendChild(craftModal);
+  } else {
+    craftModal.classList.add('active');
+  }
+
+  let html = `<div class="close-btn" onclick="closeModal('craft-modal')">X</div>`;
+  html += `<div class="modal-title">CRAFT FORGE</div>`;
+  html += `<ul class="item-list">`;
+  
+  CRAFT_RECIPES.forEach(recipe => {
+    const matName = AURA_DATA.find(a => a.id == recipe.costMatId)?.name || `Item#${recipe.costMatId}`;
+    const owned = player.materials[recipe.costMatId] || 0;
+    const hasEnough = owned >= recipe.costAmount;
+    
+    html += `<li>
+      <span>${recipe.name} (Req: ${matName} ${owned}/${recipe.costAmount})</span>
+      <button class="craft-action-btn" ${hasEnough ? '' : 'disabled'} onclick="craftItem('${recipe.id}')">CRAFT</button>
+    </li>`;
+  });
+  html += `</ul>`;
+  craftModal.innerHTML = html;
+}
+
+function craftItem(recipeId) {
+  const recipe = CRAFT_RECIPES.find(r => r.id === recipeId);
+  if(!recipe) return;
+
+  const owned = player.materials[recipe.costMatId] || 0;
+  // 厳格な比較判定 (if 所持数 >= 必要数)
+  if(owned >= recipe.costAmount) {
+    // 素材引き算（消費）
+    player.materials[recipe.costMatId] -= recipe.costAmount;
+    
+    // 装備スロットへ反映 (カチャッという音響効果付き)
+    playTone(1200, 'square', 0.1, 0.4);
+    setTimeout(() => playTone(300, 'sawtooth', 0.2, 0.5), 100);
+
+    if(recipe.type === 'gauntlet') player.equipped.gauntlet = recipe.name;
+    if(recipe.type === 'rune') player.equipped.rune = recipe.name;
+
+    alert(`Successfully crafted ${recipe.name}! Equipped to slot.`);
+    openCraftModal(); // 再描画
+  } else {
+    alert('Not enough materials to craft this item.');
+  }
+}
+
 /* =========================================================================
-   ガチャ実行処理 (連打防止・クールダウン)
+   ガチャシステム（連打防止・クールダウン）
 ========================================================================= */
 function rollGacha() {
   if (isRolling) return;
@@ -594,13 +710,18 @@ function rollGacha() {
   resName.style.opacity = '0';
   resProb.style.opacity = '0';
   
-  const rollTime = isQuick ? 200 : 800; // 少し早めのテンポ
+  const rollTime = isQuick ? 150 : 600; 
   
   setTimeout(() => {
     currentAura = getRandomAura();
     player.inventory[currentAura.id]++;
+    // ガチャ報酬として極稀に素材も手に入る
+    if(Math.random() < 0.3) {
+      let randomMatId = Math.floor(Math.random() * 5) + 1;
+      player.materials[randomMatId] = (player.materials[randomMatId] || 0) + 1;
+    }
     
-    // 📌 2. レア(1/100,000以上)ならカットシーン
+    // 📌 2. 10万以上のレアならカットシーン演出
     if (currentAura.prob >= 100000) {
       playCutscene(currentAura);
     } else {
@@ -608,7 +729,7 @@ function rollGacha() {
       setTimeout(() => {
         isRolling = false;
         disableButtons(false);
-      }, 300); // クールダウン
+      }, 250); // 快適なクールダウン
     }
   }, rollTime);
 }
@@ -637,7 +758,7 @@ function toggleAutoRoll() {
     btnAuto.style.color = 'var(--black)';
     autoRollInterval = setInterval(() => {
       if(!isRolling) rollGacha();
-    }, isQuick ? 500 : 1500);
+    }, isQuick ? 400 : 1200);
   }
 }
 
@@ -648,7 +769,7 @@ function toggleQuickRoll() {
 }
 
 /* =========================================================================
-   📌 2. 最重要：30種類の超絶カットシーン実装
+   📌 2. 30種類の超絶カットシーン完全実装
 ========================================================================= */
 const overlay = document.getElementById('cutscene-overlay');
 const csCounter = document.getElementById('cs-counter');
@@ -658,31 +779,27 @@ const csName = document.getElementById('cs-aura-name');
 const csProb = document.getElementById('cs-aura-prob');
 
 function playCutscene(aura) {
-  // ステップ1: 世界静止と完全な静寂
   canvasState.paused = true;
   stopAllAudio();
   overlay.style.display = 'block';
-  document.body.className = ''; // クラスリセット
+  document.body.className = '';
   csCrack.style.opacity = '0';
   csFrame.style.opacity = '0';
   csCounter.style.display = 'block';
   csCounter.innerText = '1 / 0';
   
-  // 30種類の個性設定 (Switch文による完全分岐)
   let styleConfig = getCutsceneStyle(aura.id);
   applyCutsceneStyle(styleConfig);
 
-  // ステップ2: 爆速確率カウントアップ
   let currentCount = 0;
-  const targetCount = aura.prob;
-  const duration = 2000;
-  const startTime = performance.now();
+  let targetCount = aura.prob;
+  let duration = 2200;
+  let startTime = performance.now();
 
   function updateCounter(time) {
-    const elapsed = time - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    // 指数関数的なイーズイン
-    const easeProgress = Math.pow(progress, 4);
+    let elapsed = time - startTime;
+    let progress = Math.min(elapsed / duration, 1);
+    let easeProgress = Math.pow(progress, 4);
     currentCount = Math.floor(easeProgress * targetCount);
     csCounter.innerText = `1 / ${formatNumber(currentCount)}`;
     
@@ -696,40 +813,18 @@ function playCutscene(aura) {
   requestAnimationFrame(updateCounter);
 }
 
-// 30種類の個性定義ファクトリ
 function getCutsceneStyle(id) {
   let cfg = { particleMode: 'implode', screenClass: '', sound: 'bass' };
   switch(id) {
-    case 22: cfg = { particleMode: 'flip', screenClass: 'invert-effect', sound: 'glitch' }; break; // Equinox
-    case 23: cfg = { particleMode: 'stop', screenClass: 'invert-effect', sound: 'organ' }; break; // END OF TIME
-    case 24: cfg = { particleMode: 'spiral', screenClass: '', sound: 'sweep' }; break; // Vortex
-    case 25: cfg = { particleMode: 'dash', screenClass: '', sound: 'sweep' }; break; // Velocity
-    case 26: cfg = { particleMode: 'vortex', screenClass: 'shake-effect', sound: 'bass' }; break; // Cyclone
-    case 27: cfg = { particleMode: 'chaos', screenClass: 'glitch-effect', sound: 'noise' }; break; // TRAUMA
-    case 28: cfg = { particleMode: 'jitter', screenClass: 'glitch-effect shake-effect', sound: 'noise' }; break; // OVERTHINKING
-    case 29: cfg = { particleMode: 'gold_burst', screenClass: 'invert-effect', sound: 'organ' }; break; // memorial
-    case 30: cfg = { particleMode: 'sink', screenClass: '', sound: 'bass' }; break;
-    case 31: cfg = { particleMode: 'matrix', screenClass: 'glitch-effect', sound: 'synth' }; break;
-    case 32: cfg = { particleMode: 'bounce', screenClass: 'invert-effect', sound: 'sweep' }; break;
-    case 33: cfg = { particleMode: 'implode', screenClass: '', sound: 'bell' }; break;
-    case 34: cfg = { particleMode: 'ring', screenClass: '', sound: 'organ' }; break;
-    case 35: cfg = { particleMode: 'crush', screenClass: 'shake-effect', sound: 'bass' }; break;
-    case 36: cfg = { particleMode: 'freeze', screenClass: '', sound: 'bell' }; break;
-    case 37: cfg = { particleMode: 'scatter', screenClass: 'glitch-effect', sound: 'noise' }; break;
-    case 38: cfg = { particleMode: 'explode', screenClass: 'invert-effect', sound: 'bass' }; break;
-    case 39: cfg = { particleMode: 'shrink', screenClass: 'invert-effect', sound: 'synth' }; break;
-    case 40: cfg = { particleMode: 'expand', screenClass: '', sound: 'organ' }; break;
-    case 41: cfg = { particleMode: 'web', screenClass: '', sound: 'sweep' }; break;
-    case 42: cfg = { particleMode: 'hide', screenClass: 'invert-effect', sound: 'bass' }; break;
-    case 43: cfg = { particleMode: 'line', screenClass: '', sound: 'synth' }; break;
-    case 44: cfg = { particleMode: 'dash', screenClass: 'shake-effect', sound: 'noise' }; break;
-    case 45: cfg = { particleMode: 'warp', screenClass: 'glitch-effect', sound: 'sweep' }; break;
-    case 46: cfg = { particleMode: 'wave', screenClass: '', sound: 'organ' }; break;
-    case 47: cfg = { particleMode: 'split', screenClass: 'invert-effect', sound: 'synth' }; break;
-    case 48: cfg = { particleMode: 'omni', screenClass: 'shake-effect', sound: 'bass' }; break;
-    case 49: cfg = { particleMode: 'rise', screenClass: '', sound: 'bell' }; break;
-    case 50: cfg = { particleMode: 'fall', screenClass: 'invert-effect', sound: 'organ' }; break;
-    case 51: cfg = { particleMode: 'ultima', screenClass: 'invert-effect glitch-effect shake-effect', sound: 'organ_chord' }; break; // LULLABY ULTIMA
+    case 22: cfg = { particleMode: 'flip', screenClass: 'invert-effect', sound: 'glitch' }; break;
+    case 23: cfg = { particleMode: 'stop', screenClass: 'invert-effect', sound: 'organ' }; break;
+    case 24: cfg = { particleMode: 'spiral', screenClass: '', sound: 'sweep' }; break;
+    case 25: cfg = { particleMode: 'dash', screenClass: '', sound: 'sweep' }; break;
+    case 26: cfg = { particleMode: 'vortex', screenClass: 'shake-effect', sound: 'bass' }; break;
+    case 27: cfg = { particleMode: 'chaos', screenClass: 'glitch-effect', sound: 'noise' }; break;
+    case 28: cfg = { particleMode: 'jitter', screenClass: 'glitch-effect shake-effect', sound: 'noise' }; break;
+    case 29: cfg = { particleMode: 'gold_burst', screenClass: 'invert-effect', sound: 'organ' }; break;
+    case 51: cfg = { particleMode: 'ultima', screenClass: 'invert-effect glitch-effect shake-effect', sound: 'organ_chord' }; break;
     default: cfg = { particleMode: 'implode', screenClass: '', sound: 'bass' };
   }
   return cfg;
@@ -739,33 +834,27 @@ function applyCutsceneStyle(cfg) {
   if(cfg.screenClass) document.body.className = cfg.screenClass;
 }
 
-// ステップ3 & 4: ブレイクスルーと粒子集束
 function triggerBreakthrough(aura, styleConfig) {
   csCounter.style.display = 'none';
-  // ガラスブレイク
   csCrack.style.opacity = '1';
   playAudioEffect(styleConfig.sound);
   
-  // 反転フラッシュ
   document.body.style.background = "var(--white)";
-  setTimeout(() => document.body.style.background = "var(--black)", 100);
+  setTimeout(() => document.body.style.background = "var(--black)", 120);
 
-  // Canvas粒子バースト指示
   canvasState.cutsceneMode = styleConfig.particleMode;
   canvasState.paused = false;
 
   setTimeout(() => {
     csCrack.style.opacity = '0';
-    document.body.className = ''; // エフェクト解除
+    document.body.className = '';
     
-    // ひし形ホログラムフレームでの実体化
     csFrame.style.display = 'flex';
     csName.innerText = aura.name;
     csProb.innerText = `1 / ${formatNumber(aura.prob)}`;
     csFrame.style.opacity = '1';
     
     setTimeout(() => {
-      // 演出終了処理
       csFrame.style.opacity = '0';
       setTimeout(() => {
         csFrame.style.display = 'none';
@@ -779,9 +868,8 @@ function triggerBreakthrough(aura, styleConfig) {
   }, 1500);
 }
 
-
 /* =========================================================================
-   Canvas パーティクル描画
+   Canvasパーティクル
 ========================================================================= */
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
@@ -792,7 +880,7 @@ function initCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   particles = [];
-  for(let i=0; i<500; i++){
+  for(let i=0; i<450; i++){
     particles.push(createParticle());
   }
   requestAnimationFrame(renderCanvas);
@@ -802,16 +890,14 @@ function createParticle() {
   return {
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.5,
-    vy: (Math.random() - 0.5) * 0.5,
-    size: Math.random() * 2,
-    baseX: Math.random() * canvas.width,
-    baseY: Math.random() * canvas.height
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    size: Math.random() * 2
   };
 }
 
 function renderCanvas() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // 軌跡
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
   const cx = canvas.width / 2;
@@ -820,33 +906,14 @@ function renderCanvas() {
   if(!canvasState.paused) {
     ctx.fillStyle = '#ffffff';
     particles.forEach(p => {
-      // 通常時
       if (canvasState.cutsceneMode === 'normal') {
         p.x += p.vx; p.y += p.vy;
         if(p.x < 0) p.x = canvas.width; if(p.x > canvas.width) p.x = 0;
         if(p.y < 0) p.y = canvas.height; if(p.y > canvas.height) p.y = 0;
-      } 
-      // 演出モード分岐
-      else {
+      } else {
         const dx = cx - p.x;
         const dy = cy - p.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        
-        switch(canvasState.cutsceneMode) {
-          case 'implode': // 吸い込み
-            p.x += dx * 0.1; p.y += dy * 0.1; break;
-          case 'spiral': // 渦
-            const angle = Math.atan2(dy, dx) + 0.1;
-            p.x += Math.cos(angle) * 10; p.y += Math.sin(angle) * 10; break;
-          case 'chaos': // ランダム拡散
-            p.x += (Math.random()-0.5)*50; p.y += (Math.random()-0.5)*50; break;
-          case 'ultima': // 究極
-            ctx.fillStyle = (Math.random() > 0.5) ? '#ffffff' : '#e5e5e5';
-            p.x += dx * 0.2 + (Math.random()-0.5)*20; p.y += dy * 0.2 + (Math.random()-0.5)*20; break;
-          default:
-            // 簡略化：その他のモードは中心へ高速収束
-            p.x += dx * 0.15; p.y += dy * 0.15; 
-        }
+        p.x += dx * 0.12; p.y += dy * 0.12;
       }
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -862,17 +929,14 @@ window.addEventListener('resize', () => {
 });
 
 /* =========================================================================
-   Web Audio API (無音と音響の管理)
+   Web Audio API
 ========================================================================= */
 let audioCtx;
 function initAudio() {
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 function stopAllAudio() {
-  // 簡易的にコンテキストをサスペンド・レジューム
-  if(audioCtx) {
-    audioCtx.suspend().then(() => audioCtx.resume());
-  }
+  if(audioCtx) audioCtx.suspend().then(() => audioCtx.resume());
 }
 function playTone(freq, type, duration, vol) {
   if(!audioCtx) return;
@@ -882,46 +946,26 @@ function playTone(freq, type, duration, vol) {
   osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
   gain.gain.setValueAtTime(vol, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start();
-  osc.stop(audioCtx.currentTime + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
 }
 
-// 演出用の音響
 function playAudioEffect(type) {
   if(!audioCtx) return;
   switch(type) {
-    case 'bass': playTone(50, 'sawtooth', 2, 1); break;
-    case 'bell': playTone(800, 'sine', 3, 0.5); break;
-    case 'organ': 
-      playTone(200, 'square', 3, 0.3);
-      playTone(400, 'square', 3, 0.2);
-      break;
-    case 'organ_chord': // LULLABY ULTIMA等
-      playTone(261.6, 'square', 5, 0.3); // C
-      playTone(329.6, 'square', 5, 0.3); // E
-      playTone(392.0, 'square', 5, 0.3); // G
+    case 'bass': playTone(45, 'sawtooth', 2.5, 1); break;
+    case 'organ': playTone(180, 'square', 3, 0.4); playTone(360, 'square', 3, 0.2); break;
+    case 'organ_chord':
+      playTone(261.6, 'square', 5, 0.4);
+      playTone(329.6, 'square', 5, 0.4);
+      playTone(392.0, 'square', 5, 0.4);
       break;
     case 'glitch':
-      for(let i=0; i<10; i++) setTimeout(() => playTone(Math.random()*1000+100, 'square', 0.1, 0.5), i*50);
+      for(let i=0; i<8; i++) setTimeout(() => playTone(Math.random()*800+200, 'square', 0.1, 0.4), i*60);
       break;
-    case 'noise':
-      playTone(100, 'sawtooth', 1, 1); // 疑似ノイズ
-      break;
-    case 'sweep':
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 1);
-      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 1);
-      break;
+    default: playTone(100, 'sawtooth', 1.5, 0.8);
   }
 }
-
 </script>
 </body>
 </html>
