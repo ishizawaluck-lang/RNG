@@ -1,1389 +1,548 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LULLABY - Divine RNG</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@100;200;400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #030305;
-            --panel-bg: rgba(10, 10, 15, 0.9);
-            --gold: #ffd700;
-            --gold-light: #fff2b2;
-            --platinum: #e0e6ed;
-            --accent-glow: rgba(255, 215, 0, 0.35);
-            --border-color: rgba(255, 215, 0, 0.3);
-            --text-main: #f0f4f8;
-            --text-muted: #94a3b8;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--bg-color);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-        }
-
-        #app-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1;
-        }
-
-        .screen.active {
-            display: flex;
-            opacity: 1;
-            z-index: 10;
-        }
-
-        /* --- 2. 純白魔法陣ローディング (PLAY専用ローダー) --- */
-        #play-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 99999;
-            opacity: 0;
-            background: radial-gradient(circle, rgba(10,10,15,0.98) 0%, rgba(3,3,5,1) 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease;
-        }
-
-        #play-loader.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .loader-box {
-            position: absolute;
-            bottom: 60px;
-            right: 60px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: #ffffff;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 4px;
-            font-size: 15px;
-        }
-
-        .white-magic-circle {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255,255,255,0.4);
-            border-top: 1px solid #ffffff;
-            border-radius: 50%;
-            position: relative;
-            animation: spinCircle 1.2s linear infinite;
-        }
-
-        .white-magic-circle::before {
-            content: '';
-            position: absolute;
-            top: 4px; left: 4px; right: 4px; bottom: 4px;
-            border: 1px dashed rgba(255,215,0,0.6);
-            transform: rotate(45deg);
-        }
-
-        @keyframes spinCircle {
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- 1. タイトル画面 (LULLABY) --- */
-        #title-screen {
-            background: radial-gradient(circle at 70% 30%, #1c1c30 0%, #0a0a12 60%, #030305 100%);
-            justify-content: flex-start;
-            align-items: flex-end;
-            padding: 8vh 10vw;
-        }
-
-        /* 立体的な雲 & 黄金の光線 */
-        .cloud-layer {
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            top: -10%;
-            left: -10%;
-            background: 
-                radial-gradient(ellipse at 50% 80%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 20% 90%, rgba(220, 230, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
-            filter: blur(40px);
-            z-index: 1;
-            animation: cloudFloat 25s ease-in-out infinite alternate;
-        }
-
-        @keyframes cloudFloat {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-15px) scale(1.03); }
-        }
-
-        .god-rays-container {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,215,0,0.06) 0%, transparent 40%, rgba(255,255,255,0.04) 60%, transparent 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .title-group {
-            position: relative;
-            z-index: 10;
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        h1.game-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 100;
-            font-size: clamp(3.5rem, 8vw, 7rem);
-            color: #ffffff;
-            letter-spacing: 1.2em;
-            margin-right: -1.2em; /* letter-spacing offset correction */
-            text-shadow: 0 0 25px rgba(255,255,255,0.7), 0 0 50px rgba(255,215,0,0.4);
-            transition: letter-spacing 1.6s cubic-bezier(0.16, 1, 0.3, 1), margin-right 1.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        h1.game-title.loaded {
-            letter-spacing: 0.4em;
-            margin-right: -0.4em;
-        }
-
-        .play-btn-wrapper {
-            margin-top: 35px;
-            opacity: 0;
-            transform: translateY(15px);
-            transition: opacity 1s ease 0.6s, transform 1s ease 0.6s;
-        }
-
-        .play-btn-wrapper.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .diamond-btn {
-            position: relative;
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            font-weight: 400;
-            letter-spacing: 0.3em;
-            padding: 16px 45px;
-            cursor: pointer;
-            clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(255,215,0,0.15);
-        }
-
-        .diamond-btn:hover {
-            background: var(--gold);
-            color: #030305;
-            box-shadow: 0 0 30px var(--gold);
-            transform: scale(1.04);
-        }
-
-        /* --- 宇宙画面 (Cosmos & RNG) --- */
-        #cosmos-screen {
-            background: radial-gradient(circle at center, #0e101a 0%, #030305 100%);
-        }
-
-        #cosmos-canvas {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
-        }
-
-        .hud-top {
-            position: absolute;
-            top: 25px; left: 35px; right: 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .hud-group {
-            display: flex;
-            gap: 15px;
-            pointer-events: auto;
-        }
-
-        .hud-panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            backdrop-filter: blur(10px);
-            font-family: 'Cinzel', serif;
-            font-size: 13px;
-            letter-spacing: 2px;
-            color: var(--platinum);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-        }
-
-        .hud-panel span {
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .side-transition-btn {
-            position: absolute;
-            top: 25px;
-            right: 35px;
-            z-index: 5;
-        }
-
-        .roll-container {
-            position: absolute;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .result-display {
-            font-family: 'Cinzel', serif;
-            font-size: 26px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--gold);
-            text-shadow: 0 0 15px var(--accent-glow);
-            min-height: 40px;
-        }
-
-        .roll-btn {
-            background: linear-gradient(135deg, #181824 0%, #09090e 100%);
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: 4px;
-            padding: 20px 60px;
-            cursor: pointer;
-            clip-path: polygon(15px 0%, calc(100% - 15px) 0%, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0% calc(100% - 15px), 0% 15px);
-            box-shadow: 0 0 25px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,215,0,0.1);
-            transition: all 0.2s ease;
-        }
-
-        .roll-btn:hover:not(:disabled) {
-            background: var(--gold);
-            color: #030305;
-            box-shadow: 0 0 35px var(--gold);
-            transform: translateY(-2px);
-        }
-
-        .roll-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: var(--text-muted);
-            color: var(--text-muted);
-        }
-
-        /* --- 4. RPGギルド世界 (Other Side) --- */
-        #rpg-screen {
-            background: radial-gradient(circle at center, #121016 0%, #050407 100%);
-        }
-
-        .rpg-container {
-            position: relative;
-            z-index: 5;
-            width: 85%;
-            max-width: 1050px;
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 35px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .rpg-header {
-            grid-column: span 3;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 5px;
-        }
-
-        .rpg-header h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 24px;
-            letter-spacing: 3px;
-            color: var(--gold);
-        }
-
-        .rpg-card {
-            background: rgba(16, 16, 26, 0.6);
-            border: 1px solid rgba(255,215,0,0.15);
-            padding: 22px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .rpg-card:hover {
-            border-color: var(--gold);
-            background: rgba(255,215,0,0.05);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(255,215,0,0.15);
-        }
-
-        .rpg-card h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            letter-spacing: 2px;
-            color: var(--platinum);
-        }
-
-        .rpg-card p {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* --- モーダル共通ウィンドウ --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 3, 5, 0.88);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal-box {
-            background: #080810;
-            border: 1px solid var(--gold);
-            width: 90%;
-            max-width: 800px;
-            max-height: 82vh;
-            overflow-y: auto;
-            padding: 35px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px; right: 25px;
-            background: transparent;
-            border: none;
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 18px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .modal-close:hover {
-            transform: scale(1.2);
-        }
-
-        /* 図鑑 (LIBRARY) */
-        .library-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            max-height: 50vh;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .aura-entry-card {
-            background: rgba(12, 12, 22, 0.7);
-            border: 1px solid rgba(255,215,0,0.2);
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .aura-entry-card:hover {
-            border-color: var(--gold);
-            background: rgba(255,215,0,0.06);
-        }
-
-        .aura-entry-card.locked {
-            opacity: 0.45;
-            border-style: dashed;
-        }
-
-        .aura-name {
-            font-family: 'Cinzel', serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gold);
-        }
-
-        .aura-prob {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* ミッション (MISSION) ポスターカルーセル */
-        .mission-carousel {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .poster-card {
-            background: #12100e;
-            border: 3px double #7a5c3a;
-            width: 100%;
-            max-width: 420px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            background-image: radial-gradient(circle, rgba(122,92,58,0.12) 0%, rgba(18,16,14,1) 90%);
-        }
-
-        .poster-title {
-            font-family: 'Cinzel', serif;
-            font-size: 20px;
-            letter-spacing: 3px;
-            color: #d4af37;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #7a5c3a;
-            padding-bottom: 8px;
-        }
-
-        .poster-sketch {
-            width: 110px; height: 130px;
-            border: 2px solid #4a3824;
-            margin: 0 auto 18px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #0a0907;
-            color: #7a5c3a;
-            font-family: monospace;
-            font-size: 10px;
-            letter-spacing: 1px;
-            text-align: center;
-            padding: 8px;
-        }
-
-        .poster-desc {
-            font-size: 12px;
-            color: #bfae96;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            min-height: 55px;
-        }
-
-        .carousel-arrow {
-            background: var(--panel-bg);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-size: 18px;
-            width: 40px; height: 40px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .carousel-arrow:hover {
-            background: var(--gold);
-            color: #030305;
-        }
-
-        /* ショップ (SHOP) ポーション10選 */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-            max-height: 52vh;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .shop-item-card {
-            background: rgba(12, 12, 22, 0.8);
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .shop-item-info h4 {
-            font-family: 'Cinzel', serif;
-            font-size: 14px;
-            color: var(--gold);
-            margin-bottom: 5px;
-        }
-
-        .shop-item-info p {
-            font-size: 11px;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        .shop-item-action {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid rgba(255,215,0,0.1);
-            padding-top: 10px;
-        }
-
-        .price-tag {
-            font-family: 'Cinzel', serif;
-            font-size: 12px;
-            color: var(--platinum);
-        }
-
-        .buy-btn {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 11px;
-            padding: 5px 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .buy-btn:hover {
-            background: var(--gold);
-            color: #030305;
-        }
-
-        /* クラフト & 装備 (CRAFT & FORGE) */
-        .craft-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            max-height: 55vh;
-            overflow-y: auto;
-        }
-
-        .recipe-list, .equipment-list-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .recipe-card, .equip-card {
-            background: rgba(12,12,22,0.7);
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .recipe-info h5, .equip-info h5 {
-            font-family: 'Cinzel', serif;
-            font-size: 13px;
-            color: var(--gold);
-        }
-
-        .recipe-info p, .equip-info p {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        /* --- 激アツ演出 (シネマティックオーバーレイ) --- */
-        #cinematic-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vw;
-            background: #000;
-            z-index: 999999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        #cinematic-overlay.active {
-            display: flex;
-        }
-
-        .glass-crack {
-            position: absolute;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.1s ease;
-        }
-
-        .glass-crack.active {
-            opacity: 1;
-            background-image: 
-                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.85) 49%, rgba(255,215,0,0.95) 50%, transparent 52%),
-                linear-gradient(-30deg, transparent 47%, rgba(255,255,255,0.75) 50%, transparent 53%),
-                linear-gradient(70deg, transparent 46%, rgba(255,255,255,0.9) 49%, transparent 51%);
-        }
-
-        .lightning-flash {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 3;
-        }
-
-        .lightning-flash.flash {
-            animation: flashAnim 0.3s ease;
-        }
-
-        @keyframes flashAnim {
-            0% { opacity: 0.95; }
-            100% { opacity: 0; }
-        }
-
-        .corona-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            box-shadow: inset 0 0 120px 60px rgba(255,215,0,0.85);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 4;
-            transition: opacity 1s ease;
-        }
-
-        .corona-overlay.active {
-            opacity: 1;
-        }
-
-        .cinematic-text {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2rem, 5vw, 4.5rem);
-            font-weight: 600;
-            letter-spacing: 0.4em;
-            color: #fff;
-            text-shadow: 0 0 25px var(--gold), 0 0 50px var(--gold);
-            z-index: 5;
-            transform: scale(2);
-            opacity: 0;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            text-align: center;
-        }
-
-        .cinematic-text.show {
-            transform: scale(1);
-            opacity: 1;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LULLABY</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@100;400;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================
+   1. CORE DESIGN (PURE BLACK & PLATINUM GOLD)
+========================================= */
+:root {
+    --bg-pure: #000000;
+    --gold: #ffd700;
+    --white: #ffffff;
+    --ease-ultra: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body, html { width: 100%; height: 100%; overflow: hidden; background: var(--bg-pure); color: var(--white); font-family: 'Cinzel', serif; }
+
+/* 共通 UI コンポーネント (座布団廃止・極細ひし形・平行四辺形) */
+.ui-panel {
+    background: var(--bg-pure);
+    border: 1px solid var(--gold);
+    clip-path: polygon(15px 0%, calc(100% - 15px) 0%, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0% calc(100% - 15px), 0% 15px);
+    padding: 20px;
+    box-shadow: inset 0 0 15px rgba(255,215,0,0.1);
+}
+.btn-diamond {
+    background: var(--bg-pure);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    padding: 12px 30px;
+    cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    transition: all 0.4s var(--ease-ultra);
+    position: relative;
+}
+.btn-diamond:hover:not(:disabled) {
+    background: var(--gold); color: var(--bg-pure); box-shadow: 0 0 20px var(--gold); transform: scale(1.05);
+}
+.btn-diamond:disabled { border-color: #333; color: #555; cursor: not-allowed; box-shadow: none; }
+
+/* 全画面コンテナ群 */
+.screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; transition: opacity 0.8s var(--ease-ultra); z-index: 10; display: flex; flex-direction: column;}
+.screen.active { opacity: 1; pointer-events: auto; }
+canvas#bg-canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+/* =========================================
+   2. TITLE SCREEN (LULLABY)
+========================================= */
+#title-screen {
+    background: radial-gradient(circle at 70% 30%, #1c1c30 0%, #0a0a12 60%, var(--bg-pure) 100%);
+    justify-content: flex-start; align-items: flex-end; padding: 12vh 8vw; z-index: 100;
+    flex-direction: row-reverse;
+}
+.cloud-layer {
+    position: absolute; bottom: -20%; left: -10%; width: 120%; height: 80%;
+    background: radial-gradient(ellipse at 50% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 60%); filter: blur(40px);
+    animation: cloudFloat 20s ease-in-out infinite alternate; pointer-events: none; z-index: 2;
+}
+.god-rays-container {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(20deg, rgba(255,215,0,0.08) 0%, transparent 30%);
+    mix-blend-mode: screen; z-index: 3; pointer-events: none;
+}
+.title-group { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: flex-end; }
+h1.game-title {
+    font-weight: 100; font-size: clamp(3rem, 6vw, 6rem); color: var(--white);
+    letter-spacing: 1.2em; margin-right: -1.2em; text-shadow: 0 0 25px rgba(255,255,255,0.7), 0 0 50px rgba(255,215,0,0.4);
+    transition: letter-spacing 1.8s var(--ease-ultra), margin-right 1.8s var(--ease-ultra);
+}
+h1.game-title.loaded { letter-spacing: 0.4em; margin-right: -0.4em; }
+#play-btn-wrapper { margin-top: 40px; opacity: 0; transform: translateY(20px); transition: all 1.2s var(--ease-ultra) 0.8s; }
+#play-btn-wrapper.active { opacity: 1; transform: translateY(0); }
+
+/* =========================================
+   3. COSMOS (GACHA) SCREEN
+========================================= */
+#cosmos-ui { z-index: 20; position: absolute; width: 100%; height: 100%; padding: 40px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+.cosmos-top, .cosmos-bottom { display: flex; justify-content: space-between; align-items: center; pointer-events: auto; }
+#roll-btn { font-size: 24px; padding: 20px 60px; clip-path: polygon(20px 0, 100% 0, calc(100% - 20px) 100%, 0 100%); }
+.corner-info { font-size: 14px; color: var(--gold); letter-spacing: 2px; }
+#result-display { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 25; pointer-events: none; }
+.aura-name { font-size: 48px; letter-spacing: 10px; opacity: 0; transition: opacity 0.5s var(--ease-ultra); text-transform: uppercase; }
+.aura-name.show { opacity: 1; }
+
+/* =========================================
+   4. CUTSCENE & TRANSITION OVERLAYS
+========================================= */
+#global-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; display: flex; justify-content: center; align-items: center; }
+
+/* 魔法陣ローディング */
+#magic-loader { position: absolute; bottom: 50px; right: 50px; display: flex; align-items: center; gap: 20px; opacity: 0; transition: opacity 1s; }
+#magic-loader.active { opacity: 1; }
+.white-magic-circle { width: 45px; height: 45px; border: 1px solid rgba(255,255,255,0.2); border-top: 2px solid #fff; border-bottom: 2px solid #fff; border-radius: 50%; position: relative; animation: spin 1.5s linear infinite; }
+.white-magic-circle::before { content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid var(--gold); transform: rotate(45deg); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 確率カウンター・カットシーン群 */
+#cutscene-container { position: absolute; width: 100%; height: 100%; opacity: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9000;}
+#prob-counter { font-size: 60px; font-weight: 100; letter-spacing: 5px; color: var(--white); text-shadow: 0 0 10px var(--white); opacity: 0; transform: scale(0.8); transition: all 0.2s; }
+#prob-counter.active { opacity: 1; transform: scale(1); }
+#glass-break { position: absolute; width: 100%; height: 100%; background: var(--white); opacity: 0; pointer-events: none; mix-blend-mode: difference;}
+.crack-line { position: absolute; background: var(--bg-pure); transform-origin: 50% 50%; }
+
+/* 最終結果ホログラムフレーム */
+#hologram-frame {
+    position: absolute; border: 1px solid var(--gold); padding: 40px 100px;
+    clip-path: polygon(30px 0, 100% 0, calc(100% - 30px) 100%, 0 100%);
+    opacity: 0; transform: scale(1.5) rotate(-2deg); transition: all 0.8s var(--ease-ultra);
+    box-shadow: inset 0 0 40px rgba(255,215,0,0.3), 0 0 50px rgba(255,215,0,0.5);
+    background: rgba(0,0,0,0.9);
+}
+#hologram-frame.show { opacity: 1; transform: scale(1) rotate(0deg); }
+#hologram-text { font-size: 50px; letter-spacing: 12px; text-shadow: 0 0 20px var(--gold); color: var(--gold); text-transform: uppercase; }
+
+/* 画面歪み・グリッチエフェクト（CSS分岐用） */
+.effect-monochrome { filter: grayscale(100%) contrast(200%) invert(100%); }
+.effect-glitch { animation: glitch 0.2s infinite; }
+.effect-neon-void { background: var(--gold) !important; color: var(--bg-pure) !important; mix-blend-mode: normal !important; }
+@keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-5px, 5px) } 40% { transform: translate(-5px, -5px) } 60% { transform: translate(5px, 5px) } 80% { transform: translate(5px, -5px) } 100% { transform: translate(0) } }
+
+/* =========================================
+   5. GUILD & SUB-SCREENS
+========================================= */
+.guild-nav { position: absolute; top: 40px; left: 40px; display: flex; gap: 20px; z-index: 30; pointer-events: auto;}
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 120px 40px 40px; overflow-y: auto; height: 100%; pointer-events: auto;}
+.item-card { border: 1px solid var(--gold); padding: 15px; text-align: center; cursor: pointer; transition: 0.3s var(--ease-ultra); clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.item-card:hover { background: rgba(255,215,0,0.1); transform: translateY(-5px); }
+.popup-ui { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); opacity: 0; pointer-events: none; z-index: 1000; width: 60%; height: 60%; transition: all 0.4s var(--ease-ultra); }
+.popup-ui.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+</style>
 </head>
 <body>
 
-<div id="app-container">
+<!-- Canvas for Stars & Particles -->
+<canvas id="bg-canvas"></canvas>
 
-    <!-- PLAY専用ローダー -->
-    <div id="play-loader">
-        <div class="loader-box">
-            <div class="white-magic-circle"></div>
-            <span>Loading...</span>
-        </div>
-    </div>
-
-    <!-- 1. タイトル画面 (LULLABY) -->
-    <div id="title-screen" class="screen active">
-        <div class="cloud-layer"></div>
-        <div class="god-rays-container"></div>
-        <div class="title-group">
-            <h1 class="game-title" id="main-game-title">LULLABY</h1>
-            <div class="play-btn-wrapper" id="play-btn-wrapper">
-                <button class="diamond-btn" onclick="clickPlayButton()">PLAY</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. メイン宇宙画面 (Cosmos & RNG) -->
-    <div id="cosmos-screen" class="screen">
-        <canvas id="cosmos-canvas"></canvas>
-        
-        <div class="hud-top">
-            <div class="hud-group">
-                <div class="hud-panel">COINS: <span id="hud-coins">500</span></div>
-                <div class="hud-panel">LUCK: <span id="hud-luck">1.0x</span></div>
-                <div class="hud-panel">EQUIP: <span id="hud-equip">None</span></div>
-            </div>
-            <div class="hud-group">
-                <button class="diamond-btn" style="padding: 8px 16px; font-size: 12px;" onclick="openModal('shop-modal')">SHOP</button>
-                <button class="diamond-btn" style="padding: 8px 16px; font-size: 12px;" onclick="openModal('craft-modal')">CRAFT</button>
-                <button class="diamond-btn" style="padding: 8px 16px; font-size: 12px;" onclick="openModal('mission-modal')">MISSION</button>
-            </div>
-        </div>
-
-        <button class="diamond-btn side-transition-btn" style="padding: 10px 20px; font-size: 12px;" onclick="transitionToOtherSide()">Go to Other Side</button>
-
-        <div class="roll-container">
-            <div class="result-display" id="result-display">Ready to Roll...</div>
-            <button class="roll-btn" id="roll-button" onclick="executeRoll()">ROLL</button>
-        </div>
-    </div>
-
-    <!-- 4. RPGギルド世界 (Other Side) -->
-    <div id="rpg-screen" class="screen">
-        <div class="rpg-container">
-            <div class="rpg-header">
-                <h2>GUILD SANCTUARY</h2>
-                <button class="diamond-btn" style="padding: 8px 18px; font-size: 12px;" onclick="transitionBackToCosmos()">Back to Cosmos</button>
-            </div>
-            <div class="rpg-card" onclick="openModal('library-modal')">
-                <h3>LIBRARY</h3>
-                <p>古代より伝わる全オーラの完全書庫。</p>
-            </div>
-            <div class="rpg-card" onclick="openModal('craft-modal')">
-                <h3>FORGE</h3>
-                <p>装備リストの確認とガントレット・ルーンの鍛造。</p>
-            </div>
-            <div class="rpg-card" onclick="openModal('mission-modal')">
-                <h3>BOUNTY BOARD</h3>
-                <p>手配書ポスターより討伐ミッションを受託。</p>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- 各種モーダル -->
-<div class="modal-overlay" id="library-modal">
-    <div class="modal-box">
-        <button class="modal-close" onclick="closeModal('library-modal')">✕</button>
-        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:10px;">LIBRARY (CODEX)</h2>
-        <div class="library-grid" id="library-grid-container"></div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="mission-modal">
-    <div class="modal-box" style="max-width: 550px; text-align: center;">
-        <button class="modal-close" onclick="closeModal('mission-modal')">✕</button>
-        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:15px;">BOUNTY MISSIONS</h2>
-        <div class="mission-carousel">
-            <button class="carousel-arrow" onclick="prevMission()">◀</button>
-            <div class="poster-card">
-                <div class="poster-title" id="poster-title">Mission Title</div>
-                <div class="poster-sketch" id="poster-sketch">[ 迷宮の怪影 ]</div>
-                <div class="poster-desc" id="poster-desc">詳細説明</div>
-                <button class="diamond-btn" style="font-size: 11px; padding: 8px 20px;" onclick="acceptCurrentMission()">ACCEPT</button>
-            </div>
-            <button class="carousel-arrow" onclick="nextMission()">▶</button>
+<!-- Title Screen -->
+<div id="title-screen" class="screen active">
+    <div class="cloud-layer"></div><div class="god-rays-container"></div>
+    <div class="title-group">
+        <h1 class="game-title" id="main-title">LULLABY</h1>
+        <div id="play-btn-wrapper">
+            <button class="btn-diamond" onclick="startGame()">PLAY</button>
         </div>
     </div>
 </div>
 
-<div class="modal-overlay" id="shop-modal">
-    <div class="modal-box">
-        <button class="modal-close" onclick="closeModal('shop-modal')">✕</button>
-        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:10px;">ALCHEMIST SHOP</h2>
-        <div class="shop-grid" id="shop-grid-container"></div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="craft-modal">
-    <div class="modal-box">
-        <button class="modal-close" onclick="closeModal('craft-modal')">✕</button>
-        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:10px;">FORGE & EQUIPMENT</h2>
-        <div class="craft-container">
-            <div>
-                <h3 style="font-family:'Cinzel'; font-size:13px; color:var(--platinum); margin-bottom:8px;">CRAFT RECIPES</h3>
-                <div class="recipe-list" id="recipe-list-container"></div>
-            </div>
-            <div>
-                <h3 style="font-family:'Cinzel'; font-size:13px; color:var(--platinum); margin-bottom:8px;">EQUIPMENT LIST</h3>
-                <div class="equipment-list-box" id="equipment-list-container"></div>
-            </div>
+<!-- Cosmos Screen -->
+<div id="cosmos-screen" class="screen">
+    <div id="cosmos-ui">
+        <div class="cosmos-top">
+            <div class="corner-info ui-panel">GOLD: <span id="gold-val">0</span></div>
+            <button class="btn-diamond" onclick="gotoLocation('guild-screen', true)">Go to Other Side</button>
+        </div>
+        <div class="cosmos-bottom">
+            <div class="corner-info ui-panel">BUFF: <span id="buff-val">NONE</span></div>
+            <button id="roll-btn" class="btn-diamond" onclick="rollGacha()">ROLL</button>
+            <div class="corner-info ui-panel">LUCK: <span id="luck-val">x1.0</span></div>
         </div>
     </div>
+    <div id="result-display">
+        <div id="aura-text" class="aura-name"></div>
+    </div>
 </div>
 
-<!-- シネマティック演出 -->
-<div id="cinematic-overlay">
-    <div class="lightning-flash" id="lightning-flash"></div>
-    <div class="glass-crack" id="glass-crack"></div>
-    <div class="corona-overlay" id="corona-overlay"></div>
-    <div class="cinematic-text" id="cinematic-text-display">AURA</div>
+<!-- Guild Screen -->
+<div id="guild-screen" class="screen">
+    <div class="guild-nav">
+        <button class="btn-diamond" onclick="gotoLocation('cosmos-screen', false)">Return to Cosmos</button>
+        <button class="btn-diamond" onclick="gotoLocation('shop-screen', false)">SHOP</button>
+        <button class="btn-diamond" onclick="gotoLocation('craft-screen', false)">CRAFT</button>
+        <button class="btn-diamond" onclick="gotoLocation('mission-screen', false)">MISSION</button>
+        <button class="btn-diamond" onclick="gotoLocation('library-screen', false)">LIBRARY</button>
+    </div>
+    <div style="position: absolute; bottom: 40px; right: 40px;" class="corner-info ui-panel">GUILD ALLEY</div>
+</div>
+
+<!-- Shop Screen -->
+<div id="shop-screen" class="screen">
+    <div class="guild-nav"><button class="btn-diamond" onclick="gotoLocation('guild-screen', false)">Back</button><div class="corner-info ui-panel" style="margin-left:20px;">SHOP (10 Potions)</div></div>
+    <div class="grid-container" id="shop-grid"></div>
+</div>
+
+<!-- Craft Screen -->
+<div id="craft-screen" class="screen">
+    <div class="guild-nav"><button class="btn-diamond" onclick="gotoLocation('guild-screen', false)">Back</button><div class="corner-info ui-panel" style="margin-left:20px;">CRAFT (Gauntlet & Rune)</div></div>
+    <div class="grid-container" id="craft-grid">
+        <div class="item-card ui-panel" onclick="equipItem('gauntlet', 'Iron Gauntlet')">Iron Gauntlet (Slot 1)</div>
+        <div class="item-card ui-panel" onclick="equipItem('rune', 'Fire Rune')">Fire Rune (Slot 2)</div>
+    </div>
+    <div style="position:absolute; bottom:40px; left:40px;" class="corner-info ui-panel">EQUIP: <span id="eq-gauntlet">None</span> | <span id="eq-rune">None</span></div>
+</div>
+
+<!-- Mission Screen -->
+<div id="mission-screen" class="screen">
+    <div class="guild-nav"><button class="btn-diamond" onclick="gotoLocation('guild-screen', false)">Back</button><div class="corner-info ui-panel" style="margin-left:20px;">MISSION</div></div>
+    <div class="grid-container"><div class="item-card ui-panel">Bounty: Goblin King</div></div>
+</div>
+
+<!-- Library Screen -->
+<div id="library-screen" class="screen">
+    <div class="guild-nav"><button class="btn-diamond" onclick="gotoLocation('guild-screen', false)">Back</button><div class="corner-info ui-panel" style="margin-left:20px;">LIBRARY (Codex)</div></div>
+    <div class="grid-container" id="library-grid"></div>
+</div>
+
+<!-- Popup UI for Library -->
+<div id="library-popup" class="ui-panel popup-ui">
+    <h2 id="popup-title" style="color:var(--gold); margin-bottom: 20px;">TITLE</h2>
+    <p id="popup-desc" style="margin-bottom: 40px; font-size:14px; letter-spacing:1px;"></p>
+    <button class="btn-diamond" id="btn-see-cutscene">SEE CUTSCENE</button>
+    <button class="btn-diamond" onclick="closePopups()">CLOSE</button>
+</div>
+
+<!-- Global Overlays -->
+<div id="global-overlay">
+    <div id="magic-loader">
+        <div class="white-magic-circle"></div><span style="letter-spacing:4px; font-size:14px;">Loading...</span>
+    </div>
+    <div id="cutscene-container">
+        <div id="prob-counter">1 / 0</div>
+        <div id="hologram-frame"><div id="hologram-text"></div></div>
+    </div>
+    <div id="glass-break"></div>
 </div>
 
 <script>
-    // --- 音響エンジン (Web Audio API) ---
-    let audioCtx = null;
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-    }
+/** =========================================================================
+ *  DATABASE: 51 Auras / Items 
+ *  (Rarity scales exponentially. 22~51 trigger Cutscenes)
+ *======================================================================== */
+const AURA_DATA = [];
+const rarityNames = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Divine", "Transcendent", "Absolute"];
+for(let i=1; i<=51; i++) {
+    let name = i === 51 ? "memorial overreached" : `Aura Fragment #${i}`;
+    let baseProb = Math.floor(Math.pow(1.3, i) * 10); // 10 to ~5,000,000,000
+    let isCutscene = i >= 22;
+    AURA_DATA.push({ id: i, name: name, prob: baseProb, isCutscene: isCutscene });
+}
 
-    function playBeep(freq = 440, duration = 0.08) {
-        initAudio();
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + duration);
-    }
-
-    function playChurchBell() {
-        initAudio();
-        const now = audioCtx.currentTime;
-        [220, 440, 660, 880].forEach((freq, idx) => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, now);
-            gain.gain.setValueAtTime(0.15 / (idx + 1), now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 3.0);
-        });
-    }
-
-    function playMemorialOrgan() {
-        initAudio();
-        const now = audioCtx.currentTime;
-        [130.81, 196.00, 261.63, 329.63, 392.00, 523.25].forEach((freq, i) => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = i % 2 === 0 ? 'sawtooth' : 'square';
-            osc.frequency.setValueAtTime(freq, now);
-            gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.linearRampToValueAtTime(0.08, now + 0.4);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 4.5);
-        });
-    }
-
-    // --- 51個のオーラ完全定義 (確率・累積重み付け対応) ---
-    const AURAS = [
-        { id: 1, name: "Common", prob: 2, desc: "どこにでもある最も一般的なオーラ。" },
-        { id: 2, name: "Uncommon", prob: 5, desc: "わずかに輝きを増したオーラ。" },
-        { id: 3, name: "Good", prob: 12, desc: "爽やかな風を纏うオーラ。" },
-        { id: 4, name: "Natural", prob: 30, desc: "大自然の息吹を感じさせるオーラ。" },
-        { id: 5, name: "Bizarre", prob: 70, desc: "奇妙な歪みを持つオーラ。" },
-        { id: 6, name: "Rage", prob: 150, desc: "闘争心を焚き付ける赤きオーラ。" },
-        { id: 7, name: "Cursed", prob: 320, desc: "禍々しい呪いのオーラ。" },
-        { id: 8, name: "Glitch", prob: 700, desc: "空間のバグを内包するオーラ。" },
-        { id: 9, name: "Starlight", prob: 1500, desc: "夜空の星屑を散りばめたオーラ。" },
-        { id: 10, name: "Galaxy", prob: 3500, desc: "銀河系の広がりを宿すオーラ。" },
-        { id: 11, name: "Void", prob: 8000, desc: "すべてを飲み込む虚無のオーラ。" },
-        { id: 12, name: "Solar", prob: 18000, desc: "太陽の強烈な熱量を放つオーラ。" },
-        { id: 13, name: "Lunar", prob: 40000, desc: "神秘的な月光を放つオーラ。" },
-        { id: 14, name: "Eclipse", prob: 90000, desc: "日食の瞬間を捉えた神秘のオーラ。" },
-        { id: 15, name: "Supernova", prob: 200000, desc: "超新星爆発の残光オーラ。" },
-        { id: 16, name: "Genesis", prob: 450000, desc: "創世の光を宿す美しいオーラ。" },
-        { id: 17, name: "Infinity", prob: 1000000, desc: "無限の可能性を示すオーラ。" },
-        { id: 18, name: "Aether", prob: 2200000, desc: "高次元エーテル層のオーラ。" },
-        { id: 19, name: "Quantum", prob: 5000000, desc: "量子の揺らぎを可視化したオーラ。" },
-        { id: 20, name: "Dimension", prob: 11000000, desc: "異次元の扉を開くオーラ。" },
-        { id: 21, name: "Chronos", prob: 24000000, desc: "時間を司る神聖なオーラ。" },
-        { id: 22, name: "Valhalla", prob: 50000000, desc: "戦乙女に導かれし神域のオーラ。" },
-        { id: 23, name: "Archangel", prob: 100000000, desc: "大天使の純白のオーラ。" },
-        { id: 24, name: "Seraphim", prob: 180000000, desc: "熾天使の燃え盛る聖炎。" },
-        { id: 25, name: "Abyssal", prob: 300000000, desc: "深淵の漆黒の波動。" },
-        { id: 26, name: "Celestial", prob: 500000000, desc: "天体の調和を奏でるオーラ。" },
-        { id: 27, name: "Pandora", prob: 800000000, desc: "禁断の災厄オーラ。" },
-        { id: 28, name: "Nirvana", prob: 1200000000, desc: "解脱の境地に至った至高の光。" },
-        { id: 29, name: "Valiant", prob: 1800000000, desc: "英雄の魂を纏うオーラ。" },
-        { id: 30, name: "Equinox", prob: 2500000000, desc: "昼夜の均衡を保つ神秘。" },
-        { id: 31, name: "Sovereign", prob: 3500000000, desc: "絶対的王者の威厳。" },
-        { id: 32, name: "Eternity", prob: 5000000000, desc: "永遠の黄金オーラ。" },
-        { id: 33, name: "Genesis-Omega", prob: 7000000000, desc: "始まりと終わりを司る。" },
-        { id: 34, name: "Overlord", prob: 10000000000, desc: "魔王の圧倒的威圧感。" },
-        { id: 35, name: "Stellar-Gate", prob: 15000000000, desc: "星間航路の光の渦。" },
-        { id: 36, name: "Nebula-X", prob: 22000000000, desc: "高エネルギー星雲オーラ。" },
-        { id: 37, name: "Astral-King", prob: 32000000000, desc: "星霊王の宿るオーラ。" },
-        { id: 38, name: "Divine-Wrath", prob: 45000000000, desc: "神罰の雷光オーラ。" },
-        { id: 39, name: "Holiness", prob: 65000000000, desc: "聖域の加護を受けた極上の光。" },
-        { id: 40, name: "Paradox", prob: 90000000000, desc: "存在が矛盾する量子オーラ。" },
-        { id: 41, name: "Zenith", prob: 130000000000, desc: "天頂に君臨する最高峰。" },
-        { id: 42, name: "Apocalypse", prob: 180000000000, desc: "終末のカタストロフィ。" },
-        { id: 43, name: "Genesis-Prime", prob: 250000000000, desc: "第一因の根源オーラ。" },
-        { id: 44, name: "Omnipotent", prob: 350000000000, desc: "全知全能の絶対的オーラ。" },
-        { id: 45, name: "Singularity", prob: 500000000000, desc: "ブラックホール中核。" },
-        { id: 46, name: "Cosmic-Reign", prob: 700000000000, desc: "宇宙を統治するオーラ。" },
-        { id: 47, name: "Astral-Titan", prob: 1000000000000, desc: "星界を支える巨神の波動。" },
-        { id: 48, name: "Infinite-Void", prob: 1500000000000, desc: "無限虚無の静寂オーラ。" },
-        { id: 49, name: "Celestial-Emperor", prob: 2200000000000, desc: "天帝の至高光彩。" },
-        { id: 50, name: "Transcendence", prob: 3500000000000, desc: "次元壁を超越した覚醒オーラ。" },
-        { id: 51, name: "memorial overreached", prob: 5055492104000, desc: "宇宙消滅後に訪れる究極の全画面侵食。" }
-    ];
-
-    // 累積確率用にソート
-    AURAS.sort((a, b) => a.prob - b.prob);
-
-    // 17種のクラフトレシピ
-    const RECIPES = [
-        { id: 'g1', type: 'gauntlet', name: "Iron Gauntlet", mat: "Common x10", mult: 1.1 },
-        { id: 'g2', type: 'gauntlet', name: "Silver Gauntlet", mat: "Uncommon x10", mult: 1.2 },
-        { id: 'g3', type: 'gauntlet', name: "Gold Gauntlet", mat: "Good x10", mult: 1.3 },
-        { id: 'g4', type: 'gauntlet', name: "Platinum Gauntlet", mat: "Natural x10", mult: 1.4 },
-        { id: 'g5', type: 'gauntlet', name: "Solar Gauntlet", mat: "Solar x5", mult: 1.6 },
-        { id: 'g6', type: 'gauntlet', name: "Lunar Gauntlet", mat: "Lunar x5", mult: 1.6 },
-        { id: 'g7', type: 'gauntlet', name: "Void Gauntlet", mat: "Void x3", mult: 2.0 },
-        { id: 'g8', type: 'gauntlet', name: "Celestial Gauntlet", mat: "Celestial x2", mult: 2.5 },
-        { id: 'r1', type: 'rune', name: "Minor Rune", mat: "Bizarre x5", mult: 1.15 },
-        { id: 'r2', type: 'rune', name: "Adept Rune", mat: "Rage x5", mult: 1.25 },
-        { id: 'r3', type: 'rune', name: "Cursed Rune", mat: "Cursed x3", mult: 1.4 },
-        { id: 'r4', type: 'rune', name: "Starlight Rune", mat: "Starlight x3", mult: 1.5 },
-        { id: 'r5', type: 'rune', name: "Galaxy Rune", mat: "Galaxy x2", mult: 1.7 },
-        { id: 'r6', type: 'rune', name: "Quantum Rune", mat: "Quantum x2", mult: 2.2 },
-        { id: 'r7', type: 'rune', name: "Chronos Rune", mat: "Chronos x1", mult: 2.8 },
-        { id: 'r8', type: 'rune', name: "Archangel Rune", mat: "Archangel x1", mult: 3.5 },
-        { id: 'r9', type: 'rune', name: "Memorial Rune", mat: "memorial overreached x1", mult: 10.0 }
-    ];
-
-    // ショップポーション10選
-    const SHOP_POTIONS = [
-        { id: 'p1', name: "Speed Potion", desc: "ルーレットの回転テンポを加速。", price: 100, effect: 'speed' },
-        { id: 'p2', name: "Fortune Potion", desc: "一時的に運気が1.5倍に上昇。", price: 250, effect: 'luck1.5' },
-        { id: 'p3', name: "Heavenly Potion", desc: "高レア確率が上昇する神聖な薬。", price: 1000, effect: 'luck3.0' },
-        { id: 'p4', name: "Cosmic Elixir", desc: "宇宙波動と同調しLuck+5.0倍。", price: 5000, effect: 'luck5.0' },
-        { id: 'p5', name: "Abyssal Brew", desc: "深淵の力でレアを引き寄せる。", price: 12000, effect: 'luck8.0' },
-        { id: 'p6', name: "Starlight Tonic", desc: "星屑の加護を得るポーション。", price: 25000, effect: 'luck12.0' },
-        { id: 'p7', name: "Chronos Sand", desc: "時間を操り試行回数を増加。", price: 50000, effect: 'speed2' },
-        { id: 'p8', name: "Aether Droplet", desc: "高次元エーテルを抽出した秘薬。", price: 100000, effect: 'luck20.0' },
-        { id: 'p9', name: "Divine Nectar", desc: "神々の愛飲する究極の不老酒。", price: 250000, effect: 'luck50.0' },
-        { id: 'p10', name: "Memorial Tears", desc: "終焉の涙。ステータスが限界突破。", price: 1000000, effect: 'luck100.0' }
-    ];
-
-    // ミッション一覧
-    const MISSIONS = [
-        { id: 'm1', title: "失われた星屑の回収", sketch: "[ SKETCH: #01 ]\n迷宮の奥深くにある星屑を採取せよ。", desc: "指定されたエリアを探索し、失われた星屑を集める古からの依頼。" },
-        { id: 'm2', title: "深淵の魔獣討伐", sketch: "[ SKETCH: #02 ]\n漆黒の洞窟に潜む怪影を排除せよ。", desc: "ギルドの安全を脅かす魔獣を討伐し、平穏を取り戻す手配書。" },
-        { id: 'm3', title: "天界の門番との接触", sketch: "[ SKETCH: #03 ]\n高次元領域への扉を開く鍵を探せ。", desc: "神域への到達を目指す者へ下された試練のミッション。" }
-    ];
-
-    let gameState = {
-        coins: 500,
-        luckMultiplier: 1.0,
-        equippedGauntlet: null,
-        equippedRune: null,
-        unlockedAuras: {},
-        craftedItems: {}
+// 30 distinct cutscene flavors logic
+function getCutsceneFlavor(id) {
+    if(id < 22) return { effect: '', pColor: '#ffd700' };
+    if(id === 51) return { effect: 'effect-neon-void', pColor: '#000000', special: 'organ' };
+    
+    // Procedurally generate 29 flavors for 22-50
+    const flavors = ['effect-monochrome', 'effect-glitch', ''];
+    const pColors = ['#ffd700', '#ffffff', '#ff3333', '#33aaff', '#cc33ff'];
+    return {
+        effect: flavors[id % flavors.length],
+        pColor: pColors[id % pColors.length]
     };
+}
 
-    let currentMissionIndex = 0;
+/** =========================================================================
+ *  AUDIO SYSTEM (Web Audio API)
+ *======================================================================== */
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx = new AudioContext();
 
-    // --- 初期化 ---
-    window.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            document.getElementById('main-game-title').classList.add('loaded');
-            document.getElementById('play-btn-wrapper').classList.add('active');
-        }, 200);
+function playTone(freq, type, duration, vol=0.1) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
 
-        initCosmosCanvas();
-        buildLibraryUI();
-        buildShopUI();
-        buildCraftUI();
-        updateMissionUI();
-    });
+function playEquipSound() { playTone(800, 'square', 0.1, 0.05); setTimeout(()=>playTone(1200, 'square', 0.2, 0.05), 50); }
+function playGlassBreak() { playTone(200, 'sawtooth', 0.5, 0.3); playTone(8000, 'square', 0.2, 0.2); }
+function playHeartbeat() { playTone(50, 'sine', 0.3, 0.5); setTimeout(()=>playTone(60, 'sine', 0.4, 0.5), 200); }
+function playPipeOrgan() { // For #51
+    const chord = [261.63, 329.63, 392.00, 523.25]; // C E G C
+    chord.forEach(f => { playTone(f, 'sawtooth', 4.0, 0.2); playTone(f*2, 'sine', 4.0, 0.1); });
+}
 
-    // --- 画面遷移コントロール ---
-    function switchScreen(screenId) {
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
+/** =========================================================================
+ *  CANVAS PARTICLES & BG ENGINE
+ *======================================================================== */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let cw, ch;
+let particles = [];
+let isTimeStopped = false;
+let animFrame;
+
+function resize() { cw = canvas.width = window.innerWidth; ch = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+
+class Particle {
+    constructor(x, y, isBurst=false, pColor='#fff') {
+        this.x = x || Math.random()*cw; this.y = y || Math.random()*ch;
+        this.z = Math.random()*cw; 
+        this.color = pColor;
+        this.vx = isBurst ? (Math.random()-0.5)*20 : 0;
+        this.vy = isBurst ? (Math.random()-0.5)*20 : 0;
+        this.isBurst = isBurst;
+        this.life = 1.0;
     }
+    update() {
+        if(isTimeStopped) return;
+        if(this.isBurst) {
+            this.x += this.vx; this.y += this.vy;
+            this.vx *= 0.95; this.vy *= 0.95; // friction
+            this.life -= 0.01;
+        } else {
+            this.z -= 2; if(this.z <= 0) { this.z = cw; this.x = Math.random()*cw; this.y = Math.random()*ch; }
+        }
+    }
+    draw() {
+        if(this.life <= 0) return;
+        ctx.fillStyle = this.color;
+        if(this.isBurst) {
+            ctx.globalAlpha = this.life;
+            ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1.0;
+        } else {
+            let sx = (this.x - cw/2) * (cw/this.z) + cw/2;
+            let sy = (this.y - ch/2) * (cw/this.z) + ch/2;
+            let r = (1 - this.z/cw) * 2;
+            ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
+        }
+    }
+}
+for(let i=0; i<400; i++) particles.push(new Particle());
 
-    // PLAYボタンクリック時の純白魔法陣ローディング
-    function clickPlayButton() {
-        initAudio();
-        const loader = document.getElementById('play-loader');
-        loader.classList.add('active');
+function loop() {
+    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0, 0, cw, ch);
+    particles.forEach(p => { p.update(); p.draw(); });
+    animFrame = requestAnimationFrame(loop);
+}
+loop();
+
+function triggerImplosion(pColor) {
+    // Blast
+    particles = [];
+    for(let i=0; i<2000; i++) particles.push(new Particle(cw/2, ch/2, true, pColor));
+    
+    // Suck in after 1s
+    setTimeout(() => {
+        particles.forEach(p => {
+            p.vx = (cw/2 - p.x) * 0.1;
+            p.vy = (ch/2 - p.y) * 0.1;
+        });
+    }, 1000);
+}
+
+/** =========================================================================
+ *  GAME STATE & LOGIC
+ *======================================================================== */
+let luckMult = 1.0;
+let isRolling = false;
+let equipSlots = { gauntlet: null, rune: null };
+
+function startGame() {
+    document.getElementById('title-screen').style.opacity = '0';
+    document.getElementById('magic-loader').classList.add('active');
+    setTimeout(() => {
+        document.getElementById('title-screen').classList.remove('active');
+        document.getElementById('magic-loader').classList.remove('active');
+        document.getElementById('cosmos-screen').classList.add('active');
+        document.getElementById('main-title').classList.add('loaded'); // Animation setup
+    }, 3000);
+}
+
+// 画面遷移と確実なUIクリーンアップ
+function gotoLocation(targetId, useMagicCircle) {
+    closePopups(); // 強制クリーンアップ
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    
+    if(useMagicCircle) {
+        document.getElementById('magic-loader').classList.add('active');
+        document.getElementById('cosmos-screen').style.opacity = '0';
         setTimeout(() => {
-            switchScreen('cosmos-screen');
-            setTimeout(() => {
-                loader.classList.remove('active');
-            }, 400);
+            document.getElementById('magic-loader').classList.remove('active');
+            document.getElementById(targetId).classList.add('active');
+            document.getElementById('cosmos-screen').style.opacity = '';
         }, 3000);
+    } else {
+        // Normal fast transition
+        document.getElementById('bg-canvas').style.transition = 'transform 0.5s';
+        document.getElementById('bg-canvas').style.transform = 'scale(0.1)';
+        setTimeout(() => {
+            document.getElementById('bg-canvas').style.transform = 'scale(1)';
+            document.getElementById(targetId).classList.add('active');
+        }, 500);
+    }
+}
+
+function closePopups() {
+    document.querySelectorAll('.popup-ui').forEach(p => p.classList.remove('active'));
+}
+
+function equipItem(slot, name) {
+    equipSlots[slot] = name;
+    document.getElementById(`eq-${slot}`).innerText = name;
+    playEquipSound();
+}
+
+/** =========================================================================
+ *  GACHA & CUTSCENE LOGIC (The Core Requirement)
+ *======================================================================== */
+function rollGacha() {
+    if(isRolling) return;
+    isRolling = true;
+    document.getElementById('roll-btn').disabled = true;
+
+    // Weighted Random
+    let totalWeight = AURA_DATA.reduce((sum, item) => sum + (1 / (item.prob / luckMult)), 0);
+    let rand = Math.random() * totalWeight;
+    let selected = AURA_DATA[0];
+    for(let item of AURA_DATA) {
+        rand -= (1 / (item.prob / luckMult));
+        if(rand <= 0) { selected = item; break; }
     }
 
-    // Other Side (RPG) への転送
-    function transitionToOtherSide() {
-        initAudio();
-        playChurchBell();
-        const loader = document.getElementById('play-loader');
-        loader.classList.add('active');
+    if(selected.isCutscene) {
+        executeCutscene(selected);
+    } else {
+        // Normal fast display
+        let txt = document.getElementById('aura-text');
+        txt.innerText = selected.name;
+        txt.classList.add('show');
+        playTone(600, 'sine', 0.2);
         setTimeout(() => {
-            switchScreen('rpg-screen');
-            setTimeout(() => {
-                loader.classList.remove('active');
-            }, 400);
-        }, 3000);
-    }
-
-    function transitionBackToCosmos() {
-        initAudio();
-        const loader = document.getElementById('play-loader');
-        loader.classList.add('active');
-        setTimeout(() => {
-            switchScreen('cosmos-screen');
-            setTimeout(() => {
-                loader.classList.remove('active');
-            }, 400);
+            txt.classList.remove('show');
+            isRolling = false;
+            document.getElementById('roll-btn').disabled = false;
         }, 1500);
     }
+}
 
-    function openModal(modalId) {
-        initAudio();
-        document.getElementById(modalId).classList.add('active');
-    }
+function executeCutscene(item) {
+    const flavor = getCutsceneFlavor(item.id);
+    const container = document.getElementById('cutscene-container');
+    const counter = document.getElementById('prob-counter');
+    const glass = document.getElementById('glass-break');
+    const holoFrame = document.getElementById('hologram-frame');
+    const holoText = document.getElementById('hologram-text');
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('active');
-    }
+    // 1. 世界静止と完全な静寂
+    isTimeStopped = true;
+    playHeartbeat();
+    container.style.opacity = '1';
+    
+    // 2. 爆速確率カウントアップ
+    counter.classList.add('active');
+    let targetProb = item.prob;
+    let currentProb = 0;
+    let duration = 2000;
+    let startTime = performance.now();
 
-    // --- 宇宙空間背景 Canvas ---
-    function initCosmosCanvas() {
-        const canvas = document.getElementById('cosmos-canvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
-        const stars = Array.from({ length: 180 }, () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            size: Math.random() * 1.8,
-            speed: Math.random() * 0.4 + 0.1
-        }));
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = '#ffffff';
-            stars.forEach(star => {
-                ctx.globalAlpha = Math.random() * 0.7 + 0.3;
-                ctx.fillRect(star.x, star.y, star.size, star.size);
-                star.y += star.speed;
-                if (star.y > height) star.y = 0;
-            });
-            requestAnimationFrame(animate);
-        }
-        animate();
-    }
-
-    // --- ガチャ抽選ロジック (累積重み付け・低確率厳密適用) ---
-    function executeRoll() {
-        initAudio();
-        const rollBtn = document.getElementById('roll-button');
-        const resultDisplay = document.getElementById('result-display');
-        rollBtn.disabled = true;
-
-        let counter = 0;
-        const maxCount = 18;
-        const intervalTime = 70; // テンポ良くスラスラ動く速度
-
-        const interval = setInterval(() => {
-            const randomAura = AURAS[Math.floor(Math.random() * AURAS.length)];
-            resultDisplay.textContent = randomAura.name;
-            playBeep(300 + counter * 20, 0.05);
-            counter++;
-
-            if (counter >= maxCount) {
-                clearInterval(interval);
-                determineFinalResult();
-            }
-        }, intervalTime);
-    }
-
-    function determineFinalResult() {
-        // 合計確率の基準値に対して装備倍率を反映
-        const maxProb = AURAS[AURAS.length - 1].prob;
-        const rand = Math.random() * maxProb / gameState.luckMultiplier;
-        let selectedAura = AURAS[0];
-
-        for (let i = AURAS.length - 1; i >= 0; i--) {
-            if (rand <= AURAS[i].prob) {
-                selectedAura = AURAS[i];
-            }
-        }
-
-        const resultDisplay = document.getElementById('result-display');
-        resultDisplay.textContent = `${selectedAura.name} (1 / ${selectedAura.prob.toLocaleString()})`;
-
-        gameState.unlockedAuras[selectedAura.id] = true;
-        gameState.coins += Math.floor(selectedAura.prob / 100000000) + 15;
-        document.getElementById('hud-coins').textContent = gameState.coins.toLocaleString();
-
-        // 10万以上のレア（または51番）でシネマティック演出発動
-        if (selectedAura.prob >= 100000 || selectedAura.id === 51) {
-            playCinematicEffect(selectedAura);
-        } else {
-            document.getElementById('roll-button').disabled = false;
-        }
-    }
-
-    // --- シネマティック演出 (10万〜50兆の演出) ---
-    function playCinematicEffect(aura) {
-        const overlay = document.getElementById('cinematic-overlay');
-        const crack = document.getElementById('glass-crack');
-        const flash = document.getElementById('lightning-flash');
-        const textDisplay = document.getElementById('cinematic-text-display');
-        const corona = document.getElementById('corona-overlay');
-
-        overlay.classList.add('active');
-        textDisplay.textContent = aura.name;
-
-        if (aura.id === 51) {
-            corona.classList.add('active');
-            playMemorialOrgan();
-        } else {
-            playChurchBell();
-        }
-
-        setTimeout(() => {
-            crack.classList.add('active');
-            flash.classList.add('flash');
-        }, 900);
-
-        setTimeout(() => {
-            textDisplay.classList.add('show');
-        }, 1300);
-
-        setTimeout(() => {
-            overlay.classList.remove('active');
-            crack.classList.remove('active');
-            flash.classList.remove('flash');
-            corona.classList.remove('active');
-            textDisplay.classList.remove('show');
-            document.getElementById('roll-button').disabled = false;
-        }, 4200);
-    }
-
-    // --- 図鑑 (LIBRARY) ---
-    function buildLibraryUI() {
-        const container = document.getElementById('library-grid-container');
-        container.innerHTML = '';
-        AURAS.forEach(aura => {
-            const isUnlocked = gameState.unlockedAuras[aura.id];
-            const card = document.createElement('div');
-            card.className = `aura-entry-card ${isUnlocked ? '' : 'locked'}`;
-            card.innerHTML = `
-                <div class="aura-name">${isUnlocked ? aura.name : '🔒 ???'}</div>
-                <div class="aura-prob">1 / ${aura.prob.toLocaleString()}</div>
-            `;
-            if (isUnlocked) {
-                card.onclick = () => playCinematicEffect(aura);
-            }
-            container.appendChild(card);
-        });
-    }
-
-    // --- ミッション ---
-    function updateMissionUI() {
-        const m = MISSIONS[currentMissionIndex];
-        document.getElementById('poster-title').textContent = m.title;
-        document.getElementById('poster-sketch').textContent = m.sketch;
-        document.getElementById('poster-desc').textContent = m.desc;
-    }
-
-    function nextMission() {
-        initAudio();
-        currentMissionIndex = (currentMissionIndex + 1) % MISSIONS.length;
-        updateMissionUI();
-    }
-
-    function prevMission() {
-        initAudio();
-        currentMissionIndex = (currentMissionIndex - 1 + MISSIONS.length) % MISSIONS.length;
-        updateMissionUI();
-    }
-
-    function acceptCurrentMission() {
-        initAudio();
-        alert('ミッションを受託しました。報酬を目指して探索を続けてください。');
-        closeModal('mission-modal');
-    }
-
-    // --- ショップポーション10選 ---
-    function buildShopUI() {
-        const container = document.getElementById('shop-grid-container');
-        container.innerHTML = '';
-        SHOP_POTIONS.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'shop-item-card';
-            card.innerHTML = `
-                <div class="shop-item-info">
-                    <h4>${p.name}</h4>
-                    <p>${p.desc}</p>
-                </div>
-                <div class="shop-item-action">
-                    <span class="price-tag">${p.price.toLocaleString()} Coins</span>
-                    <button class="buy-btn" onclick="buyPotion('${p.effect}', ${p.price})">BUY</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function buyPotion(effect, price) {
-        initAudio();
-        if (gameState.coins >= price) {
-            gameState.coins -= price;
-            document.getElementById('hud-coins').textContent = gameState.coins.toLocaleString();
-            if (effect.startsWith('luck')) {
-                const mult = parseFloat(effect.replace('luck', ''));
-                gameState.luckMultiplier = mult;
-                document.getElementById('hud-luck').textContent = `${mult}x`;
-            }
-            alert('ポーションを購入し、効果が適用されました！');
-        } else {
-            alert('コインが不足しています。');
-        }
-    }
-
-    // --- クラフト & 装備管理 (独立重複なし・最大2個) ---
-    function buildCraftUI() {
-        const recipeContainer = document.getElementById('recipe-list-container');
-        const equipContainer = document.getElementById('equipment-list-container');
-        recipeContainer.innerHTML = '';
-        equipContainer.innerHTML = '';
-
-        RECIPES.forEach(r => {
-            const card = document.createElement('div');
-            card.className = 'recipe-card';
-            card.innerHTML = `
-                <div class="recipe-info">
-                    <h5>${r.name}</h5>
-                    <p>材料: ${r.mat} (倍率: +${r.mult}x)</p>
-                </div>
-                <button class="buy-btn" onclick="craftItem('${r.id}')">CRAFT</button>
-            `;
-            recipeContainer.appendChild(card);
-        });
-
-        // 独立重複なし装備スロット (ガントレット1、ルーン1)
-        ['gauntlet', 'rune'].forEach(type => {
-            const card = document.createElement('div');
-            card.className = 'equip-card';
-            const currentEquipped = type === 'gauntlet' ? gameState.equippedGauntlet : gameState.equippedRune;
-            card.innerHTML = `
-                <div class="equip-info">
-                    <h5>${type.toUpperCase()} SLOT</h5>
-                    <p>${currentEquipped ? currentEquipped.name : '未装備'}</p>
-                </div>
-                ${currentEquipped ? `<button class="buy-btn" onclick="unequipItem('${type}')">UNEQUIP</button>` : ''}
-            `;
-            equipContainer.appendChild(card);
-        });
-    }
-
-    function craftItem(recipeId) {
-        initAudio();
-        const recipe = RECIPES.find(r => r.id === recipeId);
-        gameState.craftedItems[recipeId] = recipe;
+    function updateCounter(time) {
+        let elapsed = time - startTime;
+        let progress = Math.min(elapsed / duration, 1);
+        // Exponential ease
+        let ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        currentProb = Math.floor(ease * targetProb);
+        counter.innerText = `1 / ${currentProb.toLocaleString()}`;
         
-        // 自動装備ロジック（ガントレットかルーンか）
-        if (recipe.type === 'gauntlet') {
-            gameState.equippedGauntlet = recipe;
+        if(progress < 1) {
+            requestAnimationFrame(updateCounter);
         } else {
-            gameState.equippedRune = recipe;
+            // 3. ブレイクスルーと画面の亀裂
+            counter.classList.remove('active');
+            glass.style.opacity = '1';
+            playGlassBreak();
+            if(flavor.special === 'organ') playPipeOrgan();
+            document.body.classList.add(flavor.effect); // Apply flavor CSS
+
+            // 4. 粒子集束（インプロージョン）
+            isTimeStopped = false; // resume canvas for explosion
+            triggerImplosion(flavor.pColor);
+
+            setTimeout(() => {
+                glass.style.opacity = '0';
+                holoText.innerText = item.name;
+                holoFrame.classList.add('show');
+                
+                setTimeout(() => {
+                    // Cleanup and end cutscene
+                    holoFrame.classList.remove('show');
+                    container.style.opacity = '0';
+                    document.body.classList.remove(flavor.effect);
+                    particles = [];
+                    for(let i=0; i<400; i++) particles.push(new Particle()); // Reset stars
+                    isRolling = false;
+                    document.getElementById('roll-btn').disabled = false;
+                }, 4000);
+            }, 1200); // Wait for implosion suck-in
         }
+    }
+    requestAnimationFrame(updateCounter);
+}
 
-        updateHudEquip();
-        alert(`${recipe.name} の鍛造と装備に成功しました！`);
-        buildCraftUI();
+/** =========================================================================
+ *  INIT UI BUILDERS
+ *======================================================================== */
+window.onload = () => {
+    // Init Title Screen Animation
+    setTimeout(() => {
+        document.getElementById('main-title').classList.add('loaded');
+        document.getElementById('play-btn-wrapper').classList.add('active');
+    }, 100);
+
+    // Build Shop
+    const shopGrid = document.getElementById('shop-grid');
+    for(let i=1; i<=10; i++) {
+        let div = document.createElement('div');
+        div.className = 'item-card ui-panel';
+        div.innerHTML = `Luck Potion T${i}<br><span style="font-size:12px;color:var(--gold);">x${1 + i*0.5} (60s)</span>`;
+        div.onclick = () => { luckMult = 1 + i*0.5; document.getElementById('luck-val').innerText = `x${luckMult}`; playTone(1000,'sine',0.1); };
+        shopGrid.appendChild(div);
     }
 
-    function unequipItem(type) {
-        initAudio();
-        if (type === 'gauntlet') gameState.equippedGauntlet = null;
-        if (type === 'rune') gameState.equippedRune = null;
-        updateHudEquip();
-        buildCraftUI();
-    }
-
-    function updateHudEquip() {
-        const parts = [];
-        if (gameState.equippedGauntlet) parts.push(gameState.equippedGauntlet.name);
-        if (gameState.equippedRune) parts.push(gameState.equippedRune.name);
-        document.getElementById('hud-equip').textContent = parts.length > 0 ? parts.join(' / ') : 'None';
-    }
+    // Build Library (Codex)
+    const libGrid = document.getElementById('library-grid');
+    AURA_DATA.forEach(item => {
+        let div = document.createElement('div');
+        div.className = 'item-card ui-panel';
+        div.innerText = item.name;
+        div.onclick = () => {
+            document.getElementById('popup-title').innerText = item.name;
+            document.getElementById('popup-desc').innerText = `True Probability: 1 / ${item.prob.toLocaleString()}`;
+            let btn = document.getElementById('btn-see-cutscene');
+            if(item.isCutscene) {
+                btn.style.display = 'inline-block';
+                btn.onclick = () => { closePopups(); executeCutscene(item); };
+            } else {
+                btn.style.display = 'none';
+            }
+            document.getElementById('library-popup').classList.add('active');
+        };
+        libGrid.appendChild(div);
+    });
+};
 </script>
-
 </body>
 </html>
