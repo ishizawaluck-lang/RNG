@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stellar Odyssey - 待機画面</title>
-    <!-- Google Fonts: Montserrat (Thin 100 / Light 300) & Cinzel Decorative -->
+    <title>ASTRAL RESONANCE: MYTHIC RNG</title>
+    <!-- Google Fonts: Cinzel Decorative & Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Montserrat:wght@100;300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     
     <style>
-        /* === 基本スタイル === */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -21,8 +20,8 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: 'Montserrat', 'Cinzel Decorative', sans-serif;
-            background-color: #030107;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #020104;
             color: #ffffff;
         }
 
@@ -34,40 +33,43 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at center, #10061d 0%, #030107 100%);
-            perspective: 1000px; /* 3D空間の奥行き設定 */
+            background: radial-gradient(circle at center, #180830 0%, #05020a 60%, #020104 100%);
+            perspective: 1200px;
+            overflow: hidden;
         }
 
-        /* === 星雲の呼吸（パルス）エフェクト === */
+        /* === 3. 鮮烈な星雲（ネビュラ）オーロラ演出 === */
         .nebula-background {
             position: absolute;
-            top: -20%;
-            left: -20%;
-            width: 140%;
-            height: 140%;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
             background: 
-                radial-gradient(ellipse at 30% 40%, rgba(90, 30, 160, 0.18) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 60%, rgba(20, 80, 180, 0.15) 0%, transparent 60%);
-            opacity: 0.6;
-            filter: blur(50px);
+                radial-gradient(ellipse at 25% 35%, rgba(168, 85, 247, 0.35) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 65%, rgba(14, 165, 233, 0.35) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 20%, rgba(234, 179, 8, 0.2) 0%, transparent 45%);
+            opacity: 0.85;
+            filter: blur(60px);
             z-index: 1;
-            animation: nebulaPulse 16s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+            animation: nebulaAurora 10s ease-in-out infinite alternate;
             pointer-events: none;
         }
 
-        @keyframes nebulaPulse {
+        @keyframes nebulaAurora {
             0% {
-                opacity: 0.4;
-                filter: blur(45px) scale(1);
+                transform: scale(1) rotate(0deg);
+                filter: blur(55px) saturate(1.2);
             }
             100% {
-                opacity: 0.8;
-                filter: blur(65px) scale(1.06);
+                transform: scale(1.12) rotate(4deg);
+                filter: blur(75px) saturate(1.8);
             }
         }
 
-        /* === 空間の緩やかなワープ効果（星々レイヤー） === */
-        .stars-layer {
+        /* === 3. 粒子密度限界突破（3倍の星屑＆パチパチ弾けるフレア） === */
+        .stars-layer-1, .stars-layer-2, .stars-layer-3 {
             position: absolute;
             top: 0;
             left: 0;
@@ -75,95 +77,108 @@
             height: 100%;
             z-index: 2;
             pointer-events: none;
-            background-image: 
-                radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-                radial-gradient(1.5px 1.5px at 80px 140px, rgba(125,249,255,0.7), rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 150px 70px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
-                radial-gradient(1.5px 1.5px at 200px 180px, rgba(255,223,186,0.7), rgba(0,0,0,0));
             background-repeat: repeat;
-            background-size: 250px 250px;
-            animation: cosmicWarp 35s linear infinite;
+        }
+
+        /* 小粒・高速ワープ */
+        .stars-layer-1 {
+            background-image: 
+                radial-gradient(1px 1px at 15px 25px, #ffffff, transparent),
+                radial-gradient(1px 1px at 75px 125px, #7df9ff, transparent),
+                radial-gradient(1.2px 1.2px at 130px 45px, #fde047, transparent),
+                radial-gradient(1px 1px at 180px 190px, #ffffff, transparent);
+            background-size: 150px 150px;
+            animation: cosmicWarp 20s linear infinite;
+        }
+
+        /* 中粒・輝き強め */
+        .stars-layer-2 {
+            background-image: 
+                radial-gradient(1.8px 1.8px at 40px 90px, #facc15, transparent),
+                radial-gradient(2px 2px at 120px 30px, #38bdf8, transparent),
+                radial-gradient(1.5px 1.5px at 160px 150px, #ec4899, transparent);
+            background-size: 220px 220px;
+            animation: cosmicWarp 35s linear infinite reverse;
+            opacity: 0.8;
+        }
+
+        /* 爆発する光のフレア粒子群 */
+        .stars-layer-3 {
+            background-image: 
+                radial-gradient(2.5px 2.5px at 90px 60px, #10b981, rgba(16,185,129,0)),
+                radial-gradient(3px 3px at 40px 170px, #eab308, rgba(234,179,8,0)),
+                radial-gradient(2.5px 2.5px at 170px 110px, #a855f7, rgba(168,85,247,0));
+            background-size: 280px 280px;
+            animation: flareBurst 4s ease-in-out infinite;
         }
 
         @keyframes cosmicWarp {
-            0% {
-                transform: scale(1) rotate(0deg);
-                opacity: 0.5;
-            }
-            50% {
-                transform: scale(1.12) rotate(2deg);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 0.5;
-            }
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.15) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
         }
 
-        /* === 星座の幾何学ライン（ジオメトリー構造） === */
-        .geometry-constellation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 3;
-            pointer-events: none;
-            opacity: 0.25;
-            background-image: 
-                linear-gradient(30deg, rgba(255,255,255,0.08) 1px, transparent 1px),
-                linear-gradient(150deg, rgba(255,255,255,0.08) 1px, transparent 1px);
-            background-size: 120px 120px;
-            animation: constellationFade 20s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+        @keyframes flareBurst {
+            0%, 100% { transform: scale(0.95); opacity: 0.4; }
+            50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 8px #facc15); }
         }
 
-        @keyframes constellationFade {
-            0% { opacity: 0.15; transform: scale(1); }
-            100% { opacity: 0.3; transform: scale(1.03); }
-        }
-
-        /* === コズミック・リング（天体の環） === */
-        .cosmic-ring-container {
+        /* === 2. 神話級アストロラビ（立体宇宙魔法陣構造） === */
+        .astrolabe-container {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 450px;
-            height: 450px;
-            margin: -225px 0 0 -225px;
-            z-index: 4;
+            width: 550px;
+            height: 550px;
+            margin: -275px 0 0 -275px;
+            z-index: 3;
             pointer-events: none;
             transform-style: preserve-3d;
-            animation: ringRotate 28s linear infinite;
         }
 
-        .cosmic-ring {
+        .magic-ring {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 1px solid rgba(167, 139, 250, 0.25);
+            inset: 0;
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(167, 139, 250, 0.1);
-            transform: rotateX(70deg) rotateY(15deg);
+            border: 2px dashed rgba(234, 179, 8, 0.4);
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.2), inset 0 0 20px rgba(234, 179, 8, 0.2);
+            animation: rotateXAxis 25s linear infinite;
         }
 
-        .cosmic-ring:nth-child(2) {
-            width: 80%;
-            height: 80%;
-            top: 10%;
-            left: 10%;
-            border-color: rgba(56, 189, 248, 0.2);
-            transform: rotateX(65deg) rotateY(-30deg);
-            animation: ringRotateReverse 35s linear infinite;
+        .magic-ring:nth-child(2) {
+            inset: 40px;
+            border: 1.5px solid rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+            animation: rotateYAxis 30s linear infinite reverse;
         }
 
-        @keyframes ringRotate {
-            0% { transform: rotate3d(0.5, 1, 0.2, 0deg); }
-            100% { transform: rotate3d(0.5, 1, 0.2, 360deg); }
+        .magic-ring:nth-child(3) {
+            inset: 90px;
+            border: 2px dotted rgba(168, 85, 247, 0.6);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+            animation: rotateZAxis 20s linear infinite;
         }
 
-        @keyframes ringRotateReverse {
-            0% { transform: rotate3d(-0.5, 1, -0.2, 360deg); }
-            100% { transform: rotate3d(-0.5, 1, -0.2, 0deg); }
+        .magic-ring:nth-child(4) {
+            inset: 140px;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            animation: rotateXAxis 15s linear infinite reverse;
+        }
+
+        @keyframes rotateXAxis {
+            0% { transform: rotateX(70deg) rotateY(10deg) rotateZ(0deg); }
+            100% { transform: rotateX(70deg) rotateY(10deg) rotateZ(360deg); }
+        }
+
+        @keyframes rotateYAxis {
+            0% { transform: rotateX(40deg) rotateY(60deg) rotateZ(0deg); }
+            100% { transform: rotateX(40deg) rotateY(60deg) rotateZ(360deg); }
+        }
+
+        @keyframes rotateZAxis {
+            0% { transform: rotateX(20deg) rotateY(-30deg) rotateZ(0deg); }
+            100% { transform: rotateX(20deg) rotateY(-30deg) rotateZ(360deg); }
         }
 
         /* === コンテンツ本体 === */
@@ -175,142 +190,165 @@
             align-items: center;
             text-align: center;
             padding: 20px;
+            max-width: 90vw;
         }
 
-        /* === タイトル（極細フォント ＆ 静かなグリッチ / スキャンエフェクト） === */
+        /* === 1. タイトル名のド派手化（ゴールドグラデーション ＆ キラーンシャイン） === */
         .game-title {
-            font-family: 'Cinzel Decorative', 'Montserrat', sans-serif;
-            font-size: clamp(2.2rem, 5vw, 4.2rem);
-            font-weight: 300;
-            letter-spacing: 0.45em;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2rem, 4.5vw, 4.2rem);
+            font-weight: 900;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: #ffffff;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
-            margin-bottom: 3.5rem;
+            background: linear-gradient(135deg, #fffbeb 20%, #facc15 50%, #ca8a04 80%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.7)) drop-shadow(0 0 35px rgba(168, 85, 247, 0.5));
+            margin-bottom: 4rem;
             position: relative;
-            animation: titleGlitch 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+            overflow: hidden;
+            animation: titleFloat 6s ease-in-out infinite alternate;
         }
 
-        /* 洗練されたスキャン線 */
+        /* キラーンと光るシャインエフェクト (5秒に一度) */
         .game-title::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -120%;
-            width: 40%;
+            left: -150%;
+            width: 50%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
             transform: skewX(-25deg);
-            animation: scanLine 7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+            animation: shineEffect 5s ease-in-out infinite;
         }
 
-        @keyframes titleGlitch {
-            0%, 93%, 97%, 100% {
-                transform: translate(0);
-                text-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
-            }
-            94% {
-                transform: translate(-1.5px, 0.5px);
-                text-shadow: -2px 0 rgba(56, 189, 248, 0.5), 2px 0 rgba(167, 139, 250, 0.5);
-            }
-            96% {
-                transform: translate(1.5px, -0.5px);
-                text-shadow: 2px 0 rgba(56, 189, 248, 0.5), -2px 0 rgba(167, 139, 250, 0.5);
-            }
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
         }
 
-        @keyframes scanLine {
-            0%, 85% { left: -120%; }
-            95%, 100% { left: 220%; }
+        @keyframes shineEffect {
+            0%, 70% { left: -150%; }
+            90%, 100% { left: 200%; }
         }
 
-        /* === ボタンからのオーラエフェクト === */
+        /* === 4. 「PLAY」ボタンの神格化（アーティファクト仕様） === */
         .play-btn-container {
             position: relative;
             display: inline-block;
+            border-radius: 50px;
         }
 
+        /* 神聖な外側オーラ・重層発光 */
         .play-btn-container::before {
             content: '';
             position: absolute;
-            inset: -6px;
-            background: linear-gradient(45deg, rgba(56,189,248,0.4), rgba(167,139,250,0.4), rgba(255,255,255,0.2));
-            background-size: 300% 300%;
-            border-radius: 40px;
+            inset: -10px;
+            background: linear-gradient(45deg, #f59e0b, #38bdf8, #a855f7, #10b981, #f59e0b);
+            background-size: 400% 400%;
+            border-radius: 60px;
             z-index: -1;
-            opacity: 0.4;
-            filter: blur(10px);
-            animation: auraPulse 5s cubic-bezier(0.16, 1, 0.3, 1) infinite, auraFlow 10s linear infinite;
+            opacity: 0.75;
+            filter: blur(15px);
+            animation: artifactGlow 4s ease infinite, colorShift 8s linear infinite;
         }
 
         .play-btn {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Cinzel Decorative', serif;
             position: relative;
             display: inline-block;
-            padding: 16px 50px;
-            font-size: 1rem;
-            font-weight: 300;
-            letter-spacing: 0.4em;
-            color: #ffffff;
-            background: rgba(10, 6, 20, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 40px;
+            padding: 20px 60px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            color: #fffbeb;
+            background: radial-gradient(circle, rgba(30,15,50,0.95) 0%, rgba(10,5,20,0.98) 100%);
+            border: 2px solid rgba(250, 204, 21, 0.7);
+            border-radius: 50px;
             cursor: pointer;
             outline: none;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 25px rgba(250, 204, 21, 0.4), inset 0 0 15px rgba(250, 204, 21, 0.3);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ホバー時のブラックホール・光の渦発動エフェクト */
+        .play-btn::after {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: conic-gradient(from 0deg, transparent, rgba(250,204,21,0.8), transparent, rgba(56,189,248,0.8), transparent);
+            opacity: 0;
+            z-index: 1;
+            mix-blend-mode: overlay;
+            transition: opacity 0.3s ease;
+            animation: none;
+            pointer-events: none;
         }
 
         .play-btn:hover {
-            background: rgba(30, 20, 50, 0.85);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 25px rgba(167, 139, 250, 0.4);
-            letter-spacing: 0.45em;
+            background: radial-gradient(circle, rgba(50,20,80,0.95) 0%, rgba(20,10,40,0.98) 100%);
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: 0 0 40px rgba(250, 204, 21, 0.9), 0 0 70px rgba(168, 85, 247, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.6);
+            transform: scale(1.05) translateY(-3px);
+            letter-spacing: 0.35em;
+        }
+
+        .play-btn:hover::after {
+            opacity: 1;
+            animation: vortexSpin 1.5s linear infinite;
         }
 
         .play-btn-container:hover::before {
-            opacity: 0.8;
-            filter: blur(14px);
-            animation: auraPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite, auraFlow 5s linear infinite;
+            opacity: 1;
+            filter: blur(20px);
+            animation: artifactGlow 1.5s ease infinite, colorShift 3s linear infinite;
         }
 
-        @keyframes auraPulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.04); opacity: 0.7; }
+        @keyframes artifactGlow {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.06); opacity: 1; }
         }
 
-        @keyframes auraFlow {
+        @keyframes colorShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        @keyframes vortexSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
     <div class="screen-container">
-        <!-- 3. 星雲の呼吸レイヤー -->
+        <!-- 3. 彩度と揺らぎを最大化した星雲オーロラ背景 -->
         <div class="nebula-background"></div>
 
-        <!-- 星座の幾何学ライン -->
-        <div class="geometry-constellation"></div>
+        <!-- 3. 密度限界突破の星くず・フレア粒子群レイヤー -->
+        <div class="stars-layer-1"></div>
+        <div class="stars-layer-2"></div>
+        <div class="stars-layer-3"></div>
 
-        <!-- 1. 空間の緩やかなワープ効果レイヤー -->
-        <div class="stars-layer"></div>
-
-        <!-- 2. コズミック・リング（天体の環） -->
-        <div class="cosmic-ring-container">
-            <div class="cosmic-ring"></div>
-            <div class="cosmic-ring"></div>
+        <!-- 2. 立体宇宙魔法陣（アストロラビ） -->
+        <div class="astrolabe-container">
+            <div class="magic-ring"></div>
+            <div class="magic-ring"></div>
+            <div class="magic-ring"></div>
+            <div class="magic-ring"></div>
         </div>
 
         <!-- メインコンテンツ -->
         <div class="content-wrapper">
-            <!-- 4. タイトル（極細フォント ＆ スキャン演出） -->
-            <h1 class="game-title">Stellar Odyssey</h1>
+            <!-- 1. 神話的タイトル（ゴールドグラデーション ＆ キラーンシャイン） -->
+            <h1 class="game-title">ASTRAL RESONANCE: MYTHIC RNG</h1>
 
-            <!-- 2. ボタンからのオーラエフェクト -->
+            <!-- 4. 神格化されたアーティファクトPLAYボタン -->
             <div class="play-btn-container">
                 <button class="play-btn">PLAY</button>
             </div>
