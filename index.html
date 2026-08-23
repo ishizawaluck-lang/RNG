@@ -34,7 +34,6 @@
             align-items: center;
         }
 
-        /* Canvas Layers */
         #bg-canvas, #fx-canvas {
             position: fixed;
             top: 0;
@@ -46,7 +45,6 @@
         }
         #fx-canvas { z-index: 3; }
 
-        /* App Container */
         #app {
             position: relative;
             width: 100vw;
@@ -60,7 +58,7 @@
             overflow: hidden;
         }
 
-        /* --- INTRO SCREEN --- */
+        /* INTRO SCREEN */
         #intro-screen {
             position: absolute;
             inset: 0;
@@ -134,7 +132,7 @@
 
         .play-btn:hover::before { left: 100%; }
 
-        /* Loading View & World Transitions */
+        /* LOADING VIEWS */
         #loading-view {
             position: absolute;
             inset: 0;
@@ -149,9 +147,55 @@
             transition: opacity 0.8s ease;
         }
 
+        /* RPG FANTASY LOADING SCREEN */
+        #rpg-loading-view {
+            position: absolute;
+            inset: 0;
+            background: #080503;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .magic-circle {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border: 2px dashed var(--gold-secondary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: spin 10s linear infinite;
+            box-shadow: 0 0 40px var(--gold-glow);
+            margin-bottom: 30px;
+        }
+
+        .magic-circle::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border: 1px solid var(--gold-primary);
+            transform: rotate(45deg);
+        }
+
+        .magic-core-dot {
+            width: 30px;
+            height: 30px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--gold-primary);
+        }
+
         .loading-spinner {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border: 2px solid rgba(197,160,89,0.2);
             border-top-color: var(--gold-primary);
             border-radius: 50%;
@@ -170,7 +214,7 @@
 
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* --- MAIN GAME UI (COSMOS) --- */
+        /* MAIN GAME UI (COSMOS) */
         #main-game {
             position: absolute;
             inset: 0;
@@ -327,24 +371,7 @@
             cursor: not-allowed;
         }
 
-        .codex-btn {
-            background: transparent;
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            color: var(--gold-secondary);
-            font-family: var(--font-cinzel);
-            font-size: 0.85rem;
-            letter-spacing: 0.2em;
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .codex-btn:hover {
-            border-color: var(--gold-primary);
-            color: var(--gold-primary);
-        }
-
-        /* --- OTHER SIDE (GUILD BACKALLEY VIEW) --- */
+        /* OTHER SIDE (GUILD BACKALLEY VIEW) */
         #other-side-view {
             position: absolute;
             inset: 0;
@@ -438,7 +465,7 @@
             flex-wrap: wrap;
         }
 
-        /* --- SUB-VIEWS (MISSION & SHOP & CRAFT) --- */
+        /* SUB-VIEWS (MISSION & SHOP & CRAFT) */
         .sub-view {
             position: absolute;
             inset: 0;
@@ -623,7 +650,7 @@
             color: var(--gold-secondary);
         }
 
-        /* --- CRAFT VIEW --- */
+        /* CRAFT VIEW */
         .craft-layout {
             display: grid;
             grid-template-columns: 320px 1fr;
@@ -701,7 +728,7 @@
             color: var(--gold-secondary);
         }
 
-        /* --- QUANTITY & CODEX MODALS --- */
+        /* MODALS */
         #qty-modal, #codex-modal, #digest-modal, #material-popup, #cutscene-modal {
             position: fixed;
             inset: 0;
@@ -754,7 +781,6 @@
         }
         .modal-close:hover { color: var(--gold-primary); }
 
-        /* CODEX TABS */
         .codex-tabs {
             display: flex;
             width: 100%;
@@ -825,7 +851,6 @@
         .codex-item.unlocked .codex-item-status { color: var(--gold-primary); }
         .codex-item:not(.unlocked) .codex-item-status { color: rgba(255,255,255,0.3); }
 
-        /* CUTSCENE FULLSCREEN */
         #cutscene-modal {
             background: #000;
             z-index: 200;
@@ -877,7 +902,7 @@
 
     <div id="app">
         <!-- DIAMOND SETTINGS / CODEX BUTTON -->
-        <div class="diamond-btn" id="diamond-codex-btn" title="図鑑を開く">
+        <div class="diamond-btn" id="diamond-codex-btn" title="CODEX">
             <span>◇</span>
         </div>
 
@@ -888,10 +913,18 @@
             <button class="play-btn" id="start-btn">INITIALIZE</button>
         </div>
 
-        <!-- LOADING VIEW -->
+        <!-- STANDARD LOADING VIEW (FOR SUB-SPACES) -->
         <div id="loading-view">
             <div class="loading-spinner"></div>
-            <div class="loading-text" id="loading-text">SYNCHRONIZING COSMOS...</div>
+            <div class="loading-text" id="loading-text">Loading...</div>
+        </div>
+
+        <!-- RPG FANTASY LOADING VIEW (FOR OTHER SIDE TRANSITION) -->
+        <div id="rpg-loading-view">
+            <div class="magic-circle">
+                <div class="magic-core-dot"></div>
+            </div>
+            <div class="loading-text">Loading...</div>
         </div>
 
         <!-- MAIN GAME UI (COSMOS) -->
@@ -899,9 +932,9 @@
             <header>
                 <div class="logo">ASTRAL</div>
                 <div class="stats-container">
-                    <div>ロール回数: <span id="stat-rolls">0</span></div>
-                    <div>コイン: <span id="stat-coins">500</span></div>
-                    <div>発見オーラ: <span id="stat-discovered">1</span> / 25</div>
+                    <div>ROLLS: <span id="stat-rolls">0</span></div>
+                    <div>COINS: <span id="stat-coins">500</span></div>
+                    <div>AURA: <span id="stat-discovered">1</span> / 25</div>
                 </div>
             </header>
 
@@ -909,16 +942,16 @@
                 <div class="sun-core" id="sun-core"></div>
                 <div class="roulette-ring" id="roulette-ring"></div>
                 <div class="aura-display">
-                    <div class="aura-name" id="aura-name">準備完了</div>
+                    <div class="aura-name" id="aura-name">READY</div>
                     <div class="aura-rate" id="aura-rate">1 / 1</div>
                 </div>
             </div>
 
             <div class="controls">
-                <button class="action-btn" id="roll-btn">オーラを引く</button>
-                <button class="action-btn" id="auto-btn">オートロール</button>
-                <button class="action-btn" id="quick-btn" disabled>クイック25連</button>
-                <button class="action-btn" id="other-side-btn">あちら側の世界へ</button>
+                <button class="action-btn" id="roll-btn">ROLL</button>
+                <button class="action-btn" id="auto-btn">AUTO ROLL</button>
+                <button class="action-btn" id="quick-btn" disabled>QUICK ROLL</button>
+                <button class="action-btn" id="other-side-btn">Go to Other Side</button>
             </div>
         </div>
 
@@ -926,7 +959,7 @@
         <div id="other-side-view">
             <div class="stone-wall-overlay"></div>
             <div class="guild-content-layer">
-                <div class="guild-header">ギルドの裏路地 - サンクチュアリ</div>
+                <div class="guild-header">GUILD SANCTUARY</div>
                 <div class="guild-center-stage">
                     <div class="lantern-lamp"><div class="lantern-glow"></div></div>
                     <div style="font-family: var(--font-cinzel); font-size: 1.2rem; letter-spacing: 0.3em; color: var(--gold-secondary);">
@@ -935,10 +968,10 @@
                     <div class="lantern-lamp"><div class="lantern-glow"></div></div>
                 </div>
                 <div class="guild-menu-grid">
-                    <button class="action-btn" id="guild-mission-btn">ミッション</button>
-                    <button class="action-btn" id="guild-shop-btn">ショップ</button>
-                    <button class="action-btn" id="guild-craft-btn">クラフト</button>
-                    <button class="action-btn" id="guild-return-btn">宇宙へ戻る</button>
+                    <button class="action-btn" id="guild-mission-btn">MISSION</button>
+                    <button class="action-btn" id="guild-shop-btn">SHOP</button>
+                    <button class="action-btn" id="guild-craft-btn">CRAFT</button>
+                    <button class="action-btn" id="guild-return-btn">RETURN TO COSMOS</button>
                 </div>
             </div>
         </div>
@@ -946,8 +979,8 @@
         <!-- MISSION VIEW -->
         <div class="sub-view" id="mission-view">
             <div class="sub-header">
-                <div class="sub-title">ギルドのクエストボード</div>
-                <button class="back-btn" id="mission-back-btn">戻る</button>
+                <div class="sub-title">MISSION BOARD</div>
+                <button class="back-btn" id="mission-back-btn">BACK</button>
             </div>
             <div class="mission-container">
                 <div class="wooden-board">
@@ -958,7 +991,7 @@
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                             <div class="parchment-reward" id="quest-reward">報酬: 100 コイン</div>
-                            <button class="quest-action-btn" id="quest-action-btn">受託する</button>
+                            <button class="quest-action-btn" id="quest-action-btn">ACCEPT</button>
                         </div>
                     </div>
                 </div>
@@ -972,8 +1005,8 @@
         <!-- SHOP VIEW -->
         <div class="sub-view" id="shop-view">
             <div class="sub-header">
-                <div class="sub-title">神秘のショップ</div>
-                <button class="back-btn" id="shop-back-btn">戻る</button>
+                <div class="sub-title">MYSTIC SHOP</div>
+                <button class="back-btn" id="shop-back-btn">BACK</button>
             </div>
             <div class="shop-grid">
                 <div class="shop-card" onclick="openShopQty(0)">
@@ -1004,8 +1037,8 @@
         <!-- CRAFT VIEW -->
         <div class="sub-view" id="craft-view">
             <div class="sub-header">
-                <div class="sub-title">武具の錬成工房 (ガントレット)</div>
-                <button class="back-btn" id="craft-back-btn">戻る</button>
+                <div class="sub-title">FORGE & CRAFT</div>
+                <button class="back-btn" id="craft-back-btn">BACK</button>
             </div>
             <div class="craft-layout">
                 <div class="craft-sidebar" id="craft-recipe-list"></div>
@@ -1016,8 +1049,8 @@
                     </div>
                     <div class="craft-requirements" id="craft-slots-container"></div>
                     <div style="display: flex; gap: 20px;">
-                        <button class="action-btn" id="auto-add-btn">自動素材投入</button>
-                        <button class="action-btn" id="execute-craft-btn" disabled style="background: rgba(197,160,89,0.2);">クラフト実行</button>
+                        <button class="action-btn" id="auto-add-btn">AUTO ADD</button>
+                        <button class="action-btn" id="execute-craft-btn" disabled style="background: rgba(197,160,89,0.2);">CRAFT</button>
                     </div>
                 </div>
             </div>
@@ -1028,10 +1061,10 @@
     <div id="codex-modal">
         <div class="modal-box" style="width: 700px;">
             <button class="modal-close" id="codex-close-btn">&times;</button>
-            <div class="modal-title">大宇宙の図鑑 (CODEX)</div>
+            <div class="modal-title">CODEX</div>
             <div class="codex-tabs">
-                <button class="codex-tab active" onclick="switchCodexTab('aura')">オーラ図鑑</button>
-                <button class="codex-tab" onclick="switchCodexTab('material')">素材図鑑</button>
+                <button class="codex-tab active" onclick="switchCodexTab('aura')">AURA CODEX</button>
+                <button class="codex-tab" onclick="switchCodexTab('material')">MATERIAL CODEX</button>
             </div>
             <div class="codex-list" id="codex-list"></div>
         </div>
@@ -1044,15 +1077,15 @@
             <div class="modal-title" id="mat-pop-title">素材名</div>
             <div style="font-size: 1.05rem; line-height: 1.6; text-align: center; color: var(--text-main); margin-bottom: 25px;" id="mat-pop-desc">素材の説明文</div>
             <div style="font-size: 0.9rem; color: var(--gold-secondary); margin-bottom: 20px;">所持数: <span id="mat-pop-count">0</span> 個</div>
-            <button class="action-btn" id="mat-pop-cutscene-btn" style="display: none;" onclick="playCutscene()">カットシーンを見る</button>
+            <button class="action-btn" id="mat-pop-cutscene-btn" style="display: none;" onclick="playCutscene()">SEE CUTSCENE</button>
         </div>
     </div>
 
     <!-- CUTSCENE MODAL -->
     <div id="cutscene-modal">
         <div class="cutscene-content">
-            <div class="cutscene-text" id="cutscene-text-box">星脈の鉄鉱石は、数億年前に爆縮した超新星の残骸が冷却されて生まれた神秘の鉱物である...</div>
-            <button class="action-btn" onclick="closeCutscene()">閉じる</button>
+            <div class="cutscene-text" id="cutscene-text-box">カットシーンテキスト</div>
+            <button class="action-btn" onclick="closeCutscene()">CLOSE</button>
         </div>
     </div>
 
@@ -1067,8 +1100,8 @@
                 <button class="action-btn" onclick="adjustQty(1)">+</button>
             </div>
             <div style="display: flex; gap: 15px; width: 100%;">
-                <button class="action-btn" style="flex:1;" onclick="closeShopQty()">キャンセル</button>
-                <button class="action-btn" style="flex:1; background: rgba(197,160,89,0.3);" onclick="confirmPurchase()">購入する</button>
+                <button class="action-btn" style="flex:1;" onclick="closeShopQty()">CANCEL</button>
+                <button class="action-btn" style="flex:1; background: rgba(197,160,89,0.3);" onclick="confirmPurchase()">BUY</button>
             </div>
         </div>
     </div>
@@ -1077,13 +1110,12 @@
     <div id="digest-modal">
         <div class="modal-box" style="width: 600px;">
             <button class="modal-close" onclick="document.getElementById('digest-modal').classList.remove('active')">&times;</button>
-            <div class="modal-title">クイック25連 獲得結果</div>
+            <div class="modal-title">QUICK ROLL RESULTS</div>
             <div class="codex-list" id="digest-list" style="max-height: 50vh;"></div>
         </div>
     </div>
 
     <script>
-        /* --- GAME DATA & STATE --- */
         const AURAS = [
             { id: 0, name: "スターダスト・エコー", rate: 1, weight: 899990, unlocked: true },
             { id: 1, name: "ステラー・ヴォルテックス", rate: 10, weight: 100000, unlocked: false },
@@ -1093,7 +1125,6 @@
             { id: 5, name: "スーパーノヴァ・レムナント", rate: 10000000, weight: 0.9, unlocked: false },
             { id: 6, name: "ビッグバン・オメガ", rate: 100000000, weight: 0.1, unlocked: false }
         ];
-        // 25個までの拡張用プレースホルダー
         for (let i = 7; i < 25; i++) {
             AURAS.push({ id: i, name: `アストラル・フラグメント ${i+1}`, rate: Math.pow(10, Math.min(8, i)), weight: Math.max(0.001, 1 / Math.pow(10, i)), unlocked: false });
         }
@@ -1130,9 +1161,8 @@
         ];
         let currentQuestIndex = 0;
 
-        // Load Save
         try {
-            const saved = localStorage.getItem('astral_save_v3');
+            const saved = localStorage.getItem('astral_save_v4');
             if (saved) {
                 const data = JSON.parse(saved);
                 totalRolls = data.rolls || 0;
@@ -1159,11 +1189,11 @@
                     gauntlets: GAUNTLETS.map(g => g.crafted),
                     quests: QUESTS.map(q => ({ accepted: q.accepted, completed: q.completed, progress: q.progress }))
                 };
-                localStorage.setItem('astral_save_v3', JSON.stringify(data));
+                localStorage.setItem('astral_save_v4', JSON.stringify(data));
             } catch(e) {}
         }
 
-        /* --- WEB AUDIO API (GENTLE AMBIENT & CLICKS) --- */
+        /* WEB AUDIO API */
         let audioCtx = null;
         let masterGain = null;
         let ambientGain = null;
@@ -1175,7 +1205,7 @@
             audioCtx = new AudioContext();
 
             masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0.2, audioCtx.currentTime); // かなり控えめな音量
+            masterGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
             masterGain.connect(audioCtx.destination);
 
             let delayNode = audioCtx.createDelay();
@@ -1202,7 +1232,6 @@
             lfoG.connect(ambientGain.gain);
             lfo.start();
 
-            // Cmaj9 コード和音 (C3, G3, B3, D4, E4)
             const chordFreqs = [130.81, 196.00, 246.94, 293.66, 329.63];
             chordFreqs.forEach((f, idx) => {
                 let osc = audioCtx.createOscillator();
@@ -1238,6 +1267,20 @@
             g.connect(masterGain);
             osc.start();
             osc.stop(audioCtx.currentTime + 6.0);
+        }
+
+        function playCathedralBell() {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let g = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.5);
         }
 
         function playMechanicalClick() {
@@ -1291,7 +1334,7 @@
             playAngelChime(1760);
         }
 
-        /* --- CANVAS GRAPHICS & VISUAL ENGINE --- */
+        /* CANVAS GRAPHICS & VISUAL ENGINE */
         const bgCanvas = document.getElementById('bg-canvas');
         const bgCtx = bgCanvas.getContext('2d');
         const fxCanvas = document.getElementById('fx-canvas');
@@ -1376,9 +1419,10 @@
         }
         renderLoop();
 
-        /* --- UI ELEMENTS & CLEANUP (BUG FIX) --- */
+        /* UI ELEMENTS & CLEANUP */
         const introScreen = document.getElementById('intro-screen');
         const loadingView = document.getElementById('loading-view');
+        const rpgLoadingView = document.getElementById('rpg-loading-view');
         const mainGame = document.getElementById('main-game');
         const otherSideView = document.getElementById('other-side-view');
         const startBtn = document.getElementById('start-btn');
@@ -1428,7 +1472,6 @@
         }
         updateStatsUI();
 
-        // 徹底的なポップアップクリーンアップ（残像バグ完全解消）
         function closeAllPopups() {
             codexModal.classList.remove('active');
             qtyModal.classList.remove('active');
@@ -1441,7 +1484,7 @@
             cutsceneModal.classList.remove('active');
         }
 
-        // 画面遷移演出（太陽収縮＋黒フェード＋ローディング3秒）
+        /* STANDARD LOADING (FOR SUB-SPACES) */
         function transitionToScene(callback) {
             closeAllPopups();
             loadingView.style.opacity = '1';
@@ -1451,6 +1494,21 @@
                 setTimeout(() => {
                     loadingView.style.opacity = '0';
                     loadingView.style.pointerEvents = 'none';
+                }, 1500);
+            }, 1500);
+        }
+
+        /* RPG FANTASY LOADING (SPECIFICALLY FOR OTHER SIDE TRANSITION) */
+        function transitionToOtherSide(callback) {
+            closeAllPopups();
+            playCathedralBell();
+            rpgLoadingView.style.opacity = '1';
+            rpgLoadingView.style.pointerEvents = 'auto';
+            setTimeout(() => {
+                if (callback) callback();
+                setTimeout(() => {
+                    rpgLoadingView.style.opacity = '0';
+                    rpgLoadingView.style.pointerEvents = 'none';
                 }, 1500);
             }, 1500);
         }
@@ -1472,9 +1530,9 @@
             }, 1500);
         });
 
-        /* --- WORLD SWITCHING --- */
+        /* WORLD SWITCHING */
         otherSideBtn.addEventListener('click', () => {
-            transitionToScene(() => {
+            transitionToOtherSide(() => {
                 mainGame.style.opacity = '0';
                 mainGame.style.pointerEvents = 'none';
                 otherSideView.classList.add('active');
@@ -1482,14 +1540,14 @@
         });
 
         guildReturnBtn.addEventListener('click', () => {
-            transitionToScene(() => {
+            transitionToOtherSide(() => {
                 otherSideView.classList.remove('active');
                 mainGame.style.opacity = '1';
                 mainGame.style.pointerEvents = 'auto';
             });
         });
 
-        /* --- CODEX & MATERIAL TABS --- */
+        /* CODEX & MATERIAL TABS */
         diamondCodexBtn.addEventListener('click', () => {
             closeAllPopups();
             populateCodex();
@@ -1519,7 +1577,7 @@
                             <div class="name">${a.unlocked ? a.name : '🔒 ???'}</div>
                             <div class="rate">1 / ${a.rate.toLocaleString()}</div>
                         </div>
-                        <div class="codex-item-status">${a.unlocked ? '解放済' : '未解放'}</div>
+                        <div class="codex-item-status">${a.unlocked ? 'UNLOCKED' : 'LOCKED'}</div>
                     `;
                     codexList.appendChild(item);
                 });
@@ -1530,9 +1588,9 @@
                     item.innerHTML = `
                         <div class="codex-item-info">
                             <div class="name">${m.name}</div>
-                            <div class="rate">所持数: ${m.count} 個</div>
+                            <div class="rate">COUNT: ${m.count}</div>
                         </div>
-                        <div class="codex-item-status">詳細確認</div>
+                        <div class="codex-item-status">INSPECT</div>
                     `;
                     item.addEventListener('click', () => openMaterialPopup(m));
                     codexList.appendChild(item);
@@ -1565,7 +1623,7 @@
             cutsceneModal.classList.remove('active');
         }
 
-        /* --- MISSION SYSTEM --- */
+        /* MISSION SYSTEM */
         guildMissionBtn.addEventListener('click', () => {
             transitionToScene(() => {
                 missionView.classList.add('active');
@@ -1596,13 +1654,13 @@
             questReward.innerText = `報酬: ${q.reward} コイン`;
 
             if (q.completed) {
-                questActionBtn.innerText = "完了済";
+                questActionBtn.innerText = "COMPLETED";
                 questActionBtn.disabled = true;
             } else if (q.accepted) {
-                questActionBtn.innerText = q.progress >= q.goal ? "報酬を受け取る" : "進行中";
+                questActionBtn.innerText = q.progress >= q.goal ? "CLAIM REWARD" : "IN PROGRESS";
                 questActionBtn.disabled = q.progress < q.goal;
             } else {
-                questActionBtn.innerText = "受託する";
+                questActionBtn.innerText = "ACCEPT";
                 questActionBtn.disabled = false;
             }
         }
@@ -1640,7 +1698,7 @@
             });
         }
 
-        /* --- SHOP SYSTEM --- */
+        /* SHOP SYSTEM */
         guildShopBtn.addEventListener('click', () => {
             transitionToScene(() => {
                 shopView.classList.add('active');
@@ -1685,7 +1743,7 @@
             }
         }
 
-        /* --- CRAFT SYSTEM (GAUNTLET) --- */
+        /* CRAFT SYSTEM */
         guildCraftBtn.addEventListener('click', () => {
             transitionToScene(() => {
                 craftView.classList.add('active');
@@ -1700,7 +1758,6 @@
             });
         });
 
-        // 投入スロット管理用
         let allocatedMaterials = {};
 
         function populateCraftRecipes() {
@@ -1711,7 +1768,7 @@
                 div.className = `craft-recipe-item ${selectedRecipeIndex === idx ? 'selected' : ''}`;
                 div.innerHTML = `
                     <div class="title">${g.name}</div>
-                    <div style="font-size: 0.85rem; color: var(--gold-secondary); margin-top: 4px;">${g.crafted ? '錬成済' : '未錬成'}</div>
+                    <div style="font-size: 0.85rem; color: var(--gold-secondary); margin-top: 4px;">${g.crafted ? 'CRAFTED' : 'LOCKED'}</div>
                 `;
                 div.addEventListener('click', () => {
                     selectedRecipeIndex = idx;
@@ -1741,7 +1798,7 @@
                 slot.className = 'material-slot';
                 slot.innerHTML = `
                     <div class="m-name">${matObj.name}</div>
-                    <div class="m-count">${currentAllocated} / ${reqQty} 個</div>
+                    <div class="m-count">${currentAllocated} / ${reqQty}</div>
                     <button class="action-btn" style="padding: 6px 12px; font-size: 0.8rem;" onclick="addMaterialSlot('${matKey}')">+ 投入</button>
                 `;
                 slotsContainer.appendChild(slot);
@@ -1751,16 +1808,16 @@
 
             const executeBtn = document.getElementById('execute-craft-btn');
             if (g.crafted) {
-                executeBtn.innerText = "錬成完了済";
+                executeBtn.innerText = "CRAFTED";
                 executeBtn.disabled = true;
                 executeBtn.style.background = "rgba(197,160,89,0.2)";
             } else if (allSatisfied) {
-                executeBtn.innerText = "クラフト実行";
+                executeBtn.innerText = "CRAFT";
                 executeBtn.disabled = false;
                 executeBtn.style.background = "linear-gradient(135deg, #f3e5ab 0%, #c5a059 100%)";
                 executeBtn.style.color = "#030307";
             } else {
-                executeBtn.innerText = "素材が不足しています";
+                executeBtn.innerText = "CRAFT";
                 executeBtn.disabled = true;
                 executeBtn.style.background = "rgba(197,160,89,0.2)";
                 executeBtn.style.color = "var(--gold-primary)";
@@ -1806,7 +1863,7 @@
             populateCraftRecipes();
         });
 
-        /* --- ROLL & RNG LOGIC --- */
+        /* ROLL & RNG LOGIC */
         function rollAura() {
             let luckMultiplier = 1.0 + (inventory[0] * 0.05) + (inventory[1] * 0.15) + (inventory[2] * 0.3);
             let totalWeight = AURAS.reduce((sum, a) => sum + a.weight, 0);
@@ -1848,7 +1905,7 @@
             else if (winner.rate >= 100000) tier = 1;
 
             rouletteRing.classList.add('fast');
-            auraName.innerText = "大宇宙をスキャン中...";
+            auraName.innerText = "SCANNING...";
             auraRate.innerText = "---";
 
             let clickInterval = setInterval(() => { playMechanicalClick(); }, 120);
@@ -1908,17 +1965,16 @@
 
         rollBtn.addEventListener('click', () => {
             isAutoRolling = false;
-            autoBtn.innerText = "オートロール";
+            autoBtn.innerText = "AUTO ROLL";
             executeRoll();
         });
 
         autoBtn.addEventListener('click', () => {
             isAutoRolling = !isAutoRolling;
-            autoBtn.innerText = isAutoRolling ? "停止" : "オートロール";
+            autoBtn.innerText = isAutoRolling ? "STOP" : "AUTO ROLL";
             if (isAutoRolling && !isRolling) executeRoll();
         });
 
-        /* --- QUICK ROLL (25 ROLLS) --- */
         quickBtn.addEventListener('click', () => {
             if (totalRolls < 25 || isRolling) return;
             let results = [];
@@ -1964,7 +2020,7 @@
                         <div class="name">${res.name}</div>
                         <div class="rate">1 / ${res.rate.toLocaleString()}</div>
                     </div>
-                    <div class="codex-item-status">獲得</div>
+                    <div class="codex-item-status">OBTAINED</div>
                 `;
                 digestList.appendChild(div);
             });
