@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASTRAL - COSMIC ROULETTE</title>
+    <title>ASTRAL - COSMIC ROULETTE & GUILD</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -134,7 +134,7 @@
 
         .play-btn:hover::before { left: 100%; }
 
-        /* Loading View */
+        /* Loading View (Used for transitions) */
         #loading-view {
             position: absolute;
             inset: 0;
@@ -143,7 +143,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9;
+            z-index: 50;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.8s ease;
@@ -270,8 +270,10 @@
         /* Controls */
         .controls {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .action-btn {
@@ -279,9 +281,9 @@
             border: 1px solid var(--gold-secondary);
             color: var(--gold-primary);
             font-family: var(--font-cinzel);
-            font-size: 1rem;
-            letter-spacing: 0.3em;
-            padding: 14px 40px;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            padding: 12px 25px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -302,9 +304,9 @@
             border: 1px solid rgba(197, 160, 89, 0.4);
             color: var(--gold-secondary);
             font-family: var(--font-cinzel);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 0.2em;
-            padding: 14px 25px;
+            padding: 12px 20px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -312,6 +314,271 @@
         .codex-btn:hover {
             border-color: var(--gold-primary);
             color: var(--gold-primary);
+        }
+
+        /* --- SUB-VIEWS (MISSION & SHOP) --- */
+        .sub-view {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-color);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 60px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        .sub-view.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+            padding-bottom: 20px;
+        }
+
+        .sub-title {
+            font-family: var(--font-cinzel);
+            font-size: 1.8rem;
+            letter-spacing: 0.4em;
+            color: var(--gold-primary);
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--gold-secondary);
+            color: var(--gold-primary);
+            font-family: var(--font-cinzel);
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            padding: 10px 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .back-btn:hover { background: rgba(197,160,89,0.2); }
+
+        /* MISSION BOARD DESIGN */
+        .mission-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .wooden-board {
+            width: 650px;
+            height: 380px;
+            background: linear-gradient(135deg, #2c1d11 0%, #170e08 100%);
+            border: 8px solid #3d2616;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 30px;
+        }
+
+        .parchment {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f4ecd8 0%, #e6d5b8 100%);
+            color: #2c1d11;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .parchment-title {
+            font-family: var(--font-cinzel);
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            border-bottom: 2px solid #5c3a21;
+            padding-bottom: 10px;
+        }
+
+        .parchment-desc {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .parchment-reward {
+            font-family: var(--font-cinzel);
+            font-size: 1rem;
+            color: #8c5830;
+            font-weight: 700;
+        }
+
+        .board-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .nav-arrow {
+            background: rgba(197, 160, 89, 0.2);
+            border: 1px solid var(--gold-secondary);
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            width: 50px; height: 50px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s;
+        }
+        .nav-arrow:hover { background: rgba(197, 160, 89, 0.4); }
+
+        .quest-action-btn {
+            background: #3d2616;
+            color: #f3e5ab;
+            border: 1px solid #c5a059;
+            font-family: var(--font-cinzel);
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            padding: 12px 35px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .quest-action-btn:hover { background: #5c3a21; }
+        .quest-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* SHOP GRID & POTIONS */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            flex: 1;
+            align-content: center;
+            padding: 0 40px;
+        }
+
+        .shop-card {
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            background: rgba(255,255,255,0.02);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shop-card:hover {
+            border-color: var(--gold-primary);
+            background: rgba(197, 160, 89, 0.05);
+            box-shadow: 0 0 20px var(--gold-glow);
+            transform: translateY(-5px);
+        }
+
+        .shop-card .name {
+            font-family: var(--font-cinzel);
+            font-size: 1.1rem;
+            letter-spacing: 0.2em;
+            color: var(--gold-primary);
+            margin-bottom: 10px;
+        }
+
+        .shop-card .desc {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .shop-card .price {
+            font-family: var(--font-cinzel);
+            font-size: 1rem;
+            color: var(--gold-secondary);
+        }
+
+        /* QUANTITY MODAL */
+        #qty-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 3, 7, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        #qty-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .qty-content {
+            width: 450px;
+            border: 1px solid var(--gold-secondary);
+            background: rgba(5, 5, 12, 0.95);
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .qty-title {
+            font-family: var(--font-cinzel);
+            font-size: 1.2rem;
+            letter-spacing: 0.3em;
+            color: var(--gold-primary);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .qty-btn {
+            background: transparent;
+            border: 1px solid var(--gold-secondary);
+            color: var(--gold-primary);
+            font-size: 1.2rem;
+            width: 40px; height: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .qty-btn:hover { background: rgba(197,160,89,0.2); }
+
+        .qty-value {
+            font-family: var(--font-cinzel);
+            font-size: 1.5rem;
+            color: var(--gold-primary);
+            width: 60px;
+            text-align: center;
+        }
+
+        .qty-actions {
+            display: flex;
+            gap: 15px;
+            width: 100%;
         }
 
         /* --- CODEX MODAL --- */
@@ -324,7 +591,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0.2;
+            opacity: 0;
             pointer-events: none;
             transition: all 0.4s ease;
         }
@@ -387,7 +654,6 @@
             padding: 15px 20px;
             border: 1px solid rgba(197, 160, 89, 0.2);
             background: rgba(255,255,255,0.01);
-            transition: border-color 0.3s;
         }
 
         .codex-item.unlocked {
@@ -418,16 +684,39 @@
         .codex-item.unlocked .codex-item-status { color: var(--gold-primary); }
         .codex-item:not(.unlocked) .codex-item-status { color: rgba(255,255,255,0.3); }
 
-        /* Custom Scrollbar */
+        /* QUICK ROLL DIGEST MODAL */
+        #digest-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 3, 7, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+        #digest-modal.active { opacity: 1; pointer-events: auto; }
+
+        .digest-content {
+            width: 600px;
+            max-height: 75vh;
+            border: 1px solid var(--gold-secondary);
+            background: rgba(5, 5, 12, 0.95);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--gold-secondary); }
 
-        /* Glitch & Shockwave Overlays */
-        .glitch-effect {
-            animation: glitchAnim 0.15s infinite;
-        }
-
+        .glitch-effect { animation: glitchAnim 0.15s infinite; }
         @keyframes glitchAnim {
             0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
             20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
@@ -439,16 +728,10 @@
 
         .whiteout {
             position: fixed;
-            inset: 0;
-            background: #fff;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            inset: 0; background: #fff; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .whiteout.active {
-            opacity: 1;
-        }
+        .whiteout.active { opacity: 1; }
     </style>
 </head>
 <body>
@@ -461,7 +744,7 @@
         <!-- INTRO SCREEN -->
         <div id="intro-screen">
             <h1 class="intro-title">ASTRAL</h1>
-            <div class="intro-sub">COSMIC ROULETTE & RARITY CODEX</div>
+            <div class="intro-sub">COSMIC ROULETTE & GUILD</div>
             <button class="play-btn" id="start-btn">INITIALIZE</button>
         </div>
 
@@ -477,7 +760,8 @@
                 <div class="logo">ASTRAL</div>
                 <div class="stats-container">
                     <div>ROLLS: <span id="stat-rolls">0</span></div>
-                    <div>DISCOVERED: <span id="stat-discovered">0</span> / 6</div>
+                    <div>COINS: <span id="stat-coins">0</span></div>
+                    <div>DISCOVERED: <span id="stat-discovered">0</span> / 7</div>
                 </div>
             </header>
 
@@ -493,8 +777,69 @@
             <div class="controls">
                 <button class="action-btn" id="roll-btn">ROLL AURA</button>
                 <button class="action-btn" id="auto-btn">AUTO ROLL</button>
+                <button class="action-btn" id="quick-btn" disabled>QUICK ROLL (25)</button>
+                <button class="action-btn" id="mission-open-btn">MISSION</button>
+                <button class="action-btn" id="shop-open-btn">SHOP</button>
                 <button class="codex-btn" id="codex-open-btn">CODEX</button>
             </div>
+        </div>
+
+        <!-- MISSION VIEW -->
+        <div class="sub-view" id="mission-view">
+            <div class="sub-header">
+                <div class="sub-title">GUILD QUESTS</div>
+                <button class="back-btn" id="mission-back-btn">RETURN</button>
+            </div>
+            <div class="mission-container">
+                <div class="wooden-board">
+                    <div class="parchment" id="parchment-box">
+                        <div>
+                            <div class="parchment-title" id="quest-title">QUEST TITLE</div>
+                            <div class="parchment-desc" id="quest-desc" style="margin-top: 15px;">Quest description goes here...</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div class="parchment-reward" id="quest-reward">REWARD: 50 COINS</div>
+                            <button class="quest-action-btn" id="quest-action-btn">ACCEPT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 40px; padding-bottom: 10px;">
+                <button class="nav-arrow" id="quest-prev">◀</button>
+                <button class="nav-arrow" id="quest-next">▶</button>
+            </div>
+        </div>
+
+        <!-- SHOP VIEW -->
+        <div class="sub-view" id="shop-view">
+            <div class="sub-header">
+                <div class="sub-title">COSMIC EMPORIUM</div>
+                <button class="back-btn" id="shop-back-btn">RETURN</button>
+            </div>
+            <div class="shop-grid">
+                <div class="shop-card" onclick="openShopQty(0)">
+                    <div>
+                        <div class="name">LUCK POTION I</div>
+                        <div class="desc">Slightly boosts rare aura acquisition chances.</div>
+                    </div>
+                    <div class="price">150 COINS</div>
+                </div>
+                <div class="shop-card" onclick="openShopQty(1)">
+                    <div>
+                        <div class="name">ASTRAL CATALYST</div>
+                        <div class="desc">Resonates with cosmic energy for better roll yields.</div>
+                    </div>
+                    <div class="price">400 COINS</div>
+                </div>
+                <div class="shop-card" onclick="openShopQty(2)">
+                    <div>
+                        <div class="name">OBLIVION ESSENCE</div>
+                        <div class="desc">Pure celestial essence of extreme rarity.</div>
+                    </div>
+                    <div class="price">1200 COINS</div>
+                </div>
+            </div>
+            <div style="text-align: center; font-size: 0.9rem; color: var(--gold-secondary); letter-spacing: 0.2em;">SELECT AN ITEM TO ACQUIRE</div>
         </div>
     </div>
 
@@ -505,14 +850,39 @@
                 <div class="codex-title">RARITY CODEX</div>
                 <button class="close-codex" id="codex-close-btn">&times;</button>
             </div>
-            <div class="codex-list" id="codex-list">
-                <!-- Dynamically populated -->
+            <div class="codex-list" id="codex-list"></div>
+        </div>
+    </div>
+
+    <!-- QUANTITY POPUP MODAL -->
+    <div id="qty-modal">
+        <div class="qty-content">
+            <div class="qty-title" id="qty-item-name">SELECT QUANTITY</div>
+            <div class="qty-selector">
+                <button class="qty-btn" onclick="adjustQty(-1)">-</button>
+                <div class="qty-value" id="qty-display">1</div>
+                <button class="qty-btn" onclick="adjustQty(1)">+</button>
+            </div>
+            <div class="qty-actions">
+                <button class="action-btn" style="flex:1;" onclick="closeShopQty()">CANCEL</button>
+                <button class="action-btn" style="flex:1; background: rgba(197,160,89,0.3);" onclick="confirmPurchase()">BUY</button>
             </div>
         </div>
     </div>
 
+    <!-- QUICK ROLL DIGEST MODAL -->
+    <div id="digest-modal">
+        <div class="digest-content">
+            <div class="codex-header" style="width: 100%;">
+                <div class="codex-title">QUICK ROLL DIGEST (25 ROLLS)</div>
+                <button class="close-codex" onclick="document.getElementById('digest-modal').classList.remove('active')">&times;</button>
+            </div>
+            <div class="codex-list" id="digest-list" style="width: 100%; max-height: 50vh;"></div>
+        </div>
+    </div>
+
     <script>
-        /* --- RARITY DATA DEFINITION --- */
+        /* --- GAME DATA & STATE --- */
         const AURAS = [
             { id: 0, name: "STARDUST ECHO", rate: 1, weight: 899990, unlocked: true },
             { id: 1, name: "STELLAR VORTEX", rate: 10, weight: 100000, unlocked: false },
@@ -524,19 +894,41 @@
         ];
 
         let totalRolls = 0;
+        let totalCoins = 500;
+        let unlockedCount = 1;
         let isRolling = false;
         let isAutoRolling = false;
-        let unlockedCount = 1;
 
-        // Load saved state if any
+        // Potions / Shop Inventory
+        let inventory = { 0: 0, 1: 0, 2: 0 };
+        let selectedShopItem = 0;
+        let purchaseQty = 1;
+
+        // Quests Data
+        const QUESTS = [
+            { id: 0, title: "STELLAR HARVEST", desc: "Perform 10 standard rolls to harvest stardust energy from the cosmos.", goal: 10, progress: 0, reward: 100, accepted: false, completed: false },
+            { id: 1, title: "COSMIC EXPLORATION", desc: "Discover at least 3 unique auras across your universal journeys.", goal: 3, progress: 1, reward: 300, accepted: false, completed: false },
+            { id: 2, title: "ABSOLUTE RESONANCE", desc: "Perform 50 rolls total to achieve deep dimensional resonance.", goal: 50, progress: 0, reward: 800, accepted: false, completed: false }
+        ];
+        let currentQuestIndex = 0;
+
+        // Load saved state
         try {
-            const saved = localStorage.getItem('astral_save');
+            const saved = localStorage.getItem('astral_save_v2');
             if (saved) {
                 const data = JSON.parse(saved);
                 totalRolls = data.rolls || 0;
+                totalCoins = data.coins || 500;
                 if (data.unlocked) {
-                    AURAS.forEach((a, i) => {
-                        a.unlocked = data.unlocked[i] || a.unlocked;
+                    AURAS.forEach((a, i) => { a.unlocked = data.unlocked[i] || a.unlocked; });
+                }
+                if (data.quests) {
+                    QUESTS.forEach((q, i) => {
+                        if (data.quests[i]) {
+                            q.accepted = data.quests[i].accepted;
+                            q.completed = data.quests[i].completed;
+                            q.progress = data.quests[i].progress;
+                        }
                     });
                 }
                 unlockedCount = AURAS.filter(a => a.unlocked).length;
@@ -547,20 +939,18 @@
             try {
                 const data = {
                     rolls: totalRolls,
-                    unlocked: AURAS.map(a => a.unlocked)
+                    coins: totalCoins,
+                    unlocked: AURAS.map(a => a.unlocked),
+                    quests: QUESTS.map(q => ({ accepted: q.accepted, completed: q.completed, progress: q.progress }))
                 };
-                localStorage.setItem('astral_save', JSON.stringify(data));
+                localStorage.setItem('astral_save_v2', JSON.stringify(data));
             } catch(e) {}
         }
 
-        /* --- WEB AUDIO API (PRO LEVEL AMBIENT & SOUND ENGINE) --- */
+        /* --- WEB AUDIO API (CHURCH AMBIENT & MECHANICAL CLICKS) --- */
         let audioCtx = null;
         let masterGain = null;
-        let ambientOscs = [];
         let ambientGain = null;
-        let lfoNode = null;
-        let delayNode = null;
-        let delayFeedback = null;
         let isAudioInitialized = false;
 
         function initAudio() {
@@ -569,90 +959,93 @@
             audioCtx = new AudioContext();
 
             masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+            masterGain.gain.setValueAtTime(0.4, audioCtx.currentTime); // Gentle default volume
             masterGain.connect(audioCtx.destination);
 
-            // Delay Node for deep spatial echoes (Delay 1: 0.6s, Feedback loop)
-            delayNode = audioCtx.createDelay();
-            delayNode.delayTime.setValueAtTime(0.6, audioCtx.currentTime);
-            
-            delayFeedback = audioCtx.createGain();
-            delayFeedback.gain.setValueAtTime(0.4, audioCtx.currentTime);
-
+            // Delay for divine cathedral reverb/echo
+            let delayNode = audioCtx.createDelay();
+            delayNode.delayTime.setValueAtTime(0.8, audioCtx.currentTime);
+            let delayFeedback = audioCtx.createGain();
+            delayFeedback.gain.setValueAtTime(0.35, audioCtx.currentTime);
             let delayFilter = audioCtx.createBiquadFilter();
             delayFilter.type = 'lowpass';
-            delayFilter.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            delayFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
 
             delayNode.connect(delayFilter);
             delayFilter.connect(delayFeedback);
             delayFeedback.connect(delayNode);
             delayNode.connect(masterGain);
 
-            // 1. Deep Cosmic Drone Pad (Sine & Triangle waves at 55Hz, 110Hz, 165Hz root + 5th)
+            // Church Ambient Chord Pad (Cmaj9 chord: C3, G3, B3, D4, E4)
             ambientGain = audioCtx.createGain();
-            ambientGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            ambientGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
 
-            // LFO for Volume breathing (12 seconds period)
-            lfoNode = audioCtx.createOscillator();
-            lfoNode.frequency.setValueAtTime(1 / 12, audioCtx.currentTime);
-            let lfoGain = audioCtx.createGain();
-            lfoGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-            lfoNode.connect(lfoGain);
-            lfoGain.connect(ambientGain.gain);
-            lfoNode.start();
+            // LFO for slow breathing volume
+            let lfo = audioCtx.createOscillator();
+            lfo.frequency.setValueAtTime(1 / 14, audioCtx.currentTime);
+            let lfoG = audioCtx.createGain();
+            lfoG.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            lfo.connect(lfoG);
+            lfoG.connect(ambientGain.gain);
+            lfo.start();
 
-            const freqs = [55, 110, 165, 220];
-            freqs.forEach((f, idx) => {
+            const chordFreqs = [130.81, 196.00, 246.94, 293.66, 329.63]; // C3, G3, B3, D4, E4
+            chordFreqs.forEach((f, idx) => {
                 let osc = audioCtx.createOscillator();
                 osc.type = (idx % 2 === 0) ? 'sine' : 'triangle';
                 osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-                
-                let panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
-                if (panner) {
-                    panner.pan.setValueAtTime((idx - 1.5) * 0.5, audioCtx.currentTime);
-                    osc.connect(panner);
-                    panner.connect(ambientGain);
-                } else {
-                    osc.connect(ambientGain);
-                }
-                
+                osc.connect(ambientGain);
                 osc.start();
-                ambientOscs.push(osc);
             });
 
             ambientGain.connect(masterGain);
             ambientGain.connect(delayNode);
 
-            // 4. Crystal Chime Generator (Periodic high sparkling notes)
+            // Periodic high angelic chime
             setInterval(() => {
                 if (!audioCtx || audioCtx.state !== 'running') return;
-                playCrystalChime(880 + Math.random() * 400);
-            }, 24000);
+                playAngelChime(1318.51); // E6
+            }, 26000);
 
             isAudioInitialized = true;
         }
 
-        function playCrystalChime(freq, duration = 4.0) {
+        function playAngelChime(freq) {
             if (!audioCtx) return;
             let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            
+            let g = audioCtx.createGain();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1.5); // Very slow attack
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            g.gain.setValueAtTime(0, audioCtx.currentTime);
+            g.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 3.0); // Very long soft attack
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 7.0); // Long release
 
-            osc.connect(gain);
-            gain.connect(masterGain);
-            gain.connect(delayNode);
-
+            osc.connect(g);
+            g.connect(masterGain);
+            g.connect(audioCtx.createDelay() ? masterGain : masterGain); // route
             osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            osc.stop(audioCtx.currentTime + 7.0);
         }
 
-        // 5. Pre-roll & Tension Sound Effects
+        // Mechanical Click Sound during spin/tick
+        function playMechanicalClick() {
+            if (!audioCtx || audioCtx.state !== 'running') return;
+            let osc = audioCtx.createOscillator();
+            let g = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300 + Math.random() * 100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.04);
+
+            g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.04);
+        }
+
         let tensionOsc = null;
         let tensionGain = null;
 
@@ -660,38 +1053,23 @@
             if (!audioCtx) return;
             try {
                 if (tensionOsc) stopTensionAudio();
-                
                 tensionOsc = audioCtx.createOscillator();
                 tensionGain = audioCtx.createGain();
-
-                if (tier >= 3) {
-                    // Ticking / Clock sound simulation for Tier 2+
-                    tensionOsc.type = 'sawtooth';
-                    tensionOsc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                } else {
-                    tensionOsc.type = 'triangle';
-                    tensionOsc.frequency.setValueAtTime(110, audioCtx.currentTime);
-                }
-
+                tensionOsc.type = (tier >= 3) ? 'sawtooth' : 'triangle';
+                tensionOsc.frequency.setValueAtTime(110, audioCtx.currentTime);
                 tensionGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                tensionGain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 2.0);
+                tensionGain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 2.0);
 
                 tensionOsc.connect(tensionGain);
                 tensionGain.connect(masterGain);
-                tensionGain.connect(delayNode);
                 tensionOsc.start();
-
-                // Pitch rise over 2 seconds
                 tensionOsc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 2.0);
             } catch(e) {}
         }
 
         function stopTensionAudio() {
             if (tensionOsc) {
-                try {
-                    tensionOsc.stop();
-                    tensionOsc.disconnect();
-                } catch(e) {}
+                try { tensionOsc.stop(); tensionOsc.disconnect(); } catch(e) {}
                 tensionOsc = null;
             }
         }
@@ -699,34 +1077,31 @@
         function playClimaxHit(tier) {
             if (!audioCtx) return;
             stopTensionAudio();
-            
             if (tier === 4) {
-                // Big Bang Omega Pipe Organ / Majestic Chord
-                [110, 220, 329.63, 440, 554.37, 659.25].forEach(f => {
+                // Pipe organ majestic chord
+                [130.81, 196.00, 261.63, 329.63, 392.00, 523.25].forEach(f => {
                     let osc = audioCtx.createOscillator();
                     let g = audioCtx.createGain();
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-                    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    g.gain.setValueAtTime(0.1, audioCtx.currentTime);
                     g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5.0);
-                    
+
                     let filter = audioCtx.createBiquadFilter();
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(2500, audioCtx.currentTime);
-                    filter.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 5.0);
+                    filter.frequency.setValueAtTime(2200, audioCtx.currentTime);
+                    filter.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 5.0);
 
                     osc.connect(filter);
                     filter.connect(g);
                     g.connect(masterGain);
-                    g.connect(delayNode);
                     osc.start();
                     osc.stop(audioCtx.currentTime + 5.0);
                 });
             } else {
-                playCrystalChime(1760, 3.0);
+                playAngelChime(1760);
             }
         }
-
 
         /* --- CANVAS GRAPHICS & VISUAL ENGINE --- */
         const bgCanvas = document.getElementById('bg-canvas');
@@ -742,14 +1117,11 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Starfield particles
         let stars = [];
         for (let i = 0; i < 400; i++) {
             stars.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                size: Math.random() * 1.5,
-                baseAlpha: Math.random() * 0.7 + 0.3,
+                x: Math.random() * width, y: Math.random() * height,
+                size: Math.random() * 1.5, baseAlpha: Math.random() * 0.7 + 0.3,
                 speed: Math.random() * 0.2 + 0.05
             });
         }
@@ -760,13 +1132,7 @@
             mouse.targetY = e.clientY;
         });
 
-        // Visual FX State variables
-        let fxState = {
-            mode: 'NORMAL', // NORMAL, TENSION_1, TENSION_2, TENSION_3, TENSION_4, COLLAPSE, EXPLODE
-            timer: 0,
-            tier: 0,
-            particles: []
-        };
+        let fxState = { mode: 'NORMAL', timer: 0, tier: 0 };
 
         function updateBackground() {
             mouse.x += (mouse.targetX - mouse.x) * 0.05;
@@ -775,7 +1141,6 @@
             bgCtx.fillStyle = '#030307';
             bgCtx.fillRect(0, 0, width, height);
 
-            // Draw Parallax Stars
             const cx = width / 2;
             const cy = height / 2;
             const dx = (mouse.x - cx) * 0.0002;
@@ -784,26 +1149,22 @@
             stars.forEach(s => {
                 s.x += s.speed + dx * s.size * 20;
                 s.y += dy * s.size * 20;
-                if (s.x < 0) s.x = width;
-                if (s.x > width) s.x = 0;
-                if (s.y < 0) s.y = height;
-                if (s.y > height) s.y = 0;
+                if (s.x < 0) s.x = width; if (s.x > width) s.x = 0;
+                if (s.y < 0) s.y = height; if (s.y > height) s.y = 0;
 
                 bgCtx.fillStyle = `rgba(243, 229, 171, ${s.baseAlpha})`;
                 bgCtx.fillRect(s.x, s.y, s.size, s.size);
             });
 
-            // Draw Golden Aurora Fluid Waves on sides
             bgCtx.save();
             let time = Date.now() * 0.001;
-            let auroraSpeedMultiplier = (fxState.tier === 1 || fxState.tier >= 2) ? 3.0 : 1.0;
-            
+            let auroraSpeed = (fxState.tier === 1 || fxState.tier >= 2) ? 3.0 : 1.0;
             for (let i = 0; i < 3; i++) {
                 bgCtx.beginPath();
                 bgCtx.moveTo(0, height);
-                let waveHeight = height * 0.4 + i * 80;
+                let waveH = height * 0.4 + i * 80;
                 for (let x = 0; x <= width; x += 50) {
-                    let y = waveHeight + Math.sin(x * 0.003 + time * auroraSpeedMultiplier + i) * 80 * (fxState.tier >= 1 ? 1.8 : 1.0);
+                    let y = waveH + Math.sin(x * 0.003 + time * auroraSpeed + i) * 80 * (fxState.tier >= 1 ? 1.8 : 1.0);
                     bgCtx.lineTo(x, y);
                 }
                 bgCtx.lineTo(width, height);
@@ -818,7 +1179,6 @@
             fxCtx.clearRect(0, 0, width, height);
 
             if (fxState.mode === 'COLLAPSE') {
-                // Big Bang Omega: Everything sucked into center
                 fxState.timer -= 0.03;
                 let scale = Math.max(0, fxState.timer);
                 fxCtx.save();
@@ -829,11 +1189,8 @@
                 fxCtx.arc(0, 0, 5000, 0, Math.PI * 2);
                 fxCtx.fill();
                 fxCtx.restore();
-                if (fxState.timer <= 0) {
-                    fxState.mode = 'NORMAL';
-                }
+                if (fxState.timer <= 0) fxState.mode = 'NORMAL';
             } else if (fxState.mode === 'EXPLODE') {
-                // Post-collapse explosion / Whiteout trigger
                 fxState.timer += 0.05;
                 let alpha = Math.max(0, 1 - fxState.timer);
                 fxCtx.fillStyle = `rgba(243, 229, 171, ${alpha})`;
@@ -841,10 +1198,9 @@
                 if (fxState.timer > 1.5) fxState.mode = 'NORMAL';
             }
 
-            // Draw Canvas Lasers / Solar Flares for Tier 3 & 4
             if (fxState.tier === 3 || fxState.tier === 4) {
                 let sunX = width / 2;
-                let sunY = height / 2 - 40; // Approx stage center
+                let sunY = height / 2 - 40;
                 fxCtx.strokeStyle = 'rgba(243, 229, 171, 0.6)';
                 fxCtx.lineWidth = 1.5;
                 for (let i = 0; i < 12; i++) {
@@ -865,20 +1221,31 @@
         }
         renderLoop();
 
-
-        /* --- GAME LOGIC & ROULETTE ENGINE --- */
+        /* --- UI ELEMENTS & CLEANUP BUG FIX --- */
         const introScreen = document.getElementById('intro-screen');
         const loadingView = document.getElementById('loading-view');
         const mainGame = document.getElementById('main-game');
         const startBtn = document.getElementById('start-btn');
         const rollBtn = document.getElementById('roll-btn');
         const autoBtn = document.getElementById('auto-btn');
-        const codexBtn = document.getElementById('codex-open-btn');
+        const quickBtn = document.getElementById('quick-btn');
+        const missionOpenBtn = document.getElementById('mission-open-btn');
+        const shopOpenBtn = document.getElementById('shop-open-btn');
+        const codexOpenBtn = document.getElementById('codex-open-btn');
+
+        const missionView = document.getElementById('mission-view');
+        const missionBackBtn = document.getElementById('mission-back-btn');
+        const shopView = document.getElementById('shop-view');
+        const shopBackBtn = document.getElementById('shop-back-btn');
         const codexModal = document.getElementById('codex-modal');
         const codexCloseBtn = document.getElementById('codex-close-btn');
         const codexList = document.getElementById('codex-list');
+        const qtyModal = document.getElementById('qty-modal');
+        const digestModal = document.getElementById('digest-modal');
+        const digestList = document.getElementById('digest-list');
 
         const statRolls = document.getElementById('stat-rolls');
+        const statCoins = document.getElementById('stat-coins');
         const statDiscovered = document.getElementById('stat-discovered');
         const sunCore = document.getElementById('sun-core');
         const rouletteRing = document.getElementById('roulette-ring');
@@ -886,17 +1253,40 @@
         const auraRate = document.getElementById('aura-rate');
         const whiteout = document.getElementById('whiteout');
 
-        statRolls.innerText = totalRolls;
-        statDiscovered.innerText = unlockedCount;
-
-        // Init UI states
         function updateStatsUI() {
             statRolls.innerText = totalRolls;
+            statCoins.innerText = totalCoins;
             statDiscovered.innerText = unlockedCount;
+            if (totalRolls >= 25) {
+                quickBtn.disabled = false;
+            }
             saveGame();
         }
+        updateStatsUI();
 
-        // Screen Transition Flow
+        // 徹底的なポップアップクリーンアップ（残像バグ解決）
+        function closeAllPopups() {
+            codexModal.classList.remove('active');
+            qtyModal.classList.remove('active');
+            digestModal.classList.remove('active');
+            missionView.classList.remove('active');
+            shopView.classList.remove('active');
+        }
+
+        // Scene transition with sun contraction & loading view
+        function transitionToScene(callback) {
+            closeAllPopups();
+            loadingView.style.opacity = '1';
+            loadingView.style.pointerEvents = 'auto';
+            setTimeout(() => {
+                if (callback) callback();
+                setTimeout(() => {
+                    loadingView.style.opacity = '0';
+                    loadingView.style.pointerEvents = 'none';
+                }, 800);
+            }, 1500);
+        }
+
         startBtn.addEventListener('click', () => {
             initAudio();
             introScreen.style.opacity = '0';
@@ -910,11 +1300,11 @@
                         mainGame.style.opacity = '1';
                         mainGame.style.pointerEvents = 'auto';
                     }, 800);
-                }, 3000);
+                }, 2500);
             }, 1500);
         });
 
-        // Codex Populate
+        /* --- CODEX --- */
         function populateCodex() {
             codexList.innerHTML = '';
             AURAS.forEach(a => {
@@ -931,41 +1321,160 @@
             });
         }
 
-        codexBtn.addEventListener('click', () => {
+        codexOpenBtn.addEventListener('click', () => {
+            closeAllPopups();
             populateCodex();
             codexModal.classList.add('active');
         });
         codexCloseBtn.addEventListener('click', () => codexModal.classList.remove('active'));
 
+        /* --- MISSION SYSTEM --- */
+        missionOpenBtn.addEventListener('click', () => {
+            transitionToScene(() => {
+                missionView.classList.add('active');
+                updateQuestDisplay();
+            });
+        });
 
-        // Weighted RNG Roll
-        function rollAura() {
-            let totalWeight = AURAS.reduce((sum, a) => sum + a.weight, 0);
-            let randomVal = Math.random() * totalWeight;
-            let currentWeightSum = 0;
-            for (let a of AURAS) {
-                currentWeightSum += a.weight;
-                if (randomVal <= currentWeightSum) {
-                    return a;
+        missionBackBtn.addEventListener('click', () => {
+            transitionToScene(() => {
+                missionView.classList.remove('active');
+            });
+        });
+
+        const questTitle = document.getElementById('quest-title');
+        const questDesc = document.getElementById('quest-desc');
+        const questReward = document.getElementById('quest-reward');
+        const questActionBtn = document.getElementById('quest-action-btn');
+        const parchmentBox = document.getElementById('parchment-box');
+
+        function updateQuestDisplay() {
+            let q = QUESTS[currentQuestIndex];
+            parchmentBox.style.transform = 'scale(0.98)';
+            setTimeout(() => parchmentBox.style.transform = 'scale(1)', 150);
+
+            questTitle.innerText = q.title;
+            questDesc.innerText = `${q.desc}\n\nProgress: ${q.progress} / ${q.goal}`;
+            questReward.innerText = `REWARD: ${q.reward} COINS`;
+
+            if (q.completed) {
+                questActionBtn.innerText = "COMPLETED";
+                questActionBtn.disabled = true;
+            } else if (q.accepted) {
+                questActionBtn.innerText = q.progress >= q.goal ? "CLAIM REWARD" : "IN PROGRESS";
+                questActionBtn.disabled = q.progress < q.goal;
+            } else {
+                questActionBtn.innerText = "ACCEPT";
+                questActionBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('quest-prev').addEventListener('click', () => {
+            currentQuestIndex = (currentQuestIndex - 1 + QUESTS.length) % QUESTS.length;
+            updateQuestDisplay();
+        });
+        document.getElementById('quest-next').addEventListener('click', () => {
+            currentQuestIndex = (currentQuestIndex + 1) % QUESTS.length;
+            updateQuestDisplay();
+        });
+
+        questActionBtn.addEventListener('click', () => {
+            let q = QUESTS[currentQuestIndex];
+            if (!q.accepted) {
+                q.accepted = true;
+                updateQuestDisplay();
+            } else if (q.progress >= q.goal && !q.completed) {
+                q.completed = true;
+                totalCoins += q.reward;
+                updateStatsUI();
+                updateQuestDisplay();
+            }
+            saveGame();
+        });
+
+        function checkQuestProgress(type, amount = 1) {
+            QUESTS.forEach(q => {
+                if (q.accepted && !q.completed) {
+                    if (type === 'roll') {
+                        q.progress = Math.min(q.goal, q.progress + amount);
+                    } else if (type === 'discovery') {
+                        q.progress = Math.min(q.goal, unlockedCount);
+                    }
                 }
+            });
+        }
+
+        /* --- SHOP SYSTEM --- */
+        shopOpenBtn.addEventListener('click', () => {
+            transitionToScene(() => {
+                shopView.classList.add('active');
+            });
+        });
+
+        shopBackBtn.addEventListener('click', () => {
+            transitionToScene(() => {
+                shopView.classList.remove('active');
+            });
+        });
+
+        const prices = [150, 400, 1200];
+        const itemNames = ["LUCK POTION I", "ASTRAL CATALYST", "OBLIVION ESSENCE"];
+
+        function openShopQty(itemId) {
+            selectedShopItem = itemId;
+            purchaseQty = 1;
+            document.getElementById('qty-item-name').innerText = itemNames[itemId];
+            document.getElementById('qty-display').innerText = purchaseQty;
+            qtyModal.classList.add('active');
+        }
+
+        function closeShopQty() {
+            qtyModal.classList.remove('active');
+        }
+
+        function adjustQty(delta) {
+            purchaseQty = Math.max(1, Math.min(99, purchaseQty + delta));
+            document.getElementById('qty-display').innerText = purchaseQty;
+        }
+
+        function confirmPurchase() {
+            let cost = prices[selectedShopItem] * purchaseQty;
+            if (totalCoins >= cost) {
+                totalCoins -= cost;
+                inventory[selectedShopItem] += purchaseQty;
+                updateStatsUI();
+                closeShopQty();
+            } else {
+                alert("Insufficient Coins!");
+            }
+        }
+
+        /* --- ROLLETTE & RNG LOGIC --- */
+        function rollAura() {
+            // Apply potion luck boost if available
+            let luckMultiplier = 1.0 + (inventory[0] * 0.05) + (inventory[1] * 0.15) + (inventory[2] * 0.3);
+            let totalWeight = AURAS.reduce((sum, a) => sum + a.weight, 0);
+            let randomVal = Math.random() * totalWeight / luckMultiplier;
+            let currentSum = 0;
+            for (let a of AURAS) {
+                currentSum += a.weight;
+                if (randomVal <= currentSum) return a;
             }
             return AURAS[0];
         }
-
-        // Main Roll execution with 2-second pre-roll aura upgrade演出
-        let preRollTimeout = null;
-        let rollInterval = null;
 
         function executeRoll() {
             if (isRolling) return;
             isRolling = true;
             rollBtn.disabled = true;
             autoBtn.disabled = true;
+            quickBtn.disabled = true;
 
             totalRolls++;
+            checkQuestProgress('roll', 1);
+            checkQuestProgress('discovery', 1);
             updateStatsUI();
 
-            // Pre-determine winning result
             let winner = rollAura();
             let tier = 0;
             if (winner.rate >= 100000000) tier = 4;
@@ -973,56 +1482,43 @@
             else if (winner.rate >= 1000000) tier = 2;
             else if (winner.rate >= 100000) tier = 1;
 
-            // Fast visual spinning
             rouletteRing.classList.add('fast');
             auraName.innerText = "SCANNING COSMOS...";
             auraRate.innerText = "---";
 
-            // Shuffle rolling aesthetic text
+            let clickInterval = setInterval(() => {
+                playMechanicalClick();
+            }, 120);
+
             let shuffleTimer = setInterval(() => {
                 let randomAura = AURAS[Math.floor(Math.random() * AURAS.length)];
                 auraName.innerText = randomAura.unlocked ? randomAura.name : "🔒 ???";
                 auraRate.innerText = `1 / ${randomAura.rate.toLocaleString()}`;
             }, 80);
 
-            // 2 Seconds Before Stop: Trigger Upgrade Pre-Roll Event
             setTimeout(() => {
                 fxState.tier = tier;
                 startTensionAudio(tier);
-
-                if (tier >= 1) {
-                    // Tier 1 (1/100k+): Pulse speed up & Gold aura acceleration
-                }
-                if (tier >= 2) {
-                    // Tier 2 (1/1M+): Time freeze / stardust pause effect
-                }
-                if (tier >= 3) {
-                    // Tier 3 (1/10M+): UI Glitch
-                    mainGame.classList.add('glitch-effect');
-                }
-                if (tier >= 4) {
-                    // Tier 4 (1/100M+): Big Bang Omega - Complete black void suck-in
+                if (tier >= 3) mainGame.classList.add('glitch-effect');
+                if (tier === 4) {
                     fxState.mode = 'COLLAPSE';
                     fxState.timer = 1.0;
                 }
-            }, 1000); // Trigger 1 second into 3-second spin
+            }, 1000);
 
-            // Complete Roll after 3 seconds
             setTimeout(() => {
                 clearInterval(shuffleTimer);
+                clearInterval(clickInterval);
                 rouletteRing.classList.remove('fast');
                 mainGame.classList.remove('glitch-effect');
                 stopTensionAudio();
 
-                // Unlock check
                 if (!winner.unlocked) {
                     winner.unlocked = true;
                     unlockedCount = AURAS.filter(a => a.unlocked).length;
                 }
 
-                // Climax Audio & Visual effect
                 playClimaxHit(tier);
-
                 if (tier === 4) {
                     fxState.mode = 'EXPLODE';
                     fxState.timer = 0;
@@ -1036,6 +1532,7 @@
                 isRolling = false;
                 rollBtn.disabled = false;
                 autoBtn.disabled = false;
+                if (totalRolls >= 25) quickBtn.disabled = false;
                 fxState.tier = 0;
 
                 updateStatsUI();
@@ -1055,21 +1552,67 @@
         autoBtn.addEventListener('click', () => {
             isAutoRolling = !isAutoRolling;
             autoBtn.innerText = isAutoRolling ? "STOP AUTO" : "AUTO ROLL";
-            if (isAutoRolling && !isRolling) {
-                executeRoll();
-            }
+            if (isAutoRolling && !isRolling) executeRoll();
         });
 
-        // Sun Core Pulsing Animation loop
+        /* --- QUICK ROLL (25 ROLLS) --- */
+        quickBtn.addEventListener('click', () => {
+            if (totalRolls < 25 || isRolling) return;
+            let results = [];
+            let hasRare = false;
+            let maxTier = 0;
+
+            for (let i = 0; i < 25; i++) {
+                totalRolls++;
+                let r = rollAura();
+                if (!r.unlocked) {
+                    r.unlocked = true;
+                    unlockedCount = AURAS.filter(a => a.unlocked).length;
+                }
+                results.push(r);
+                if (r.rate >= 100000) {
+                    hasRare = true;
+                    let t = r.rate >= 100000000 ? 4 : (r.rate >= 10000000 ? 3 : (r.rate >= 1000000 ? 2 : 1));
+                    if (t > maxTier) maxTier = t;
+                }
+            }
+            checkQuestProgress('roll', 25);
+            checkQuestProgress('discovery', 25);
+            updateStatsUI();
+
+            if (hasRare) {
+                fxState.tier = maxTier;
+                startTensionAudio(maxTier);
+                playClimaxHit(maxTier);
+                if (maxTier === 4) {
+                    whiteout.classList.add('active');
+                    setTimeout(() => whiteout.classList.remove('active'), 600);
+                }
+                setTimeout(() => { stopTensionAudio(); fxState.tier = 0; }, 2000);
+            }
+
+            // Populate Digest Modal
+            digestList.innerHTML = '';
+            results.forEach(res => {
+                let div = document.createElement('div');
+                div.className = `codex-item unlocked`;
+                div.innerHTML = `
+                    <div class="codex-item-info">
+                        <div class="name">${res.name}</div>
+                        <div class="rate">1 / ${res.rate.toLocaleString()}</div>
+                    </div>
+                    <div class="codex-item-status">OBTAINED</div>
+                `;
+                digestList.appendChild(div);
+            });
+            digestModal.classList.add('active');
+        });
+
+        // Sun pulsing animation loop
         let pulseTime = 0;
         function animateSun() {
             pulseTime += 0.03;
-            let scalePulse = 1;
-            if (fxState.tier >= 1) {
-                scalePulse = 1 + Math.sin(pulseTime * 15) * 0.25; // Fast fierce pulse
-            } else {
-                scalePulse = 1 + Math.sin(pulseTime * 2) * 0.05; // Gentle breathing
-            }
+            let scalePulse = (fxState.tier >= 1) ? (1 + Math.sin(pulseTime * 15) * 0.25) : (1 + Math.sin(pulseTime * 2) * 0.05);
             sunCore.style.transform = `scale(${scalePulse})`;
             requestAnimationFrame(animateSun);
         }
