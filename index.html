@@ -1,24 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LULLABY</title>
+<title>LULLABY - COMPLETE REBUILD</title>
 <style>
-  /* 📌 1 & 3. 純白・漆黒のモノクローム世界観（黄色一切廃止） */
   :root {
     --black: #000000;
     --white: #ffffff;
-    --silver: #e5e5e5;
+    --gray-dark: #111111;
+    --gray-mid: #333333;
+    --silver: #888888;
   }
+
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     user-select: none;
-    -webkit-user-drag: none;
     font-family: 'Helvetica Neue', Arial, sans-serif;
   }
+
   body {
     background-color: var(--black);
     color: var(--white);
@@ -26,6 +28,7 @@
     width: 100vw;
     height: 100vh;
   }
+
   canvas {
     position: absolute;
     top: 0; left: 0;
@@ -34,66 +37,41 @@
     z-index: 1;
   }
 
-  /* 📌 1. タイトル画面の大改造（動く雲海と巨大タイトル） */
+  /* 1. タイトル画面（流動する雲海アニメーション） */
   #title-screen {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(to bottom, var(--white) 0%, var(--silver) 40%, var(--black) 100%);
+    inset: 0;
+    background: linear-gradient(to bottom, var(--white) 0%, #dcdcdc 40%, var(--black) 100%);
     z-index: 100;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    transition: opacity 2s ease-in-out;
-    overflow: hidden;
+    transition: opacity 1.5s ease-in-out;
   }
-  /* 流動する3D雲海アニメーションとライトリーク */
   .cloud-sea {
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(229,229,229,0.4) 40%, transparent 70%);
-    animation: moveClouds 25s linear infinite;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(180,180,180,0.3) 50%, transparent 80%);
+    animation: moveClouds 20s linear infinite;
     mix-blend-mode: overlay;
     pointer-events: none;
   }
   @keyframes moveClouds {
     0% { transform: scale(1) translate(0, 0) rotate(0deg); }
-    50% { transform: scale(1.2) translate(-5%, -5%) rotate(5deg); }
+    50% { transform: scale(1.15) translate(-4%, -4%) rotate(3deg); }
     100% { transform: scale(1) translate(0, 0) rotate(0deg); }
   }
-  .light-beam {
-    position: absolute;
-    top: 0; left: 50%;
-    width: 200px; height: 100%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
-    transform: translateX(-50%) rotate(-15deg);
-    animation: beamSway 8s ease-in-out infinite alternate;
-    pointer-events: none;
-  }
-  @keyframes beamSway {
-    0% { transform: translateX(-60%) rotate(-20deg) scaleX(0.8); opacity: 0.5; }
-    100% { transform: translateX(-40%) rotate(-10deg) scaleX(1.2); opacity: 1; }
-  }
-
-  .title-text {
-    position: absolute;
-    top: 25%;
-    font-size: clamp(5rem, 10vw, 12rem);
+  .title-logo {
+    font-size: clamp(3rem, 8vw, 10rem);
     font-weight: 100;
     color: var(--black);
-    letter-spacing: 1.2em;
-    animation: titleIntro 3s cubic-bezier(0.1, 1, 0.2, 1) forwards;
-    text-shadow: 0 0 20px rgba(255,255,255,0.8);
-    white-space: nowrap;
+    letter-spacing: 0.5em;
+    z-index: 2;
+    text-shadow: 0 0 30px rgba(255,255,255,0.9);
+    margin-bottom: 50px;
   }
-  @keyframes titleIntro {
-    100% { letter-spacing: 0.4em; transform: translateX(0); }
-  }
-
-  /* 完全ひし形 PLAY ボタン */
-  .play-btn {
-    position: absolute;
-    top: 62%;
+  .play-diamond-btn {
     width: 130px; height: 130px;
     transform: rotate(45deg);
     border: 1px solid var(--black);
@@ -101,128 +79,84 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: all 0.3s ease;
     background: transparent;
+    transition: background 0.3s;
+    z-index: 2;
   }
-  .play-btn:hover { background: var(--black); }
-  .play-btn-text {
+  .play-diamond-btn:hover { background: var(--black); }
+  .play-diamond-btn span {
     transform: rotate(-45deg);
     font-weight: 100;
-    letter-spacing: 0.3em;
+    letter-spacing: 0.2em;
     color: var(--black);
-    transition: color 0.3s ease;
+    transition: color 0.3s;
   }
-  .play-btn:hover .play-btn-text { color: var(--white); }
+  .play-diamond-btn:hover span { color: var(--white); }
 
-  /* 波紋エフェクト */
-  .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: var(--white);
-    transform: scale(0);
-    animation: rippleEffect 1.5s ease-out forwards;
-    pointer-events: none;
-  }
-  @keyframes rippleEffect { 100% { transform: scale(50); opacity: 0; } }
-
-  /* ロード画面 */
-  #loading-screen {
-    position: absolute; top:0; left:0; width:100%; height:100%;
-    background: var(--black);
-    z-index: 99;
-    display: none;
-    opacity: 0;
-    transition: opacity 1s ease;
-  }
-  .loading-ui {
-    position: absolute;
-    bottom: 30px; right: 40px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  .loading-text { font-weight: 100; letter-spacing: 0.2em; color: var(--white); }
-  .magic-circle {
-    width: 30px; height: 30px;
-    border: 1px dashed var(--white);
-    border-radius: 50%;
-    animation: spin 3s linear infinite;
-  }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
-  .diamond-magic-circle {
-    width: 50px; height: 50px;
-    border: 1px solid var(--white);
-    transform: rotate(45deg);
-    animation: spinDiamond 2s linear infinite;
-  }
-  @keyframes spinDiamond { 100% { transform: rotate(405deg); } }
-
-  /* メイン画面 */
+  /* 2. メインゲーム画面 */
   #main-screen {
-    position: absolute; top:0; left:0; width:100%; height:100%;
+    position: absolute;
+    inset: 0;
     z-index: 10;
     display: none;
     opacity: 0;
     transition: opacity 1s ease;
   }
 
-  /* 📌 1 & 3. ひし形アイコンUI群 */
+  /* 左上のひし形アイコンメニュー（重なり完全防止：縦に余裕を持ったグリッド配置） */
   #ui-container {
     position: absolute;
-    top: 40px; left: 40px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-    width: 340px;
-    z-index: 20;
-  }
-  .icon-wrapper {
-    position: relative;
+    top: 30px; left: 30px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 60px;
+    gap: 20px;
+    z-index: 20;
   }
-  .diamond-btn {
+  .menu-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+  }
+  .diamond-icon {
     width: 44px; height: 44px;
     transform: rotate(45deg);
     border: 1px solid var(--white);
+    background: var(--gray-dark);
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: rgba(0,0,0,0.8);
+    flex-shrink: 0;
+    transition: background 0.2s;
   }
-  .diamond-btn:hover { background: var(--white); }
-  .diamond-btn svg {
+  .menu-row:hover .diamond-icon { background: var(--white); }
+  .diamond-icon svg {
     transform: rotate(-45deg);
-    fill: var(--white);
     width: 18px; height: 18px;
-    transition: fill 0.2s ease;
+    fill: var(--white);
+    transition: fill 0.2s;
   }
-  .diamond-btn:hover svg { fill: var(--black); }
-  .icon-text {
-    margin-top: 28px; /* ひし形との被り完全解消 */
-    font-size: 0.6rem;
+  .menu-row:hover .diamond-icon svg { fill: var(--black); }
+  .menu-text {
+    font-size: 0.75rem;
     font-weight: 100;
-    letter-spacing: 0.3em;
-    color: var(--white);
-    text-align: center;
+    letter-spacing: 0.25em;
+    color: var(--silver);
     white-space: nowrap;
+    transition: color 0.2s;
   }
+  .menu-row:hover .menu-text { color: var(--white); }
 
-  /* 📌 3. ROLLボタン群（平行四辺形・ひし形トーン） */
+  /* 下部 ROLL ボタンエリア */
   #roll-container {
     position: absolute;
-    bottom: 50px;
-    left: 50%;
+    bottom: 40px; left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 30px;
+    gap: 25px;
     z-index: 20;
   }
-  .roll-btn {
+  .roll-action-btn {
     width: 150px; height: 45px;
     transform: skewX(-15deg);
     border: 1px solid var(--white);
@@ -231,741 +165,399 @@
     font-weight: 100;
     letter-spacing: 0.2em;
     cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s;
   }
-  .roll-btn span { transform: skewX(15deg); }
-  .roll-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
-  .roll-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .roll-action-btn span { transform: skewX(15deg); }
+  .roll-action-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
+  .roll-action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* 結果表示 */
-  #gacha-result {
+  /* ガチャ結果表示 */
+  #gacha-display {
     position: absolute;
     top: 42%; left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     z-index: 15;
   }
-  .aura-name {
-    font-size: 2.5rem;
-    font-weight: 100;
-    letter-spacing: 0.5em;
-    color: var(--white);
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  .aura-prob {
-    font-size: 0.8rem;
-    font-weight: 100;
-    letter-spacing: 0.2em;
-    color: var(--silver);
-    margin-top: 10px;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
+  .res-name { font-size: 2.5rem; font-weight: 100; letter-spacing: 0.4em; margin-bottom: 10px; }
+  .res-prob { font-size: 0.8rem; font-weight: 100; color: var(--silver); letter-spacing: 0.2em; }
 
-  /* モーダル・独立空間UI */
-  .modal {
+  /* モーダル共通ウインドウ */
+  .modal-overlay {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    width: 460px; max-height: 650px;
-    background: rgba(0,0,0,0.95);
-    border: 1px solid var(--white);
-    padding: 30px;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
     z-index: 50;
     display: none;
-    opacity: 0;
-    transition: all 0.3s ease;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-box {
+    width: 450px; max-height: 80vh;
+    background: var(--black);
+    border: 1px solid var(--white);
+    padding: 30px;
+    position: relative;
     overflow-y: auto;
   }
-  .modal.active {
-    display: block; opacity: 1; transform: translate(-50%, -50%) scale(1);
-  }
   .modal-title {
-    font-weight: 100; letter-spacing: 0.3em; border-bottom: 1px solid var(--white);
-    padding-bottom: 10px; margin-bottom: 20px; text-align: center; font-size: 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 100;
+    letter-spacing: 0.3em;
+    border-bottom: 1px solid var(--gray-mid);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    text-align: center;
   }
-  .close-btn {
+  .close-modal {
     position: absolute; top: 15px; right: 20px;
     cursor: pointer; font-weight: 100; font-size: 1.2rem;
   }
-  .item-list { list-style: none; }
-  .item-list li {
-    display: flex; justify-content: space-between; align-items: center;
-    font-weight: 100; letter-spacing: 0.1em; font-size: 0.8rem;
-    padding: 12px 0; border-bottom: 1px dotted var(--silver);
-  }
-
-  /* クラフト専用ボタン */
-  .craft-action-btn {
-    background: transparent;
-    border: 1px solid var(--white);
-    color: var(--white);
-    padding: 5px 15px;
+  .list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dotted var(--gray-mid);
+    font-size: 0.8rem;
     font-weight: 100;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-    transition: all 0.2s;
   }
-  .craft-action-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
-  .craft-action-btn:disabled { opacity: 0.2; border-color: var(--silver); cursor: not-allowed; }
 
-  /* 📌 2. カットシーン演出オーバーレイ */
-  #cutscene-overlay {
-    position: absolute; top:0; left:0; width:100%; height:100%;
+  /* 📌 厳格なクラフトボタン無効化デザイン */
+  .craft-exec-btn {
+    border: 1px solid var(--white);
+    background: transparent;
+    color: var(--white);
+    padding: 6px 16px;
+    font-weight: 100;
+    letter-spacing: 0.15s;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: 0.2s;
+  }
+  .craft-exec-btn:hover:not(:disabled) {
+    background: var(--white);
+    color: var(--black);
+  }
+  .craft-exec-btn:disabled {
+    border-color: var(--gray-mid);
+    color: var(--gray-mid);
+    background: var(--gray-dark);
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  /* 3. カットシーン・演出オーバーレイ */
+  #cutscene-layer {
+    position: absolute; inset: 0;
     z-index: 80;
     pointer-events: none;
     display: none;
-    background: transparent;
+    justify-content: center;
+    align-items: center;
   }
-  .cutscene-counter {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  .cs-counter-text {
     font-size: 3.5rem; font-weight: 100; letter-spacing: 0.2em; color: var(--white);
   }
-  .glass-crack {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at 50% 50%, transparent 20%, rgba(255,255,255,0.4) 80%);
+  .cs-crack-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 10%, rgba(255,255,255,0.3) 90%);
     opacity: 0;
+    transition: opacity 0.3s;
   }
-  .cinematic-frame {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) skewX(-10deg);
-    border: 1px solid var(--white);
-    padding: 25px 50px;
-    opacity: 0;
-    display: flex; flex-direction: column; align-items: center;
-    background: rgba(0,0,0,0.9);
-  }
-  .cinematic-frame span { transform: skewX(10deg); }
-
-  .invert-effect { filter: invert(1); }
-  .glitch-effect { animation: glitch 0.15s infinite; }
-  @keyframes glitch {
-    0% { transform: translate(3px, 1px); }
-    50% { transform: translate(-3px, -2px); }
-    100% { transform: translate(2px, 2px); }
-  }
-  .shake-effect { animation: shake 0.08s infinite; }
-  @keyframes shake {
-    0% { transform: translate(0, 0); }
-    50% { transform: translate(6px, 6px); }
-    100% { transform: translate(-6px, -6px); }
+  .invert-mode { filter: invert(1); }
+  .shake-mode { animation: screenShake 0.08s infinite; }
+  @keyframes screenShake {
+    0% { transform: translate(0,0); }
+    50% { transform: translate(5px, -5px); }
+    100% { transform: translate(-5px, 5px); }
   }
 </style>
 </head>
 <body>
 
-  <!-- 📌 1. タイトル画面 -->
+  <!-- タイトル画面 -->
   <div id="title-screen">
     <div class="cloud-sea"></div>
-    <div class="light-beam"></div>
-    <div class="title-text">LULLABY</div>
-    <div class="play-btn" onclick="startGame(event)">
-      <div class="play-btn-text">PLAY</div>
-    </div>
-  </div>
-
-  <!-- ロード画面 -->
-  <div id="loading-screen">
-    <div class="loading-ui" id="loading-ui-default">
-      <div class="loading-text">Loading...</div>
-      <div class="magic-circle"></div>
-    </div>
-    <div class="loading-ui" id="loading-ui-otherside" style="display:none; bottom: 50%; right: 50%; transform: translate(50%, 50%); flex-direction: column;">
-      <div class="diamond-magic-circle"></div>
-      <div class="loading-text" style="margin-top: 25px;">Entering Other Side...</div>
+    <div class="title-logo">LULLABY</div>
+    <div class="play-diamond-btn" onclick="startApp()">
+      <span>PLAY</span>
     </div>
   </div>
 
   <!-- メイン画面 -->
   <div id="main-screen">
     <canvas id="bg-canvas"></canvas>
-    
-    <!-- 📌 1 & 3. 正確に整理されたひし形UI＋アイコン群 -->
+
+    <!-- 左メニュー（重なりゼロの縦並び） -->
     <div id="ui-container">
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="openModal('settings-modal')">
-          <svg viewBox="0 0 24 24"><path d="M19.4 13c.2-.6.2-1.3.2-2s0-1.4-.2-2l2.1-1.6c.2-.2.2-.4.1-.6l-2-3.5c-.1-.2-.3-.2-.5-.2l-2.5 1c-.5-.4-1.1-.7-1.7-1l-.4-2.6C14.5 0 14.3 0 14.1 0h-4.2c-.2 0-.4 0-.4.3l-.4 2.6c-.6.3-1.2.6-1.7 1l-2.5-1c-.2-.1-.4 0-.5.2l-2 3.5c-.1.2 0 .4.1.6L4.6 9c-.2.6-.2 1.3-.2 2s0 1.4.2 2l-2.1 1.6c-.2.2-.2.4-.1.6l2 3.5c.1.2.3.2.5.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.3.4.3h4.2c.2 0 .4 0 .4-.3l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1c.2.1.4 0 .5-.2l2-3.5c.1-.2 0-.4-.1-.6l-2.1-1.6zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"/></svg>
-        </div>
-        <div class="icon-text">SETTINGS</div>
-      </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="openModal('backpack-modal')">
+      <div class="menu-row" onclick="openModal('backpack-modal')">
+        <div class="diamond-icon">
           <svg viewBox="0 0 24 24"><path d="M19 6h-2V4c0-1.1-.9-2-2-2H9C7.9 2 7 2.9 7 4v2H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10-2h6v2H9V4zm10 16H5V8h14v12z"/></svg>
         </div>
-        <div class="icon-text">BACKPACK</div>
+        <div class="menu-text">BACKPACK</div>
       </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="openModal('equipment-modal')">
-          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        </div>
-        <div class="icon-text">EQUIP</div>
-      </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="gotoOtherSide('SHOP')">
-          <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.6L5.2 14c-.1.3-.2.6-.2 1 0 1.1.9 2 2 2h12v-2H7.4c-.1 0-.2-.1-.2-.2v-.1l.9-1.7h7.5c.7 0 1.4-.4 1.7-1l3.9-7.1c.1-.2.2-.5.2-.8 0-1.1-.9-2-2-2H5.2L4.3 2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-        </div>
-        <div class="icon-text">SHOP</div>
-      </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="gotoOtherSide('CRAFT')">
+      <div class="menu-row" onclick="openModal('craft-modal')">
+        <div class="diamond-icon">
           <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.1L9.4 6.6 6.6 9.4 1.9 4.7C.6 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
         </div>
-        <div class="icon-text">CRAFT</div>
+        <div class="menu-text">CRAFT FORGE</div>
       </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="gotoOtherSide('MISSION')">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-        </div>
-        <div class="icon-text">MISSION</div>
-      </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="gotoOtherSide('LIBRARY')">
-          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
-        </div>
-        <div class="icon-text">LIBRARY</div>
-      </div>
-      <div class="icon-wrapper">
-        <div class="diamond-btn" onclick="gotoOtherSide('GUILD')">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="2"/><path d="M12 6v6l4 2" fill="none" stroke="white" stroke-width="2"/></svg>
-        </div>
-        <div class="icon-text">OTHER SIDE</div>
-      </div>
-    </div>
-
-    <!-- ROLL ボタン群 -->
-    <div id="roll-container">
-      <button class="roll-btn" id="btn-roll" onclick="rollGacha()"><span>ROLL</span></button>
-      <button class="roll-btn" id="btn-auto" onclick="toggleAutoRoll()"><span>AUTO ROLL</span></button>
-      <button class="roll-btn" id="btn-quick" onclick="toggleQuickRoll()"><span>QUICK ROLL</span></button>
     </div>
 
     <!-- ガチャ結果 -->
-    <div id="gacha-result">
-      <div class="aura-name" id="aura-name"></div>
-      <div class="aura-prob" id="aura-prob"></div>
+    <div id="gacha-display">
+      <div class="res-name" id="res-name">---</div>
+      <div class="res-prob" id="res-prob">1 / 1</div>
+    </div>
+
+    <!-- ROLLボタン -->
+    <div id="roll-container">
+      <button class="roll-action-btn" id="btn-roll" onclick="executeRoll()"><span>ROLL</span></button>
+      <button class="roll-action-btn" id="btn-auto" onclick="toggleAutoRoll()"><span>AUTO</span></button>
     </div>
   </div>
 
-  <!-- モーダル各種 -->
-  <div id="backpack-modal" class="modal">
-    <div class="close-btn" onclick="closeModal('backpack-modal')">X</div>
-    <div class="modal-title">BACKPACK & MATERIALS</div>
-    <ul class="item-list" id="backpack-list"></ul>
+  <!-- モーダル: バックパック -->
+  <div class="modal-overlay" id="backpack-modal">
+    <div class="modal-box">
+      <div class="close-modal" onclick="closeModal('backpack-modal')">✕</div>
+      <div class="modal-title">BACKPACK & MATERIALS</div>
+      <div id="backpack-list"></div>
+    </div>
   </div>
 
-  <div id="equipment-modal" class="modal">
-    <div class="close-btn" onclick="closeModal('equipment-modal')">X</div>
-    <div class="modal-title">EQUIPMENT LIST (INDEPENDENT)</div>
-    <ul class="item-list" id="equipment-list">
-      <li><span>GAUNTLET SLOT 1</span><span id="slot-gauntlet">NONE</span></li>
-      <li><span>RUNE SLOT 1</span><span id="slot-rune">NONE</span></li>
-    </ul>
-  </div>
-
-  <div id="settings-modal" class="modal">
-    <div class="close-btn" onclick="closeModal('settings-modal')">X</div>
-    <div class="modal-title">SETTINGS</div>
-    <ul class="item-list"><li>MASTER VOLUME: 100%</li><li>GRAPHICS QUALITY: ULTRA</li></ul>
+  <!-- モーダル: クラフト -->
+  <div class="modal-overlay" id="craft-modal">
+    <div class="modal-box">
+      <div class="close-modal" onclick="closeModal('craft-modal')">✕</div>
+      <div class="modal-title">CRAFT FORGE</div>
+      <div id="craft-list"></div>
+    </div>
   </div>
 
   <!-- カットシーンオーバーレイ -->
-  <div id="cutscene-overlay">
-    <div class="cutscene-counter" id="cs-counter" style="display:none;">1 / 0</div>
-    <div class="glass-crack" id="cs-crack"></div>
-    <div class="cinematic-frame" id="cs-frame">
-      <span class="aura-name" id="cs-aura-name" style="opacity:1;"></span>
-      <span class="aura-prob" id="cs-aura-prob" style="opacity:1;"></span>
-    </div>
+  <div id="cutscene-layer">
+    <div class="cs-crack-bg" id="cs-crack"></div>
+    <div class="cs-counter-text" id="cs-counter">1 / 0</div>
   </div>
 
 <script>
-/* =========================================================================
-   データ構造とガチャ確率ロジック (51種)
-========================================================================= */
-const AURA_DATA = [];
-const formatNumber = (num) => num.toLocaleString();
+// --- データ定義 ---
+const MATERIALS = {
+  1: { name: "Iron Dust", count: 2 },    // 初期所持数 2
+  2: { name: "Void Shard", count: 0 }    // 初期所持数 0 (不足によりクラフトボタンが必ずグレーアウト・ロックされる)
+};
 
-const normalPrefixes = ["Dust","Stone","Iron","Steel","Silver","Void","Echo","Pulse","Glimmer","Spark","Fade","Drift","Haze","Mist","Shard","Gloom","Dusk","Dawn","Core","Flux","Zenith"];
-for(let i=0; i<21; i++){
-  let prob = Math.floor(Math.pow(1.5, i+1) * 2); 
-  AURA_DATA.push({ id: i+1, name: normalPrefixes[i], prob: prob, rarity: 'normal' });
-}
-
-const rareNames = [
-  "Equinox Balance","END OF TIME","Vortex","Velocity","Cyclone","TRAUMA","OVERTHINKING",
-  "memorial overreached","Abyss Gaze","Paradox Shift","Quantum Leap","Singularity",
-  "Event Horizon","Stellar Collapse","Absolute Zero","Entropy","Supernova","Black Dwarf",
-  "White Hole","Cosmic Web","Dark Matter","Neutrino","Tachyon","Warp Drive","String Theory",
-  "Multiverse","Omnipresence","Genesis","Revelation","LULLABY ULTIMA"
-];
-for(let i=0; i<30; i++){
-  let prob = 100000 + Math.floor(Math.pow(1.6, i) * 40000); 
-  if(i===29) prob = 5000000000;
-  AURA_DATA.push({ id: 22+i, name: rareNames[i], prob: prob, rarity: 'rare' });
-}
-
-// 📌 2. クラフト用レシピデータ（素材と必要数）
 const CRAFT_RECIPES = [
-  { id: 'g_1', name: 'Astral Gauntlet', type: 'gauntlet', costMatId: 1, costAmount: 5 },
-  { id: 'g_2', name: 'Void Gauntlet', type: 'gauntlet', costMatId: 3, costAmount: 10 },
-  { id: 'r_1', name: 'Echo Rune', type: 'rune', costMatId: 2, costAmount: 5 },
-  { id: 'r_2', name: 'Zenith Rune', type: 'rune', costMatId: 10, costAmount: 3 }
+  { id: 'r1', name: 'Iron Gauntlet', costMatId: 1, costAmount: 1 }, // 所持2個 >= 必要1個 （作成可能）
+  { id: 'r2', name: 'Void Blade', costMatId: 2, costAmount: 5 }       // 所持0個 < 必要5個 （完全ロック）
 ];
 
-const getTotalWeight = () => AURA_DATA.reduce((sum, aura) => sum + (1 / aura.prob), 0);
-const getRandomAura = () => {
-  const totalWeight = getTotalWeight();
-  let r = Math.random() * totalWeight;
-  for(let aura of AURA_DATA) {
-    r -= (1 / aura.prob);
-    if(r <= 0) return aura;
-  }
-  return AURA_DATA[0];
-};
+const Auras = [
+  { name: "Dust", prob: 5 },
+  { name: "Stone", prob: 25 },
+  { name: "Iron", prob: 120 },
+  { name: "Steel", prob: 850 },
+  { name: "END OF TIME (Rare)", prob: 250000 } // カットシーン発生用
+];
 
-// プレイヤーインベントリ（素材も含めてID管理）
-const player = {
-  inventory: {},
-  materials: { 1: 3, 2: 4, 3: 0, 10: 1 }, // 初期テスト用素材
-  equipped: { gauntlet: null, rune: null }
-};
-AURA_DATA.forEach(a => player.inventory[a.id] = 0);
-
-/* =========================================================================
-   状態管理・DOM制御
-========================================================================= */
 let isRolling = false;
-let autoRollInterval = null;
-let isQuick = false;
-let currentAura = null;
+let autoTimer = null;
 
-const btnRoll = document.getElementById('btn-roll');
-const btnAuto = document.getElementById('btn-auto');
-const btnQuick = document.getElementById('btn-quick');
-const resName = document.getElementById('aura-name');
-const resProb = document.getElementById('aura-prob');
-
-/* タイトル画面遷移 */
-function startGame(e) {
-  const btn = e.currentTarget;
-  const ripple = document.createElement('div');
-  ripple.classList.add('ripple');
-  btn.appendChild(ripple);
-  
-  initAudio();
-  playTone(440, 'sine', 0.1, 1);
-
+// --- アプリ起動 ---
+function startApp() {
+  const title = document.getElementById('title-screen');
+  title.style.opacity = '0';
   setTimeout(() => {
-    document.getElementById('title-screen').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('title-screen').style.display = 'none';
-      document.getElementById('loading-screen').style.display = 'block';
-      setTimeout(() => document.getElementById('loading-screen').style.opacity = '1', 50);
-      
-      setTimeout(() => {
-        document.getElementById('loading-screen').style.opacity = '0';
-        setTimeout(() => {
-          document.getElementById('loading-screen').style.display = 'none';
-          document.getElementById('main-screen').style.display = 'block';
-          setTimeout(() => document.getElementById('main-screen').style.opacity = '1', 50);
-          initCanvas();
-        }, 1000);
-      }, 3000);
-    }, 2000);
+    title.style.display = 'none';
+    const main = document.getElementById('main-screen');
+    main.style.display = 'block';
+    setTimeout(() => main.style.opacity = '1', 50);
+    initCanvas();
   }, 1000);
 }
 
-/* 空間遷移 (Other Side) */
-function gotoOtherSide(destination) {
-  cleanupUI();
-  playTone(880, 'triangle', 0.1, 0.5);
-  document.getElementById('loading-ui-default').style.display = 'none';
-  document.getElementById('loading-ui-otherside').style.display = 'flex';
-  
-  const loader = document.getElementById('loading-screen');
-  loader.style.display = 'block';
-  setTimeout(() => loader.style.opacity = '1', 50);
-  
-  setTimeout(() => {
-    if(destination === 'CRAFT') {
-      openCraftModal();
-    } else {
-      alert(`Arrived at ${destination} (Independent Space)`);
-    }
-    loader.style.opacity = '0';
-    setTimeout(() => {
-      loader.style.display = 'none';
-      document.getElementById('loading-ui-default').style.display = 'flex';
-      document.getElementById('loading-ui-otherside').style.display = 'none';
-    }, 1000);
-  }, 3000);
-}
-
-function cleanupUI() {
-  document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-}
-
+// --- モーダル制御 ---
 function openModal(id) {
-  playTone(600, 'sine', 0.05, 0.1);
-  if(id === 'backpack-modal') updateBackpack();
-  if(id === 'equipment-modal') updateEquipmentUI();
-  document.getElementById(id).classList.add('active');
+  if(id === 'backpack-modal') renderBackpack();
+  if(id === 'craft-modal') renderCraft();
+  document.getElementById(id).style.display = 'flex';
 }
 function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
+  document.getElementById(id).style.display = 'none';
 }
 
-function updateBackpack() {
-  const list = document.getElementById('backpack-list');
-  list.innerHTML = '';
-  // 素材一覧表示
-  Object.keys(player.materials).forEach(matId => {
-    const matName = AURA_DATA.find(a => a.id == matId)?.name || `Material #${matId}`;
-    const li = document.createElement('li');
-    li.innerHTML = `<span>[MAT] ${matName}</span><span>x${player.materials[matId]}</span>`;
-    list.appendChild(li);
-  });
-  // オーラ一覧表示
-  AURA_DATA.forEach(a => {
-    if(player.inventory[a.id] > 0) {
-      const li = document.createElement('li');
-      li.innerHTML = `<span>${a.name}</span><span>x${player.inventory[a.id]}</span>`;
-      list.appendChild(li);
-    }
-  });
-}
-
-function updateEquipmentUI() {
-  document.getElementById('slot-gauntlet').innerText = player.equipped.gauntlet || 'NONE';
-  document.getElementById('slot-rune').innerText = player.equipped.rune || 'NONE';
-}
-
-/* 📌 2. クラフト画面と厳格な素材判定・消費ロジック */
-function openCraftModal() {
-  // クラフト専用モーダルを動的構築して表示
-  let craftModal = document.getElementById('craft-modal');
-  if(!craftModal) {
-    craftModal = document.createElement('div');
-    craftModal.id = 'craft-modal';
-    craftModal.className = 'modal active';
-    document.body.appendChild(craftModal);
-  } else {
-    craftModal.classList.add('active');
+function renderBackpack() {
+  const container = document.getElementById('backpack-list');
+  container.innerHTML = '';
+  for(let id in MATERIALS) {
+    container.innerHTML += `
+      <div class="list-row">
+        <span>[MAT] ${MATERIALS[id].name}</span>
+        <span>x${MATERIALS[id].count}</span>
+      </div>
+    `;
   }
+}
 
-  let html = `<div class="close-btn" onclick="closeModal('craft-modal')">X</div>`;
-  html += `<div class="modal-title">CRAFT FORGE</div>`;
-  html += `<ul class="item-list">`;
-  
+// 📌 厳格なクラフト素材判定とボタン制御
+function renderCraft() {
+  const container = document.getElementById('craft-list');
+  container.innerHTML = '';
+
   CRAFT_RECIPES.forEach(recipe => {
-    const matName = AURA_DATA.find(a => a.id == recipe.costMatId)?.name || `Item#${recipe.costMatId}`;
-    const owned = player.materials[recipe.costMatId] || 0;
-    const hasEnough = owned >= recipe.costAmount;
-    
-    html += `<li>
-      <span>${recipe.name} (Req: ${matName} ${owned}/${recipe.costAmount})</span>
-      <button class="craft-action-btn" ${hasEnough ? '' : 'disabled'} onclick="craftItem('${recipe.id}')">CRAFT</button>
-    </li>`;
+    const mat = MATERIALS[recipe.costMatId];
+    const hasEnough = mat.count >= recipe.costAmount; // 判定
+
+    container.innerHTML += `
+      <div class="list-row">
+        <div>
+          <div>${recipe.name}</div>
+          <div style="font-size:0.65rem; color:var(--silver);">Req: ${mat.name} (${mat.count}/${recipe.costAmount})</div>
+        </div>
+        <button class="craft-exec-btn" ${hasEnough ? '' : 'disabled'} onclick="craftItem('${recipe.id}')">
+          CRAFT
+        </button>
+      </div>
+    `;
   });
-  html += `</ul>`;
-  craftModal.innerHTML = html;
 }
 
 function craftItem(recipeId) {
   const recipe = CRAFT_RECIPES.find(r => r.id === recipeId);
-  if(!recipe) return;
+  const mat = MATERIALS[recipe.costMatId];
 
-  const owned = player.materials[recipe.costMatId] || 0;
-  // 厳格な比較判定 (if 所持数 >= 必要数)
-  if(owned >= recipe.costAmount) {
-    // 素材引き算（消費）
-    player.materials[recipe.costMatId] -= recipe.costAmount;
-    
-    // 装備スロットへ反映 (カチャッという音響効果付き)
-    playTone(1200, 'square', 0.1, 0.4);
-    setTimeout(() => playTone(300, 'sawtooth', 0.2, 0.5), 100);
-
-    if(recipe.type === 'gauntlet') player.equipped.gauntlet = recipe.name;
-    if(recipe.type === 'rune') player.equipped.rune = recipe.name;
-
-    alert(`Successfully crafted ${recipe.name}! Equipped to slot.`);
-    openCraftModal(); // 再描画
+  // 念のための二重ガード
+  if(mat.count >= recipe.costAmount) {
+    mat.count -= recipe.costAmount; // 素材を消費
+    alert(`${recipe.name} を作成しました！`);
+    renderCraft(); // ボタン状態を再評価して更新
   } else {
-    alert('Not enough materials to craft this item.');
+    alert("素材が不足しています。");
   }
 }
 
-/* =========================================================================
-   ガチャシステム（連打防止・クールダウン）
-========================================================================= */
-function rollGacha() {
+// --- ガチャ・演出処理 ---
+function executeRoll() {
   if (isRolling) return;
   isRolling = true;
-  disableButtons(true);
-  
-  resName.style.opacity = '0';
-  resProb.style.opacity = '0';
-  
-  const rollTime = isQuick ? 150 : 600; 
-  
-  setTimeout(() => {
-    currentAura = getRandomAura();
-    player.inventory[currentAura.id]++;
-    // ガチャ報酬として極稀に素材も手に入る
-    if(Math.random() < 0.3) {
-      let randomMatId = Math.floor(Math.random() * 5) + 1;
-      player.materials[randomMatId] = (player.materials[randomMatId] || 0) + 1;
-    }
-    
-    // 📌 2. 10万以上のレアならカットシーン演出
-    if (currentAura.prob >= 100000) {
-      playCutscene(currentAura);
-    } else {
-      showResult(currentAura);
-      setTimeout(() => {
-        isRolling = false;
-        disableButtons(false);
-      }, 250); // 快適なクールダウン
-    }
-  }, rollTime);
+  document.getElementById('btn-roll').disabled = true;
+
+  // 抽選
+  const result = Auras[Math.floor(Math.random() * Auras.length)];
+
+  if (result.prob >= 100000) {
+    playCutscene(result);
+  } else {
+    showResult(result);
+    isRolling = false;
+    document.getElementById('btn-roll').disabled = false;
+  }
 }
 
 function showResult(aura) {
-  resName.innerText = aura.name;
-  resProb.innerText = `1 / ${formatNumber(aura.prob)}`;
-  resName.style.opacity = '1';
-  resProb.style.opacity = '1';
-}
-
-function disableButtons(disabled) {
-  btnRoll.disabled = disabled;
-  btnAuto.disabled = disabled;
-  btnQuick.disabled = disabled;
+  document.getElementById('res-name').innerText = aura.name;
+  document.getElementById('res-prob').innerText = `1 / ${aura.prob.toLocaleString()}`;
 }
 
 function toggleAutoRoll() {
-  if (autoRollInterval) {
-    clearInterval(autoRollInterval);
-    autoRollInterval = null;
-    btnAuto.style.background = 'transparent';
-    btnAuto.style.color = 'var(--white)';
+  const btn = document.getElementById('btn-auto');
+  if (autoTimer) {
+    clearInterval(autoTimer);
+    autoTimer = null;
+    btn.style.background = 'transparent';
+    btn.style.color = 'var(--white)';
   } else {
-    btnAuto.style.background = 'var(--white)';
-    btnAuto.style.color = 'var(--black)';
-    autoRollInterval = setInterval(() => {
-      if(!isRolling) rollGacha();
-    }, isQuick ? 400 : 1200);
+    btn.style.background = 'var(--white)';
+    btn.style.color = 'var(--black)';
+    autoTimer = setInterval(() => {
+      if(!isRolling) executeRoll();
+    }, 600);
   }
 }
 
-function toggleQuickRoll() {
-  isQuick = !isQuick;
-  btnQuick.style.background = isQuick ? 'var(--white)' : 'transparent';
-  btnQuick.style.color = isQuick ? 'var(--black)' : 'var(--white)';
-}
-
-/* =========================================================================
-   📌 2. 30種類の超絶カットシーン完全実装
-========================================================================= */
-const overlay = document.getElementById('cutscene-overlay');
-const csCounter = document.getElementById('cs-counter');
-const csCrack = document.getElementById('cs-crack');
-const csFrame = document.getElementById('cs-frame');
-const csName = document.getElementById('cs-aura-name');
-const csProb = document.getElementById('cs-aura-prob');
-
+// レア演出（カットシーン）
 function playCutscene(aura) {
-  canvasState.paused = true;
-  stopAllAudio();
-  overlay.style.display = 'block';
-  document.body.className = '';
-  csCrack.style.opacity = '0';
-  csFrame.style.opacity = '0';
-  csCounter.style.display = 'block';
-  csCounter.innerText = '1 / 0';
+  const layer = document.getElementById('cutscene-layer');
+  const counter = document.getElementById('cs-counter');
+  const crack = document.getElementById('cs-crack');
   
-  let styleConfig = getCutsceneStyle(aura.id);
-  applyCutsceneStyle(styleConfig);
+  layer.style.display = 'flex';
+  document.body.classList.add('invert-mode', 'shake-mode');
+  crack.style.opacity = '1';
 
-  let currentCount = 0;
-  let targetCount = aura.prob;
-  let duration = 2200;
+  let current = 0;
+  let target = aura.prob;
   let startTime = performance.now();
 
-  function updateCounter(time) {
-    let elapsed = time - startTime;
-    let progress = Math.min(elapsed / duration, 1);
-    let easeProgress = Math.pow(progress, 4);
-    currentCount = Math.floor(easeProgress * targetCount);
-    csCounter.innerText = `1 / ${formatNumber(currentCount)}`;
-    
+  function animateCount(time) {
+    let progress = Math.min((time - startTime) / 2000, 1);
+    current = Math.floor(Math.pow(progress, 3) * target);
+    counter.innerText = `1 / ${current.toLocaleString()}`;
+
     if (progress < 1) {
-      requestAnimationFrame(updateCounter);
+      requestAnimationFrame(animateCount);
     } else {
-      csCounter.innerText = `1 / ${formatNumber(targetCount)}`;
-      triggerBreakthrough(aura, styleConfig);
-    }
-  }
-  requestAnimationFrame(updateCounter);
-}
-
-function getCutsceneStyle(id) {
-  let cfg = { particleMode: 'implode', screenClass: '', sound: 'bass' };
-  switch(id) {
-    case 22: cfg = { particleMode: 'flip', screenClass: 'invert-effect', sound: 'glitch' }; break;
-    case 23: cfg = { particleMode: 'stop', screenClass: 'invert-effect', sound: 'organ' }; break;
-    case 24: cfg = { particleMode: 'spiral', screenClass: '', sound: 'sweep' }; break;
-    case 25: cfg = { particleMode: 'dash', screenClass: '', sound: 'sweep' }; break;
-    case 26: cfg = { particleMode: 'vortex', screenClass: 'shake-effect', sound: 'bass' }; break;
-    case 27: cfg = { particleMode: 'chaos', screenClass: 'glitch-effect', sound: 'noise' }; break;
-    case 28: cfg = { particleMode: 'jitter', screenClass: 'glitch-effect shake-effect', sound: 'noise' }; break;
-    case 29: cfg = { particleMode: 'gold_burst', screenClass: 'invert-effect', sound: 'organ' }; break;
-    case 51: cfg = { particleMode: 'ultima', screenClass: 'invert-effect glitch-effect shake-effect', sound: 'organ_chord' }; break;
-    default: cfg = { particleMode: 'implode', screenClass: '', sound: 'bass' };
-  }
-  return cfg;
-}
-
-function applyCutsceneStyle(cfg) {
-  if(cfg.screenClass) document.body.className = cfg.screenClass;
-}
-
-function triggerBreakthrough(aura, styleConfig) {
-  csCounter.style.display = 'none';
-  csCrack.style.opacity = '1';
-  playAudioEffect(styleConfig.sound);
-  
-  document.body.style.background = "var(--white)";
-  setTimeout(() => document.body.style.background = "var(--black)", 120);
-
-  canvasState.cutsceneMode = styleConfig.particleMode;
-  canvasState.paused = false;
-
-  setTimeout(() => {
-    csCrack.style.opacity = '0';
-    document.body.className = '';
-    
-    csFrame.style.display = 'flex';
-    csName.innerText = aura.name;
-    csProb.innerText = `1 / ${formatNumber(aura.prob)}`;
-    csFrame.style.opacity = '1';
-    
-    setTimeout(() => {
-      csFrame.style.opacity = '0';
+      counter.innerText = `1 / ${target.toLocaleString()}`;
       setTimeout(() => {
-        csFrame.style.display = 'none';
-        overlay.style.display = 'none';
-        canvasState.cutsceneMode = 'normal';
+        layer.style.display = 'none';
+        document.body.classList.remove('invert-mode', 'shake-mode');
+        crack.style.opacity = '0';
         showResult(aura);
         isRolling = false;
-        disableButtons(false);
-      }, 500);
-    }, 3000);
-  }, 1500);
+        document.getElementById('btn-roll').disabled = false;
+      }, 1200);
+    }
+  }
+  requestAnimationFrame(animateCount);
 }
 
-/* =========================================================================
-   Canvasパーティクル
-========================================================================= */
+// --- 背景パーティクル ---
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
-const canvasState = { paused: false, cutsceneMode: 'normal' };
 
 function initCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   particles = [];
-  for(let i=0; i<450; i++){
-    particles.push(createParticle());
-  }
-  requestAnimationFrame(renderCanvas);
-}
-
-function createParticle() {
-  return {
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: (Math.random() - 0.5) * 0.4,
-    size: Math.random() * 2
-  };
-}
-
-function renderCanvas() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-
-  if(!canvasState.paused) {
-    ctx.fillStyle = '#ffffff';
-    particles.forEach(p => {
-      if (canvasState.cutsceneMode === 'normal') {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x < 0) p.x = canvas.width; if(p.x > canvas.width) p.x = 0;
-        if(p.y < 0) p.y = canvas.height; if(p.y > canvas.height) p.y = 0;
-      } else {
-        const dx = cx - p.x;
-        const dy = cy - p.y;
-        p.x += dx * 0.12; p.y += dy * 0.12;
-      }
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+  for(let i=0; i<300; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      size: Math.random() * 1.5
     });
   }
-  requestAnimationFrame(renderCanvas);
+  loopCanvas();
+}
+
+function loopCanvas() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = '#ffffff';
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x < 0) p.x = canvas.width; if(p.x > canvas.width) p.x = 0;
+    if(p.y < 0) p.y = canvas.height; if(p.y > canvas.height) p.y = 0;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(loopCanvas);
 }
 
 window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
-
-/* =========================================================================
-   Web Audio API
-========================================================================= */
-let audioCtx;
-function initAudio() {
-  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-function stopAllAudio() {
-  if(audioCtx) audioCtx.suspend().then(() => audioCtx.resume());
-}
-function playTone(freq, type, duration, vol) {
-  if(!audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(); osc.stop(audioCtx.currentTime + duration);
-}
-
-function playAudioEffect(type) {
-  if(!audioCtx) return;
-  switch(type) {
-    case 'bass': playTone(45, 'sawtooth', 2.5, 1); break;
-    case 'organ': playTone(180, 'square', 3, 0.4); playTone(360, 'square', 3, 0.2); break;
-    case 'organ_chord':
-      playTone(261.6, 'square', 5, 0.4);
-      playTone(329.6, 'square', 5, 0.4);
-      playTone(392.0, 'square', 5, 0.4);
-      break;
-    case 'glitch':
-      for(let i=0; i<8; i++) setTimeout(() => playTone(Math.random()*800+200, 'square', 0.1, 0.4), i*60);
-      break;
-    default: playTone(100, 'sawtooth', 1.5, 0.8);
-  }
-}
 </script>
 </body>
 </html>
