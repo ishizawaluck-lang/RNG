@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LULLABY - COMPLETE REBUILD</title>
+<title>LULLABY - COMPLETE HOLOGRAM MINIMALISM</title>
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root {
     --black: #000000;
     --white: #ffffff;
-    --gray-dark: #111111;
-    --gray-mid: #333333;
+    --gray-dark: #0a0a0a;
+    --gray-mid: #222222;
     --silver: #888888;
   }
 
@@ -18,6 +20,7 @@
     margin: 0;
     padding: 0;
     user-select: none;
+    -webkit-user-drag: none;
     font-family: 'Helvetica Neue', Arial, sans-serif;
   }
 
@@ -37,126 +40,204 @@
     z-index: 1;
   }
 
-  /* 1. タイトル画面（流動する雲海アニメーション） */
+  /* 📌 1. タイトル画面：流動する3D雲海とライトリーク */
   #title-screen {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, var(--white) 0%, #dcdcdc 40%, var(--black) 100%);
+    background: linear-gradient(to bottom, var(--white) 0%, #c5c5c5 35%, var(--black) 100%);
     z-index: 100;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     transition: opacity 1.5s ease-in-out;
+    overflow: hidden;
   }
   .cloud-sea {
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(180,180,180,0.3) 50%, transparent 80%);
-    animation: moveClouds 20s linear infinite;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(200,200,200,0.4) 40%, transparent 75%);
+    animation: moveClouds 25s linear infinite;
     mix-blend-mode: overlay;
     pointer-events: none;
   }
   @keyframes moveClouds {
     0% { transform: scale(1) translate(0, 0) rotate(0deg); }
-    50% { transform: scale(1.15) translate(-4%, -4%) rotate(3deg); }
+    50% { transform: scale(1.2) translate(-5%, -5%) rotate(4deg); }
     100% { transform: scale(1) translate(0, 0) rotate(0deg); }
   }
+  .light-beam {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 250px; height: 100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.85), transparent);
+    transform: translateX(-50%) rotate(-12deg);
+    animation: beamSway 8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes beamSway {
+    0% { transform: translateX(-55%) rotate(-15deg) scaleX(0.8); opacity: 0.6; }
+    100% { transform: translateX(-45%) rotate(-8deg) scaleX(1.3); opacity: 1; }
+  }
+
   .title-logo {
-    font-size: clamp(3rem, 8vw, 10rem);
+    position: absolute;
+    top: 25%;
+    font-size: clamp(3.5rem, 8vw, 10rem);
     font-weight: 100;
     color: var(--black);
-    letter-spacing: 0.5em;
+    letter-spacing: 1.2em;
     z-index: 2;
-    text-shadow: 0 0 30px rgba(255,255,255,0.9);
-    margin-bottom: 50px;
+    animation: titleIntro 2.5s cubic-bezier(0.1, 1, 0.2, 1) forwards;
+    text-shadow: 0 0 30px rgba(255,255,255,0.8);
+    white-space: nowrap;
   }
-  .play-diamond-btn {
-    width: 130px; height: 130px;
+  @keyframes titleIntro {
+    100% { letter-spacing: 0.35em; transform: translateX(0); }
+  }
+
+  /* ひし形 PLAY ボタン */
+  .play-btn-wrapper {
+    position: absolute;
+    top: 60%;
+    width: 140px; height: 140px;
     transform: rotate(45deg);
     border: 1px solid var(--black);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    transition: all 0.3s ease;
     background: transparent;
-    transition: background 0.3s;
     z-index: 2;
   }
-  .play-diamond-btn:hover { background: var(--black); }
-  .play-diamond-btn span {
+  .play-btn-wrapper:hover { background: var(--black); }
+  .play-btn-text {
     transform: rotate(-45deg);
     font-weight: 100;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.3em;
     color: var(--black);
-    transition: color 0.3s;
+    transition: color 0.3s ease;
   }
-  .play-diamond-btn:hover span { color: var(--white); }
+  .play-btn-wrapper:hover .play-btn-text { color: var(--white); }
 
-  /* 2. メインゲーム画面 */
+  /* 📌 ローディング画面（回転する白い魔法陣） */
+  #loading-screen {
+    position: absolute; inset: 0;
+    background: var(--black);
+    z-index: 99;
+    display: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .magic-diamond {
+    width: 60px; height: 60px;
+    border: 1px solid var(--white);
+    transform: rotate(45deg);
+    animation: spinMagic 2s linear infinite;
+  }
+  @keyframes spinMagic { 100% { transform: rotate(405deg); } }
+  .loading-label {
+    font-weight: 100;
+    letter-spacing: 0.3em;
+    font-size: 0.8rem;
+    color: var(--white);
+  }
+
+  /* 📌 メインゲーム画面 */
   #main-screen {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     z-index: 10;
     display: none;
     opacity: 0;
     transition: opacity 1s ease;
   }
 
-  /* 左上のひし形アイコンメニュー（重なり完全防止：縦に余裕を持ったグリッド配置） */
-  #ui-container {
+  /* 左上固定：SETTINGS & TITLE ペア配置 */
+  #top-left-system {
     position: absolute;
-    top: 30px; left: 30px;
+    top: 35px; left: 35px;
+    display: flex;
+    gap: 20px;
+    z-index: 25;
+  }
+
+  /* メイン画面・ギルド空間共通のひし形アイコンボタンUI群 */
+  .holo-btn-wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    z-index: 20;
-  }
-  .menu-row {
-    display: flex;
     align-items: center;
-    gap: 20px;
     cursor: pointer;
+    margin-bottom: 25px;
   }
-  .diamond-icon {
+  .holo-diamond {
     width: 44px; height: 44px;
     transform: rotate(45deg);
     border: 1px solid var(--white);
-    background: var(--gray-dark);
+    background: rgba(0,0,0,0.85);
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
   }
-  .menu-row:hover .diamond-icon { background: var(--white); }
-  .diamond-icon svg {
+  .holo-btn-wrapper:hover .holo-diamond { background: var(--white); }
+  .holo-diamond i {
     transform: rotate(-45deg);
-    width: 18px; height: 18px;
-    fill: var(--white);
-    transition: fill 0.2s;
+    font-size: 16px;
+    color: var(--white);
+    transition: color 0.2s ease;
   }
-  .menu-row:hover .diamond-icon svg { fill: var(--black); }
-  .menu-text {
-    font-size: 0.75rem;
-    font-weight: 100;
-    letter-spacing: 0.25em;
-    color: var(--silver);
-    white-space: nowrap;
-    transition: color 0.2s;
-  }
-  .menu-row:hover .menu-text { color: var(--white); }
-
-  /* 下部 ROLL ボタンエリア */
-  #roll-container {
+  .holo-btn-wrapper:hover .holo-diamond i { color: var(--black); }
+  .holo-text {
     position: absolute;
-    bottom: 40px; left: 50%;
-    transform: translateX(-50%);
+    top: 52px;
+    font-size: 0.6rem;
+    font-weight: 100;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Cosmos画面の左側配置群 */
+  #cosmos-ui-left {
+    position: absolute;
+    top: 130px; left: 45px;
     display: flex;
-    gap: 25px;
+    flex-direction: column;
+    gap: 35px;
     z-index: 20;
   }
-  .roll-action-btn {
+
+  /* ギルド空間（Other Side）の4ボタン配置群（中央または右側スマート配置） */
+  #guild-ui-container {
+    position: absolute;
+    top: 130px; left: 45px;
+    display: none;
+    flex-direction: column;
+    gap: 35px;
+    z-index: 20;
+  }
+
+  /* ROLL ボタン群 */
+  #roll-container {
+    position: absolute;
+    bottom: 50px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    z-index: 20;
+  }
+  .roll-btn {
     width: 150px; height: 45px;
     transform: skewX(-15deg);
     border: 1px solid var(--white);
@@ -165,14 +246,14 @@
     font-weight: 100;
     letter-spacing: 0.2em;
     cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background 0.2s, color 0.2s;
   }
-  .roll-action-btn span { transform: skewX(15deg); }
-  .roll-action-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
-  .roll-action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .roll-btn span { transform: skewX(15deg); }
+  .roll-btn:hover:not(:disabled) { background: var(--white); color: var(--black); }
+  .roll-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   /* ガチャ結果表示 */
   #gacha-display {
@@ -182,26 +263,26 @@
     text-align: center;
     z-index: 15;
   }
-  .res-name { font-size: 2.5rem; font-weight: 100; letter-spacing: 0.4em; margin-bottom: 10px; }
+  .res-name { font-size: 2.5rem; font-weight: 100; letter-spacing: 0.5em; margin-bottom: 12px; }
   .res-prob { font-size: 0.8rem; font-weight: 100; color: var(--silver); letter-spacing: 0.2em; }
 
-  /* モーダル共通ウインドウ */
-  .modal-overlay {
+  /* モーダル共通ウィンドウ（ホログラムミニマリズム） */
+  .modal-window {
     position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 50;
-    display: none;
-    justify-content: center;
-    align-items: center;
-  }
-  .modal-box {
-    width: 450px; max-height: 80vh;
-    background: var(--black);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    width: 480px; max-height: 70vh;
+    background: rgba(0, 0, 0, 0.95);
     border: 1px solid var(--white);
-    padding: 30px;
-    position: relative;
+    padding: 35px;
+    z-index: 60;
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease;
     overflow-y: auto;
+  }
+  .modal-window.active {
+    display: block; opacity: 1; transform: translate(-50%, -50%) scale(1);
   }
   .modal-title {
     font-size: 0.9rem;
@@ -209,10 +290,10 @@
     letter-spacing: 0.3em;
     border-bottom: 1px solid var(--gray-mid);
     padding-bottom: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     text-align: center;
   }
-  .close-modal {
+  .close-modal-btn {
     position: absolute; top: 15px; right: 20px;
     cursor: pointer; font-weight: 100; font-size: 1.2rem;
   }
@@ -220,29 +301,30 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: 14px 0;
     border-bottom: 1px dotted var(--gray-mid);
     font-size: 0.8rem;
     font-weight: 100;
+    letter-spacing: 0.1em;
   }
 
-  /* 📌 厳格なクラフトボタン無効化デザイン */
-  .craft-exec-btn {
-    border: 1px solid var(--white);
+  /* 📌 厳格なクラフトボタン（素材不足時完全ロック） */
+  .craft-action-btn {
     background: transparent;
+    border: 1px solid var(--white);
     color: var(--white);
     padding: 6px 16px;
     font-weight: 100;
-    letter-spacing: 0.15s;
-    cursor: pointer;
+    letter-spacing: 0.2em;
     font-size: 0.75rem;
-    transition: 0.2s;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
-  .craft-exec-btn:hover:not(:disabled) {
+  .craft-action-btn:hover:not(:disabled) {
     background: var(--white);
     color: var(--black);
   }
-  .craft-exec-btn:disabled {
+  .craft-action-btn:disabled {
     border-color: var(--gray-mid);
     color: var(--gray-mid);
     background: var(--gray-dark);
@@ -250,30 +332,54 @@
     opacity: 0.4;
   }
 
-  /* 3. カットシーン・演出オーバーレイ */
-  #cutscene-layer {
+  /* 📌 2. カットシーン・演出オーバーレイ（星型スパイク＋ガラス亀裂＋ネガポジフラッシュ） */
+  #cutscene-overlay {
     position: absolute; inset: 0;
-    z-index: 80;
+    z-index: 90;
     pointer-events: none;
     display: none;
     justify-content: center;
     align-items: center;
   }
-  .cs-counter-text {
-    font-size: 3.5rem; font-weight: 100; letter-spacing: 0.2em; color: var(--white);
+  .cs-counter {
+    font-size: 4rem; font-weight: 100; letter-spacing: 0.2em; color: var(--white);
+    z-index: 92;
   }
-  .cs-crack-bg {
+  .cs-glass-crack {
     position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 50%, transparent 10%, rgba(255,255,255,0.3) 90%);
+    background: radial-gradient(circle at 50% 50%, transparent 10%, rgba(255,255,255,0.4) 90%);
     opacity: 0;
-    transition: opacity 0.3s;
+    z-index: 91;
+    transition: opacity 0.1s;
   }
+  .cs-star-flare {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 0px; height: 0px;
+    background: radial-gradient(circle, var(--white) 0%, transparent 70%);
+    z-index: 93;
+    opacity: 0;
+  }
+  .cinematic-holo-frame {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) skewX(-12deg);
+    border: 1px solid var(--white);
+    padding: 30px 60px;
+    background: rgba(0,0,0,0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 95;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .cinematic-holo-frame span { transform: skewX(12deg); }
+
   .invert-mode { filter: invert(1); }
-  .shake-mode { animation: screenShake 0.08s infinite; }
+  .shake-mode { animation: screenShake 0.07s infinite; }
   @keyframes screenShake {
-    0% { transform: translate(0,0); }
-    50% { transform: translate(5px, -5px); }
-    100% { transform: translate(-5px, 5px); }
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(7px, -7px); }
+    100% { transform: translate(-7px, 7px); }
   }
 </style>
 </head>
@@ -282,9 +388,18 @@
   <!-- タイトル画面 -->
   <div id="title-screen">
     <div class="cloud-sea"></div>
+    <div class="light-beam"></div>
     <div class="title-logo">LULLABY</div>
-    <div class="play-diamond-btn" onclick="startApp()">
-      <span>PLAY</span>
+    <div class="play-btn-wrapper" onclick="startApp()">
+      <div class="play-btn-text">PLAY</div>
+    </div>
+  </div>
+
+  <!-- ロード画面 -->
+  <div id="loading-screen">
+    <div class="loading-container">
+      <div class="magic-diamond"></div>
+      <div class="loading-label" id="loading-text">LOADING...</div>
     </div>
   </div>
 
@@ -292,231 +407,436 @@
   <div id="main-screen">
     <canvas id="bg-canvas"></canvas>
 
-    <!-- 左メニュー（重なりゼロの縦並び） -->
-    <div id="ui-container">
-      <div class="menu-row" onclick="openModal('backpack-modal')">
-        <div class="diamond-icon">
-          <svg viewBox="0 0 24 24"><path d="M19 6h-2V4c0-1.1-.9-2-2-2H9C7.9 2 7 2.9 7 4v2H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10-2h6v2H9V4zm10 16H5V8h14v12z"/></svg>
-        </div>
-        <div class="menu-text">BACKPACK</div>
+    <!-- 左上固定：SETTINGS ＆ TITLE ペア配置 -->
+    <div id="top-left-system">
+      <div class="holo-btn-wrapper" onclick="openModal('settings-modal')" style="margin-bottom:0;">
+        <div class="holo-diamond"><i class="fa-solid fa-gear"></i></div>
+        <div class="holo-text">SETTINGS</div>
       </div>
-      <div class="menu-row" onclick="openModal('craft-modal')">
-        <div class="diamond-icon">
-          <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.1L9.4 6.6 6.6 9.4 1.9 4.7C.6 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
-        </div>
-        <div class="menu-text">CRAFT FORGE</div>
+      <div class="holo-btn-wrapper" onclick="returnToTitle()" style="margin-bottom:0;">
+        <div class="holo-diamond"><i class="fa-solid fa-house"></i></div>
+        <div class="holo-text">TITLE</div>
       </div>
     </div>
 
-    <!-- ガチャ結果 -->
+    <!-- Cosmos画面左側：BACKPACK ＆ OTHER SIDEボタン -->
+    <div id="cosmos-ui-left">
+      <div class="holo-btn-wrapper" onclick="openModal('backpack-modal')">
+        <div class="holo-diamond"><i class="fa-solid fa-bag-shopping"></i></div>
+        <div class="holo-text">BACKPACK</div>
+      </div>
+      <div class="holo-btn-wrapper" onclick="gotoOtherSide()">
+        <div class="holo-diamond"><i class="fa-solid fa-earth-americas"></i></div>
+        <div class="holo-text">OTHER SIDE</div>
+      </div>
+    </div>
+
+    <!-- ギルド空間（Other Side）遷移後に出現する4つのボタン -->
+    <div id="guild-ui-container">
+      <div class="holo-btn-wrapper" onclick="openModal('library-modal')">
+        <div class="holo-diamond"><i class="fa-solid fa-book"></i></div>
+        <div class="holo-text">LIBRARY</div>
+      </div>
+      <div class="holo-btn-wrapper" onclick="openModal('mission-modal')">
+        <div class="holo-diamond"><i class="fa-solid fa-scroll"></i></div>
+        <div class="holo-text">MISSION</div>
+      </div>
+      <div class="holo-btn-wrapper" onclick="openModal('craft-modal')">
+        <div class="holo-diamond"><i class="fa-solid fa-hammer"></i></div>
+        <div class="holo-text">CRAFT</div>
+      </div>
+      <div class="holo-btn-wrapper" onclick="openModal('shop-modal')">
+        <div class="holo-diamond"><i class="fa-solid fa-flask"></i></div>
+        <div class="holo-text">SHOP</div>
+      </div>
+    </div>
+
+    <!-- ガチャ結果表示 -->
     <div id="gacha-display">
       <div class="res-name" id="res-name">---</div>
       <div class="res-prob" id="res-prob">1 / 1</div>
     </div>
 
-    <!-- ROLLボタン -->
+    <!-- ROLL ボタン群 -->
     <div id="roll-container">
-      <button class="roll-action-btn" id="btn-roll" onclick="executeRoll()"><span>ROLL</span></button>
-      <button class="roll-action-btn" id="btn-auto" onclick="toggleAutoRoll()"><span>AUTO</span></button>
+      <button class="roll-btn" id="btn-roll" onclick="executeRoll()"><span>ROLL</span></button>
+      <button class="roll-btn" id="btn-auto" onclick="toggleAutoRoll()"><span>AUTO ROLL</span></button>
     </div>
   </div>
 
-  <!-- モーダル: バックパック -->
-  <div class="modal-overlay" id="backpack-modal">
-    <div class="modal-box">
-      <div class="close-modal" onclick="closeModal('backpack-modal')">✕</div>
-      <div class="modal-title">BACKPACK & MATERIALS</div>
-      <div id="backpack-list"></div>
-    </div>
+  <!-- モーダル各種 -->
+  <div class="modal-window" id="backpack-modal">
+    <div class="close-modal-btn" onclick="closeModal('backpack-modal')">✕</div>
+    <div class="modal-title">BACKPACK & MATERIALS</div>
+    <div id="backpack-list"></div>
   </div>
 
-  <!-- モーダル: クラフト -->
-  <div class="modal-overlay" id="craft-modal">
-    <div class="modal-box">
-      <div class="close-modal" onclick="closeModal('craft-modal')">✕</div>
-      <div class="modal-title">CRAFT FORGE</div>
-      <div id="craft-list"></div>
-    </div>
+  <div class="modal-window" id="craft-modal">
+    <div class="close-modal-btn" onclick="closeModal('craft-modal')">✕</div>
+    <div class="modal-title">CRAFT FORGE</div>
+    <div id="craft-list"></div>
+  </div>
+
+  <div class="modal-window" id="shop-modal">
+    <div class="close-modal-btn" onclick="closeModal('shop-modal')">✕</div>
+    <div class="modal-title">ALCHEMY SHOP</div>
+    <div id="shop-list"></div>
+  </div>
+
+  <div class="modal-window" id="mission-modal">
+    <div class="close-modal-btn" onclick="closeModal('mission-modal')">✕</div>
+    <div class="modal-title">GUILD MISSIONS</div>
+    <div id="mission-list"></div>
+  </div>
+
+  <div class="modal-window" id="library-modal">
+    <div class="close-modal-btn" onclick="closeModal('library-modal')">✕</div>
+    <div class="modal-title">LIBRARY ARCHIVE</div>
+    <div id="library-list"></div>
+  </div>
+
+  <div class="modal-window" id="settings-modal">
+    <div class="close-modal-btn" onclick="closeModal('settings-modal')">✕</div>
+    <div class="modal-title">SYSTEM SETTINGS</div>
+    <div class="list-row"><span>MASTER VOLUME</span><span>100%</span></div>
+    <div class="list-row"><span>GRAPHICS QUALITY</span><span>ULTRA</span></div>
   </div>
 
   <!-- カットシーンオーバーレイ -->
-  <div id="cutscene-layer">
-    <div class="cs-crack-bg" id="cs-crack"></div>
-    <div class="cs-counter-text" id="cs-counter">1 / 0</div>
+  <div id="cutscene-overlay">
+    <div class="cs-glass-crack" id="cs-crack"></div>
+    <div class="cs-star-flare" id="cs-flare"></div>
+    <div class="cs-counter" id="cs-counter">1 / 0</div>
+    <div class="cinematic-holo-frame" id="cs-frame">
+      <span class="res-name" id="cs-name" style="opacity:1; margin-bottom:8px;"></span>
+      <span class="res-prob" id="cs-prob" style="opacity:1;"></span>
+    </div>
   </div>
 
 <script>
 // --- データ定義 ---
-const MATERIALS = {
-  1: { name: "Iron Dust", count: 2 },    // 初期所持数 2
-  2: { name: "Void Shard", count: 0 }    // 初期所持数 0 (不足によりクラフトボタンが必ずグレーアウト・ロックされる)
+const formatNum = (n) => n.toLocaleString();
+
+const AURA_DATA = [];
+const normalNames = ["Dust","Stone","Iron","Steel","Silver","Void","Echo","Pulse","Glimmer","Spark","Fade","Drift","Haze","Mist","Shard","Gloom","Dusk","Dawn","Core","Flux","Zenith"];
+for(let i=0; i<21; i++){
+  AURA_DATA.push({ id: i+1, name: normalNames[i], prob: Math.floor(Math.pow(1.5, i+1) * 2), rarity: 'normal' });
+}
+
+const rareNames = [
+  "Equinox Balance","END OF TIME","Vortex","Velocity","Cyclone","TRAUMA","OVERTHINKING",
+  "memorial overreached","Abyss Gaze","Paradox Shift","Quantum Leap","Singularity",
+  "Event Horizon","Stellar Collapse","Absolute Zero","Entropy","Supernova","Black Dwarf",
+  "White Hole","Cosmic Web","Dark Matter","Neutrino","Tachyon","Warp Drive","String Theory",
+  "Multiverse","Omnipresence","Genesis","Revelation","LULLABY ULTIMA"
+];
+for(let i=0; i<30; i++){
+  let p = 150000 + Math.floor(Math.pow(1.58, i) * 35000);
+  if(i === 29) p = 5000000000; // 50億
+  AURA_DATA.push({ id: 22+i, name: rareNames[i], prob: p, rarity: 'rare' });
+}
+
+// プレイヤーデータ＆インベントリ
+const player = {
+  inventory: {},
+  materials: { 1: 3, 2: 0 }, // 1: Iron Dust (3個), 2: Void Shard (0個によりVoid Bladeは完全にロックされる)
+  equipped: { gauntlet: null, rune: null }
 };
+AURA_DATA.forEach(a => player.inventory[a.id] = 0);
 
 const CRAFT_RECIPES = [
-  { id: 'r1', name: 'Iron Gauntlet', costMatId: 1, costAmount: 1 }, // 所持2個 >= 必要1個 （作成可能）
-  { id: 'r2', name: 'Void Blade', costMatId: 2, costAmount: 5 }       // 所持0個 < 必要5個 （完全ロック）
-];
-
-const Auras = [
-  { name: "Dust", prob: 5 },
-  { name: "Stone", prob: 25 },
-  { name: "Iron", prob: 120 },
-  { name: "Steel", prob: 850 },
-  { name: "END OF TIME (Rare)", prob: 250000 } // カットシーン発生用
+  { id: 'g1', name: 'Astral Gauntlet', type: 'gauntlet', costMatId: 1, costAmount: 2 }, // 所持3個 >= 必要2個（作成可）
+  { id: 'g2', name: 'Void Blade', type: 'gauntlet', costMatId: 2, costAmount: 5 }       // 所持0個 < 必要5個（完全ロック）
 ];
 
 let isRolling = false;
-let autoTimer = null;
+let autoInterval = null;
+let luckBuffTimer = 0;
 
-// --- アプリ起動 ---
+// --- アプリ起動 / タイトル遷移 ---
 function startApp() {
   const title = document.getElementById('title-screen');
   title.style.opacity = '0';
   setTimeout(() => {
     title.style.display = 'none';
-    const main = document.getElementById('main-screen');
-    main.style.display = 'block';
-    setTimeout(() => main.style.opacity = '1', 50);
-    initCanvas();
+    showLoader("ENTERING COSMOS...", () => {
+      document.getElementById('main-screen').style.display = 'block';
+      setTimeout(() => document.getElementById('main-screen').style.opacity = '1', 50);
+      initCanvas();
+    });
   }, 1000);
 }
 
-// --- モーダル制御 ---
+function returnToTitle() {
+  if (autoInterval) toggleAutoRoll();
+  cleanupModals();
+  showLoader("RETURNING TO TITLE...", () => {
+    document.getElementById('main-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('main-screen').style.display = 'none';
+      const title = document.getElementById('title-screen');
+      title.style.display = 'flex';
+      setTimeout(() => title.style.opacity = '1', 50);
+    }, 1000);
+  });
+}
+
+function showLoader(text, callback) {
+  const loader = document.getElementById('loading-screen');
+  document.getElementById('loading-text').innerText = text;
+  loader.style.display = 'flex';
+  setTimeout(() => loader.style.opacity = '1', 50);
+
+  setTimeout(() => {
+    loader.style.opacity = '0';
+    setTimeout(() => {
+      loader.style.display = 'none';
+      if(callback) callback();
+    }, 1000);
+  }, 3000);
+}
+
+// --- Other Side（ギルド世界）への世界切り替え ---
+function gotoOtherSide() {
+  if (autoInterval) toggleAutoRoll();
+  cleanupModals();
+  showLoader("ENTERING OTHER SIDE...", () => {
+    // Cosmos側のUIを非表示にし、ギルド空間の4ボタンUIを顕現
+    document.getElementById('cosmos-ui-left').style.display = 'none';
+    document.getElementById('roll-container').style.display = 'none';
+    document.getElementById('gacha-display').style.display = 'none';
+    document.getElementById('guild-ui-container').style.display = 'flex';
+  });
+}
+
+// タイトルへ戻る際やOther SideでCosmosに戻る場合の初期化
+function cleanupModals() {
+  document.querySelectorAll('.modal-window').forEach(m => m.classList.remove('active'));
+}
+
+// --- モーダル制御 ＆ 各種機能レンダリング ---
 function openModal(id) {
+  cleanupModals();
   if(id === 'backpack-modal') renderBackpack();
   if(id === 'craft-modal') renderCraft();
-  document.getElementById(id).style.display = 'flex';
+  if(id === 'shop-modal') renderShop();
+  if(id === 'mission-modal') renderMissions();
+  if(id === 'library-modal') renderLibrary();
+  document.getElementById(id).classList.add('active');
 }
 function closeModal(id) {
-  document.getElementById(id).style.display = 'none';
+  document.getElementById(id).classList.remove('active');
 }
 
 function renderBackpack() {
-  const container = document.getElementById('backpack-list');
-  container.innerHTML = '';
-  for(let id in MATERIALS) {
-    container.innerHTML += `
-      <div class="list-row">
-        <span>[MAT] ${MATERIALS[id].name}</span>
-        <span>x${MATERIALS[id].count}</span>
-      </div>
-    `;
+  const list = document.getElementById('backpack-list');
+  list.innerHTML = '';
+  for(let mId in player.materials) {
+    const mName = AURA_DATA.find(a => a.id == mId)?.name || `Material #${mId}`;
+    list.innerHTML += `<div class="list-row"><span>[MAT] ${mName}</span><span>x${player.materials[mId]}</span></div>`;
   }
+  AURA_DATA.forEach(a => {
+    if(player.inventory[a.id] > 0) {
+      list.innerHTML += `<div class="list-row"><span>${a.name}</span><span>x${player.inventory[a.id]}</span></div>`;
+    }
+  });
 }
 
-// 📌 厳格なクラフト素材判定とボタン制御
+// 📌 厳格な素材判定と無効化ロック付きクラフト
 function renderCraft() {
-  const container = document.getElementById('craft-list');
-  container.innerHTML = '';
-
+  const list = document.getElementById('craft-list');
+  list.innerHTML = '';
   CRAFT_RECIPES.forEach(recipe => {
-    const mat = MATERIALS[recipe.costMatId];
-    const hasEnough = mat.count >= recipe.costAmount; // 判定
+    const matCount = player.materials[recipe.costMatId] || 0;
+    const hasEnough = matCount >= recipe.costAmount;
+    const matName = AURA_DATA.find(a => a.id == recipe.costMatId)?.name || 'Material';
 
-    container.innerHTML += `
+    list.innerHTML += `
       <div class="list-row">
         <div>
           <div>${recipe.name}</div>
-          <div style="font-size:0.65rem; color:var(--silver);">Req: ${mat.name} (${mat.count}/${recipe.costAmount})</div>
+          <div style="font-size:0.65rem; color:var(--silver); margin-top:4px;">Req: ${matName} (${matCount}/${recipe.costAmount})</div>
         </div>
-        <button class="craft-exec-btn" ${hasEnough ? '' : 'disabled'} onclick="craftItem('${recipe.id}')">
-          CRAFT
-        </button>
+        <button class="craft-action-btn" ${hasEnough ? '' : 'disabled'} onclick="executeCraft('${recipe.id}')">CRAFT</button>
       </div>
     `;
   });
 }
 
-function craftItem(recipeId) {
+function executeCraft(recipeId) {
   const recipe = CRAFT_RECIPES.find(r => r.id === recipeId);
-  const mat = MATERIALS[recipe.costMatId];
+  const matCount = player.materials[recipe.costMatId] || 0;
 
-  // 念のための二重ガード
-  if(mat.count >= recipe.costAmount) {
-    mat.count -= recipe.costAmount; // 素材を消費
-    alert(`${recipe.name} を作成しました！`);
-    renderCraft(); // ボタン状態を再評価して更新
+  if(matCount >= recipe.costAmount) {
+    player.materials[recipe.costMatId] -= recipe.costAmount;
+    player.equipped[recipe.type] = recipe.name;
+    alert(`Successfully forged ${recipe.name}! Equipped.`);
+    renderCraft();
   } else {
-    alert("素材が不足しています。");
+    alert("Materials are insufficient.");
   }
 }
 
-// --- ガチャ・演出処理 ---
+function renderShop() {
+  const list = document.getElementById('shop-list');
+  list.innerHTML = `
+    <div class="list-row"><span>Luck Elixir (+50% Rate / 60s)</span><button class="craft-action-btn" onclick="buyBuff()">BUY (1 Iron)</button></div>
+    <div class="list-row"><span>Status: ${luckBuffTimer > 0 ? 'ACTIVE ('+luckBuffTimer+'s)' : 'STANDBY'}</span><span></span></div>
+  `;
+}
+function buyBuff() {
+  if((player.materials[1] || 0) >= 1) {
+    player.materials[1]--;
+    luckBuffTimer = 60;
+    alert("Luck Elixir activated!");
+    renderShop();
+    const timer = setInterval(() => {
+      luckBuffTimer--;
+      if(luckBuffTimer <= 0) clearInterval(timer);
+    }, 1000);
+  } else {
+    alert("Not enough Iron Dust.");
+  }
+}
+
+function renderMissions() {
+  const list = document.getElementById('mission-list');
+  list.innerHTML = `
+    <div class="list-row"><span>Hunt 10 Void Echoes</span><button class="craft-action-btn" onclick="alert('Mission completed!')">CLAIM</button></div>
+    <div class="list-row"><span>Ascend to the Zenith</span><button class="craft-action-btn" disabled>LOCKED</button></div>
+  `;
+}
+
+function renderLibrary() {
+  const list = document.getElementById('library-list');
+  list.innerHTML = '';
+  AURA_DATA.slice(0, 15).forEach(a => {
+    list.innerHTML += `<div class="list-row"><span>${a.name}</span><span>1 / ${formatNum(a.prob)}</span></div>`;
+  });
+}
+
+// --- ガチャ抽選ロジック ---
+const getTotalWeight = () => AURA_DATA.reduce((sum, a) => sum + (1 / (a.prob / (luckBuffTimer > 0 ? 1.5 : 1))), 0);
+const rollAura = () => {
+  const tw = getTotalWeight();
+  let r = Math.random() * tw;
+  for(let a of AURA_DATA) {
+    r -= (1 / (a.prob / (luckBuffTimer > 0 ? 1.5 : 1)));
+    if(r <= 0) return a;
+  }
+  return AURA_DATA[0];
+};
+
 function executeRoll() {
   if (isRolling) return;
   isRolling = true;
   document.getElementById('btn-roll').disabled = true;
 
-  // 抽選
-  const result = Auras[Math.floor(Math.random() * Auras.length)];
+  setTimeout(() => {
+    const aura = rollAura();
+    player.inventory[aura.id]++;
+    if(Math.random() < 0.35) player.materials[1]++;
 
-  if (result.prob >= 100000) {
-    playCutscene(result);
-  } else {
-    showResult(result);
-    isRolling = false;
-    document.getElementById('btn-roll').disabled = false;
-  }
+    if (aura.prob >= 150000) {
+      playCutscene(aura);
+    } else {
+      showGachaResult(aura);
+      isRolling = false;
+      document.getElementById('btn-roll').disabled = false;
+    }
+  }, 350);
 }
 
-function showResult(aura) {
+function showGachaResult(aura) {
   document.getElementById('res-name').innerText = aura.name;
-  document.getElementById('res-prob').innerText = `1 / ${aura.prob.toLocaleString()}`;
+  document.getElementById('res-prob').innerText = `1 / ${formatNum(aura.prob)}`;
 }
 
 function toggleAutoRoll() {
   const btn = document.getElementById('btn-auto');
-  if (autoTimer) {
-    clearInterval(autoTimer);
-    autoTimer = null;
+  if (autoInterval) {
+    clearInterval(autoInterval);
+    autoInterval = null;
     btn.style.background = 'transparent';
     btn.style.color = 'var(--white)';
   } else {
     btn.style.background = 'var(--white)';
     btn.style.color = 'var(--black)';
-    autoTimer = setInterval(() => {
+    autoInterval = setInterval(() => {
       if(!isRolling) executeRoll();
-    }, 600);
+    }, 500);
   }
 }
 
-// レア演出（カットシーン）
+// 📌 2. 究極進化カットシーン演出（星型スパイク＋ガラス亀裂＋ネガポジフラッシュ）
 function playCutscene(aura) {
-  const layer = document.getElementById('cutscene-layer');
+  const overlay = document.getElementById('cutscene-overlay');
   const counter = document.getElementById('cs-counter');
   const crack = document.getElementById('cs-crack');
-  
-  layer.style.display = 'flex';
-  document.body.classList.add('invert-mode', 'shake-mode');
-  crack.style.opacity = '1';
+  const flare = document.getElementById('cs-flare');
+  const frame = document.getElementById('cs-frame');
+
+  overlay.style.display = 'flex';
+  counter.style.display = 'block';
+  frame.style.display = 'none';
+  counter.innerText = '1 / 0';
+  crack.style.opacity = '0';
+  flare.style.opacity = '0';
 
   let current = 0;
   let target = aura.prob;
-  let startTime = performance.now();
+  let start = performance.now();
 
-  function animateCount(time) {
-    let progress = Math.min((time - startTime) / 2000, 1);
-    current = Math.floor(Math.pow(progress, 3) * target);
-    counter.innerText = `1 / ${current.toLocaleString()}`;
+  function countAnim(time) {
+    let prog = Math.min((time - start) / 2200, 1);
+    current = Math.floor(Math.pow(prog, 4) * target);
+    counter.innerText = `1 / ${formatNum(current)}`;
 
-    if (progress < 1) {
-      requestAnimationFrame(animateCount);
+    if(prog < 1) {
+      requestAnimationFrame(countAnim);
     } else {
-      counter.innerText = `1 / ${target.toLocaleString()}`;
+      counter.innerText = `1 / ${formatNum(target)}`;
+      
+      // 刹那の爆発＆ガラス亀裂＆ネガポジフラッシュ発動
+      crack.style.opacity = '1';
+      flare.style.opacity = '1';
+      flare.style.width = '300px';
+      flare.style.height = '300px';
+      document.body.classList.add('invert-mode', 'shake-mode');
+
       setTimeout(() => {
-        layer.style.display = 'none';
-        document.body.classList.remove('invert-mode', 'shake-mode');
+        document.body.style.background = 'var(--white)';
+        setTimeout(() => document.body.style.background = 'var(--black)', 100);
+      }, 50);
+
+      setTimeout(() => {
+        counter.style.display = 'none';
         crack.style.opacity = '0';
-        showResult(aura);
-        isRolling = false;
-        document.getElementById('btn-roll').disabled = false;
-      }, 1200);
+        flare.style.opacity = '0';
+        document.body.classList.remove('invert-mode', 'shake-mode');
+
+        document.getElementById('cs-name').innerText = aura.name;
+        document.getElementById('cs-prob').innerText = `1 / ${formatNum(aura.prob)}`;
+        frame.style.display = 'flex';
+        setTimeout(() => frame.style.opacity = '1', 50);
+
+        setTimeout(() => {
+          frame.style.opacity = '0';
+          setTimeout(() => {
+            frame.style.display = 'none';
+            overlay.style.display = 'none';
+            showGachaResult(aura);
+            isRolling = false;
+            document.getElementById('btn-roll').disabled = false;
+          }, 400);
+        }, 3000);
+      }, 1400);
     }
   }
-  requestAnimationFrame(animateCount);
+  requestAnimationFrame(countAnim);
 }
 
-// --- 背景パーティクル ---
+// --- 背景Canvasパーティクル ---
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
@@ -525,20 +845,20 @@ function initCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   particles = [];
-  for(let i=0; i<300; i++) {
+  for(let i=0; i<400; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      size: Math.random() * 1.5
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      size: Math.random() * 1.8
     });
   }
   loopCanvas();
 }
 
 function loopCanvas() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = '#ffffff';
