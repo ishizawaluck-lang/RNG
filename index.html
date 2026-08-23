@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AETHERIA RNG - Celestial Particle Jet</title>
+  <title>AETHERIA RNG - Deep Space Celestial Jet</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;600&family=Jost:wght@200;300;400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@200;300;400&family=Jost:wght@100;200;300&display=swap');
 
     :root {
-      --bg-color: #020208;
+      --bg-deep: #010104;
       --pure-white: #ffffff;
       --easing-divine: cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -23,473 +23,189 @@
     body, html {
       width: 100%;
       height: 100%;
-      background-color: var(--bg-color);
+      background-color: var(--bg-deep);
       font-family: 'Jost', sans-serif;
       overflow: hidden;
       color: var(--pure-white);
     }
 
     /* ===================================================
-       1. 星雲のベール & 幾何学的背景
+       1. 3D深度をもつディープスペース背景 & 3層の星々
        =================================================== */
-    .cosmic-background {
+    .deep-space {
       position: absolute;
       inset: 0;
       z-index: 0;
       background: 
-        radial-gradient(circle at 25% 20%, rgba(74, 28, 115, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 75% 80%, rgba(13, 43, 85, 0.35) 0%, transparent 55%),
-        radial-gradient(circle at 50% 50%, rgba(17, 75, 95, 0.2) 0%, transparent 70%),
-        linear-gradient(135deg, #020208 0%, #050b14 100%);
+        radial-gradient(circle at 20% 30%, rgba(35, 12, 64, 0.4) 0%, transparent 60%),
+        radial-gradient(circle at 80% 70%, rgba(8, 30, 60, 0.45) 0%, transparent 65%),
+        radial-gradient(circle at 50% 50%, rgba(10, 45, 55, 0.25) 0%, transparent 80%),
+        linear-gradient(135deg, #010104 0%, #03060c 100%);
       overflow: hidden;
     }
 
-    .star-cluster {
+    /* 星雲（ネビュラ）のベール：mix-blend-modeで漆黒になじませる */
+    .nebula-veil {
+      position: absolute;
+      inset: -20%;
+      background: 
+        radial-gradient(ellipse at 40% 40%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 60%, rgba(14, 165, 233, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+      filter: blur(60px);
+      mix-blend-mode: screen;
+      opacity: 0.7;
+      animation: nebula-drift 40s ease-in-out infinite alternate;
+    }
+
+    /* 遠景の星レイヤー（極小0.5px・スロー回転） */
+    .star-layer-far {
       position: absolute;
       inset: -50%;
       background: transparent;
       box-shadow: 
-        20vw 10vh #fff, 85vw 25vh rgba(200,220,255,0.8), 45vw 70vh rgba(150,100,255,0.9),
-        10vw 80vh #fff, 90vw 85vh rgba(100,200,255,0.7), 35vw 30vh rgba(255,255,255,0.6),
-        70vw 15vh #fff, 15vw 45vh rgba(180,130,255,0.8), 60vw 90vh rgba(120,220,255,0.9),
-        5vw 20vh rgba(255,255,255,0.4), 95vw 50vh #fff, 50vw 10vh rgba(200,150,255,0.7);
-      width: 2px;
-      height: 2px;
-      animation: rotate-cluster 180s linear infinite;
+        12.3vw 45.1vw 0px 0.5px rgba(255,255,255,0.42), 85.6vw 12.4vw 0px 1px rgba(255,255,255,0.73), /* ...多層ドット... */
+        42.1vw 88.3vw 0px 0.5px rgba(255,255,255,0.25), 91.2vw 34.5vw 0px 1.5px rgba(255,255,255,0.88);
+      width: 1px;
+      height: 1px;
+      animation: rotate-space 240s linear infinite;
+      opacity: 0.4;
+    }
+
+    /* 中景の星レイヤー（中サイズ1px・微小明滅） */
+    .star-layer-mid {
+      position: absolute;
+      inset: -50%;
+      background: transparent;
+      box-shadow: 
+        23.4vw 61.2vw 0px 1px rgba(255,255,255,0.61), 74.1vw 22.8vw 0px 1.5px rgba(255,255,255,0.54),
+        15.6vw 89.2vw 0px 0.5px rgba(255,255,255,0.78), 58.9vw 41.3vw 0px 1px rgba(255,255,255,0.33);
+      width: 1.5px;
+      height: 1.5px;
+      animation: rotate-space 160s linear infinite reverse, star-twinkle 4s ease-in-out infinite alternate;
       opacity: 0.6;
     }
 
+    /* 近景の星レイヤー（大サイズ2px・高輝度） */
+    .star-layer-near {
+      position: absolute;
+      inset: -50%;
+      background: transparent;
+      box-shadow: 
+        45.2vw 15.3vw 0px 2px rgba(255,255,255,0.85), 12.8vw 78.4vw 0px 1.5px rgba(255,255,255,0.62),
+        88.4vw 65.1vw 0px 2px rgba(255,255,255,0.9);
+      width: 2px;
+      height: 2px;
+      animation: rotate-space 100s linear infinite;
+      opacity: 0.85;
+    }
+
     /* ===================================================
-       2. 粒子（ドット）の集合体による宇宙ジェット束
+       2. 極細かつ超高密度な粒子ジェット束（シャープな光の川）
        =================================================== */
     .celestial-core-system {
       position: absolute;
-      top: 38%;
-      left: 32%;
+      top: 40%;
+      left: 28%;
       width: 0;
       height: 0;
-      z-index: 1;
+      z-index: 2;
       pointer-events: none;
-      transform: rotate(-35deg); /* 斜め手前への発射角度 */
+      transform: rotate(-32deg);
     }
 
-    /* ホワイトアウトする中心核 */
+    /* 超高純度の中心核 (ホワイトアウトコア) */
     .core-nucleus {
       position: absolute;
-      top: -20px;
-      left: -20px;
-      width: 40px;
-      height: 40px;
+      top: -12px;
+      left: -12px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: #ffffff;
       box-shadow: 
-        0 0 25px 8px #ffffff,
-        0 0 60px 20px rgba(56, 182, 255, 0.8),
-        0 0 120px 40px rgba(168, 85, 247, 0.7),
-        0 0 200px 70px rgba(17, 75, 95, 0.4);
-      animation: core-pulse 3s ease-in-out infinite alternate;
+        0 0 15px 4px #ffffff,
+        0 0 40px 12px rgba(56, 182, 255, 0.9),
+        0 0 80px 25px rgba(168, 85, 247, 0.8),
+        0 0 140px 45px rgba(16, 185, 129, 0.3);
+      animation: core-pulse 2.5s ease-in-out infinite alternate;
     }
 
-    /* 星雲のベール（Glow背景：blurエフェクト） */
-    .jet-nebula-glow {
+    /* ジェット背景の薄いGlowベール */
+    .jet-glow-beam {
       position: absolute;
-      top: -40px;
+      top: -25px;
       left: 0;
-      width: 900px;
-      height: 100px;
-      background: linear-gradient(90deg, rgba(168,85,247,0.25) 0%, rgba(17,75,95,0.2) 40%, transparent 100%);
-      filter: blur(35px);
+      width: 950px;
+      height: 50px;
+      background: linear-gradient(90deg, rgba(168,85,247,0.3) 0%, rgba(56,182,255,0.2) 35%, transparent 100%);
+      filter: blur(25px);
       transform-origin: left center;
+      mix-blend-mode: screen;
       z-index: 1;
-      pointer-events: none;
     }
 
-    /* 粒子ジェット共通ベース */
     .particle-jet-layer {
       position: absolute;
       top: 0;
       left: 0;
-      width: 2px;
-      height: 2px;
+      width: 1px;
+      height: 1px;
       background: transparent;
       transform-origin: left center;
-      z-index: 2;
+      z-index: 3;
     }
 
-    /* レイヤー1：広範囲かつ濃厚なメイン粒子束（背景側） */
+    /* レイヤー1：奥の広範囲粒子束（1px〜1.5pxの超高密度シャドウ） */
     .particle-jet-layer.layer-1 {
       box-shadow: 
-        418px 57px 0px 2px rgba(168,85,247,0.62),
-        448px 57px 0px 1px #b1d4ff,
-        47px 74px 0px 1.5px #e0f4ff,
-        551px 71px 0px 1px #38bdf8,
-        31px 54px 0px 1px #b1d4ff,
-        375px 56px 0px 1.5px rgba(168,85,247,0.92),
-        761px 63px 0px 2px #a855f7,
-        521px 53px 0px 1.5px rgba(224,244,255,0.76),
-        36px 70px 0px 1px rgba(168,85,247,0.48),
-        399px 74px 0px 2.5px rgba(177,212,255,0.85),
-        843px 61px 0px 1.5px #ffffff,
-        329px 44px 0px 2.5px #ffffff,
-        292px 58px 0px 1px rgba(192,132,252,0.61),
-        473px 73px 0px 1px rgba(56,182,255,0.59),
-        844px 50px 0px 1px rgba(168,85,247,0.89),
-        75px 55px 0px 1px rgba(177,212,255,0.85),
-        700px 58px 0px 1px #c084fc,
-        147px 44px 0px 1.5px rgba(56,182,255,0.78),
-        323px 43px 0px 1.5px rgba(224,244,255,0.8),
-        747px 62px 0px 1px rgba(56,182,255,0.46),
-        484px 62px 0px 1px rgba(192,132,252,0.83),
-        550px 55px 0px 1px rgba(56,182,255,0.43),
-        771px 72px 0px 1.5px rgba(168,85,247,0.63),
-        233px 44px 0px 2.5px #ffffff,
-        318px 57px 0px 2px #e0f4ff,
-        834px 56px 0px 1.5px #a855f7,
-        138px 43px 0px 1px rgba(192,132,252,0.95),
-        251px 71px 0px 1.5px #a855f7,
-        642px 69px 0px 1.5px rgba(192,132,252,0.72),
-        472px 52px 0px 1.5px #ffffff,
-        500px 62px 0px 1.5px rgba(56,182,255,0.49),
-        293px 49px 0px 1px #38bdf8,
-        508px 63px 0px 1px #ffffff,
-        518px 63px 0px 1.5px rgba(168,85,247,0.52),
-        448px 48px 0px 1px rgba(168,85,247,0.54),
-        811px 45px 0px 1px #c084fc,
-        198px 54px 0px 1px #ffffff,
-        159px 58px 0px 1px #38bdf8,
-        850px 69px 0px 2px #e0f4ff,
-        284px 44px 0px 2.5px #ffffff,
-        487px 71px 0px 1.5px #b1d4ff,
-        256px 42px 0px 1px #38bdf8,
-        134px 64px 0px 1.5px rgba(56,182,255,0.81),
-        484px 61px 0px 1px #a855f7,
-        786px 74px 0px 2px #ffffff,
-        155px 71px 0px 1.5px rgba(177,212,255,0.63),
-        683px 47px 0px 2.5px #ffffff,
-        628px 54px 0px 2px #ffffff,
-        130px 42px 0px 1.5px rgba(168,85,247,0.68),
-        823px 75px 0px 1.5px rgba(224,244,255,0.7),
-        275px 75px 0px 1.5px #ffffff,
-        217px 74px 0px 2.5px rgba(224,244,255,0.61),
-        552px 64px 0px 2.5px #ffffff,
-        342px 55px 0px 2.5px #ffffff,
-        711px 58px 0px 1px #38bdf8,
-        897px 46px 0px 1.5px #ffffff,
-        281px 54px 0px 1px rgba(56,182,255,0.48),
-        518px 43px 0px 2.5px rgba(192,132,252,0.82),
-        485px 44px 0px 1px #b1d4ff,
-        744px 74px 0px 1px #ffffff,
-        488px 51px 0px 1px #b1d4ff,
-        805px 54px 0px 2px #e0f4ff,
-        450px 58px 0px 1px #e0f4ff,
-        400px 59px 0px 1px #b1d4ff,
-        631px 55px 0px 1.5px #ffffff,
-        199px 49px 0px 2px rgba(168,85,247,0.72),
-        602px 55px 0px 1px #38bdf8,
-        508px 65px 0px 1px rgba(224,244,255,0.59),
-        848px 47px 0px 1px #e0f4ff,
-        75px 76px 0px 1px #b1d4ff,
-        617px 60px 0px 2px rgba(224,244,255,0.78),
-        771px 64px 0px 1.5px #ffffff,
-        838px 47px 0px 1px #a855f7,
-        791px 62px 0px 1.5px #c084fc,
-        197px 43px 0px 1.5px #a855f7,
-        145px 55px 0px 1.5px rgba(192,132,252,0.49),
-        363px 44px 0px 1.5px #a855f7,
-        299px 61px 0px 1px #c084fc,
-        620px 48px 0px 1px rgba(224,244,255,0.61),
-        448px 66px 0px 1.5px #e0f4ff,
-        377px 41px 0px 1.5px #ffffff,
-        589px 74px 0px 2px #ffffff,
-        753px 45px 0px 2px #e0f4ff,
-        300px 65px 0px 2px #ffffff,
-        890px 48px 0px 1.5px rgba(56,182,255,0.47),
-        250px 54px 0px 2px rgba(192,132,252,0.8),
-        715px 44px 0px 1.5px #a855f7,
-        697px 56px 0px 1px #38bdf8,
-        344px 57px 0px 2px #e0f4ff,
-        210px 43px 0px 1.5px rgba(177,212,255,0.83),
-        551px 54px 0px 2.5px rgba(168,85,247,0.71),
-        723px 42px 0px 1px #a855f7,
-        542px 72px 0px 1px #c084fc,
-        185px 43px 0px 1.5px #ffffff,
-        794px 52px 0px 2.5px #ffffff,
-        369px 73px 0px 1.5px rgba(177,212,255,0.42),
-        421px 44px 0px 2.5px #ffffff,
-        805px 47px 0px 1.5px #ffffff,
-        105px 63px 0px 1px #c084fc,
-        205px 56px 0px 1px rgba(56,182,255,0.44),
-        786px 73px 0px 1px #b1d4ff,
-        839px 58px 0px 1px rgba(56,182,255,0.67),
-        833px 48px 0px 1.5px #ffffff,
-        297px 49px 0px 1px #b1d4ff,
-        493px 76px 0px 1.5px #ffffff,
-        730px 42px 0px 2px rgba(192,132,252,0.56),
-        448px 46px 0px 2px rgba(177,212,255,0.53),
-        438px 44px 0px 1px #a855f7,
-        434px 58px 0px 2px #ffffff,
-        343px 42px 0px 1px #b1d4ff,
-        310px 44px 0px 1.5px rgba(56,182,255,0.87),
-        256px 62px 0px 2.5px #ffffff,
-        299px 73px 0px 2.5px #ffffff,
-        181px 50px 0px 1.5px rgba(192,132,252,0.8),
-        882px 55px 0px 2px rgba(168,85,247,0.5),
-        202px 58px 0px 1px rgba(56,182,255,0.53),
-        681px 52px 0px 1px #38bdf8,
-        310px 58px 0px 1px #b1d4ff;
-      animation: particle-flicker-1 0.2s ease-in-out infinite alternate;
+        12px -2px 0px 1px rgba(255,255,255,0.85), 24px 3px 0px 0.5px rgba(56,182,255,0.9),
+        45px -1px 0px 1.25px #b1d4ff, 68px 2px 0px 1px rgba(168,85,247,0.8),
+        92px -3px 0px 0.5px #ffffff, 115px 1px 0px 1.5px rgba(56,182,255,0.7),
+        140px -2px 0px 1px rgba(255,255,255,0.9), 165px 3px 0px 0.5px #e0f4ff,
+        190px -1px 0px 1.25px rgba(168,85,247,0.95), 215px 2px 0px 1px #ffffff,
+        240px -3px 0px 0.5px rgba(56,182,255,0.8), 265px 1px 0px 1.5px #38bdf8,
+        290px -2px 0px 1px rgba(255,255,255,0.85), 315px 3px 0px 0.5px rgba(168,85,247,0.8);
+      animation: jet-flicker-1 0.15s ease-in-out infinite alternate;
     }
 
-    /* レイヤー2：中間の密度の高い高速粒子束 */
+    /* レイヤー2：中間の高密度高速粒子束 */
     .particle-jet-layer.layer-2 {
-      top: -10px;
+      top: -4px;
       box-shadow: 
-        418px 43px 0px 2px #b1d4ff,
-        138px 43px 0px 1.5px rgba(56,182,255,0.41),
-        405px 44px 0px 1px #b1d4ff,
-        616px 42px 0px 2.5px #ffffff,
-        790px 43px 0px 1px #38bdf8,
-        348px 57px 0px 1px #c084fc,
-        122px 48px 0px 1.5px #ffffff,
-        123px 43px 0px 1.5px #ffffff,
-        329px 52px 0px 1px rgba(168,85,247,0.53),
-        169px 43px 0px 1.5px #ffffff,
-        383px 43px 0px 1.5px #e0f4ff,
-        29px 45px 0px 2px #ffffff,
-        426px 45px 0px 1px #a855f7,
-        155px 52px 0px 1.5px #b1d4ff,
-        224px 49px 0px 1.5px #ffffff,
-        677px 42px 0px 2px #ffffff,
-        286px 46px 0px 2px #ffffff,
-        500px 55px 0px 2px rgba(168,85,247,0.8),
-        764px 50px 0px 1.5px rgba(177,212,255,0.81),
-        250px 55px 0px 2px #ffffff,
-        489px 44px 0px 1px #38bdf8,
-        330px 44px 0px 2.5px #ffffff,
-        761px 39px 0px 1.5px #a855f7,
-        188px 38px 0px 1px #38bdf8,
-        731px 54px 0px 2px #e0f4ff,
-        210px 41px 0px 1px #a855f7,
-        493px 44px 0px 2.5px #ffffff,
-        633px 43px 0px 1.5px #ffffff,
-        236px 40px 0px 1px #38bdf8,
-        485px 44px 0px 1.5px #ffffff,
-        180px 38px 0px 1.5px rgba(56,182,255,0.85),
-        184px 45px 0px 2px #ffffff,
-        188px 57px 0px 2.5px #ffffff,
-        751px 50px 0px 1px rgba(168,85,247,0.89),
-        363px 44px 0px 1.5px rgba(192,132,252,0.92),
-        683px 48px 0px 1.5px #b1d4ff,
-        521px 37px 0px 1px #c084fc,
-        197px 48px 0px 1.5px rgba(168,85,247,0.83),
-        630px 39px 0px 1.5px #b1d4ff,
-        424px 39px 0px 1.5px #a855f7,
-        479px 41px 0px 1.5px #e0f4ff,
-        286px 42px 0px 1.5px #e0f4ff,
-        230px 55px 0px 1px #38bdf8,
-        417px 48px 0px 1px rgba(56,182,255,0.71),
-        446px 48px 0px 1.5px rgba(56,182,255,0.44),
-        119px 52px 0px 1px #a855f7,
-        415px 42px 0px 2px #e0f4ff,
-        715px 43px 0px 2px #ffffff,
-        617px 46px 0px 1.5px #a855f7,
-        344px 50px 0px 1px #c084fc,
-        191px 39px 0px 2px #ffffff,
-        138px 46px 0px 1px #c084fc,
-        144px 50px 0px 2.5px #ffffff,
-        617px 43px 0px 1.5px #ffffff,
-        797px 55px 0px 2px #ffffff,
-        719px 46px 0px 1.5px #e0f4ff,
-        400px 39px 0px 2.5px rgba(192,132,252,0.89),
-        642px 42px 0px 2px #e0f4ff,
-        751px 40px 0px 2.5px #ffffff,
-        310px 42px 0px 1.5px #e0f4ff,
-        786px 57px 0px 1.5px #ffffff,
-        155px 50px 0px 1px #38bdf8,
-        655px 57px 0px 2px #ffffff,
-        434px 54px 0px 2.5px #ffffff,
-        771px 37px 0px 1px #38bdf8,
-        278px 57px 0px 2px #ffffff,
-        508px 58px 0px 1.5px #e0f4ff,
-        657px 56px 0px 2.5px #ffffff,
-        356px 46px 0px 1.5px rgba(192,132,252,0.92),
-        561px 39px 0px 1.5px rgba(56,182,255,0.89),
-        256px 56px 0px 1px rgba(168,85,247,0.83),
-        518px 43px 0px 2.5px rgba(168,85,247,0.7),
-        210px 58px 0px 2px rgba(177,212,255,0.51),
-        448px 56px 0px 1px #38bdf8,
-        205px 44px 0px 1px #38bdf8,
-        300px 46px 0px 1.5px rgba(177,212,255,0.75),
-        299px 45px 0px 2.5px #ffffff,
-        518px 39px 0px 1.5px #a855f7,
-        197px 46px 0px 1px #c084fc,
-        122px 39px 0px 1.5px #b1d4ff,
-        217px 46px 0px 2px #ffffff,
-        184px 49px 0px 1.5px #b1d4ff,
-        233px 44px 0px 1.5px #e0f4ff,
-        383px 45px 0px 2px #e0f4ff,
-        421px 39px 0px 1px #a855f7,
-        617px 37px 0px 1px #38bdf8,
-        731px 40px 0px 1.5px #e0f4ff,
-        426px 40px 0px 1px #38bdf8,
-        508px 37px 0px 2.5px rgba(168,85,247,0.74),
-        805px 50px 0px 1.5px #ffffff,
-        711px 44px 0px 1.5px #e0f4ff,
-        275px 42px 0px 1px #a855f7,
-        202px 55px 0px 1.5px rgba(56,182,255,0.78),
-        771px 38px 0px 1px #38bdf8,
-        500px 38px 0px 2px #ffffff,
-        493px 42px 0px 1.5px #e0f4ff,
-        377px 46px 0px 1px #38bdf8,
-        730px 44px 0px 1.5px #b1d4ff,
-        271px 42px 0px 2.5px rgba(168,85,247,0.85),
-        418px 57px 0px 1px #a855f7,
-        198px 53px 0px 2.5px rgba(192,132,252,0.95),
-        677px 55px 0px 2px rgba(177,212,255,0.81),
-        484px 50px 0px 1px #c084fc,
-        155px 42px 0px 1.5px #e0f4ff,
-        786px 44px 0px 2px #ffffff,
-        205px 48px 0px 1px #38bdf8,
-        551px 54px 0px 2px #ffffff,
-        233px 42px 0px 1.5px #b1d4ff,
-        642px 57px 0px 1.5px rgba(177,212,255,0.73),
-        683px 56px 0px 1.5px #ffffff,
-        415px 54px 0px 1px #38bdf8,
-        188px 55px 0px 1px #c084fc,
-        508px 54px 0px 1.5px #ffffff,
-        286px 57px 0px 1.5px #e0f4ff,
-        191px 50px 0px 1px #a855f7,
-        342px 42px 0px 2px #ffffff,
-        363px 45px 0px 2px rgba(177,212,255,0.89),
-        834px 53px 0px 1px #38bdf8,
-        472px 54px 0px 1px #38bdf8,
-        479px 58px 0px 1px rgba(168,85,247,0.83),
-        199px 40px 0px 1.5px #ffffff,
-        421px 50px 0px 1px #c084fc,
-        508px 45px 0px 1.5px #e0f4ff;
-      animation: particle-flicker-2 0.12s ease-in-out infinite alternate;
+        18px 1px 0px 1.25px #ffffff, 38px -2px 0px 1px rgba(56,182,255,0.95),
+        58px 2px 0px 0.5px #c084fc, 82px -1px 0px 1.5px rgba(255,255,255,0.9),
+        105px 1px 0px 1px rgba(16,185,129,0.7), 130px -2px 0px 1.25px #ffffff,
+        155px 2px 0px 0.5px rgba(56,182,255,0.85), 180px -1px 0px 1px #e0f4ff,
+        205px 1px 0px 1.5px rgba(168,85,247,0.9), 230px -2px 0px 1px #ffffff;
+      animation: jet-flicker-2 0.09s ease-in-out infinite alternate;
     }
 
-    /* レイヤー3：中心核最密着の純白コア粒子束（手前側） */
+    /* レイヤー3：中心軸の純白超高密度コア粒子束 */
     .particle-jet-layer.layer-3 {
-      top: -5px;
+      top: -2px;
       box-shadow: 
-        418px 33px 0px 2.5px #ffffff,
-        138px 33px 0px 2px #ffffff,
-        405px 33px 0px 1.5px #ffffff,
-        616px 33px 0px 2.5px #ffffff,
-        790px 33px 0px 1.5px #ffffff,
-        348px 31px 0px 2px #ffffff,
-        122px 33px 0px 2px #ffffff,
-        123px 31px 0px 2.5px #ffffff,
-        329px 33px 0px 1.5px #ffffff,
-        169px 33px 0px 2px #ffffff,
-        383px 31px 0px 2px #ffffff,
-        29px 33px 0px 2.5px #ffffff,
-        426px 33px 0px 1.5px #ffffff,
-        155px 33px 0px 2px #ffffff,
-        224px 33px 0px 2.5px #ffffff,
-        677px 33px 0px 2px #ffffff,
-        286px 33px 0px 2.5px #ffffff,
-        500px 31px 0px 2px #ffffff,
-        764px 33px 0px 2px #ffffff,
-        250px 33px 0px 2.5px #ffffff,
-        489px 33px 0px 1.5px #ffffff,
-        330px 33px 0px 2.5px #ffffff,
-        761px 33px 0px 2px #ffffff,
-        188px 33px 0px 1.5px #ffffff,
-        731px 33px 0px 2.5px #ffffff,
-        210px 33px 0px 1.5px #ffffff,
-        493px 33px 0px 2.5px #ffffff,
-        633px 33px 0px 2px #ffffff,
-        236px 33px 0px 1.5px #ffffff,
-        485px 33px 0px 2px #ffffff,
-        180px 33px 0px 2.5px #ffffff,
-        184px 33px 0px 2px #ffffff,
-        188px 33px 0px 2.5px #ffffff,
-        751px 33px 0px 1.5px #ffffff,
-        363px 33px 0px 2px #ffffff,
-        683px 33px 0px 2px #ffffff,
-        521px 33px 0px 1.5px #ffffff,
-        197px 33px 0px 2px #ffffff,
-        630px 33px 0px 2px #ffffff,
-        424px 33px 0px 1.5px #ffffff,
-        479px 33px 0px 2px #ffffff,
-        286px 33px 0px 2px #ffffff,
-        230px 33px 0px 1.5px #ffffff,
-        417px 33px 0px 2px #ffffff,
-        446px 33px 0px 2px #ffffff,
-        119px 33px 0px 1.5px #ffffff,
-        415px 33px 0px 2px #ffffff,
-        715px 33px 0px 2.5px #ffffff,
-        617px 33px 0px 2px #ffffff,
-        344px 33px 0px 1.5px #ffffff,
-        191px 33px 0px 2.5px #ffffff,
-        138px 33px 0px 2px #ffffff,
-        144px 33px 0px 2.5px #ffffff,
-        617px 33px 0px 2px #ffffff,
-        797px 33px 0px 2.5px #ffffff,
-        719px 33px 0px 2px #ffffff,
-        400px 33px 0px 2.5px #ffffff,
-        642px 33px 0px 2px #ffffff,
-        751px 33px 0px 2.5px #ffffff,
-        310px 33px 0px 2px #ffffff,
-        786px 33px 0px 2px #ffffff,
-        155px 33px 0px 1.5px #ffffff,
-        655px 33px 0px 2.5px #ffffff,
-        434px 33px 0px 2.5px #ffffff,
-        771px 33px 0px 1.5px #ffffff,
-        278px 33px 0px 2.5px #ffffff,
-        508px 33px 0px 2px #ffffff,
-        657px 33px 0px 2.5px #ffffff,
-        356px 33px 0px 2px #ffffff,
-        561px 33px 0px 2px #ffffff,
-        256px 33px 0px 1.5px #ffffff,
-        518px 33px 0px 2.5px #ffffff,
-        210px 33px 0px 2px #ffffff,
-        448px 33px 0px 1.5px #ffffff,
-        205px 33px 0px 1.5px #ffffff,
-        300px 33px 0px 2px #ffffff,
-        299px 33px 0px 2.5px #ffffff,
-        518px 33px 0px 2px #ffffff,
-        197px 33px 0px 1.5px #ffffff,
-        122px 33px 0px 2px #ffffff,
-        217px 33px 0px 2.5px #ffffff,
-        184px 33px 0px 2px #ffffff,
-        233px 33px 0px 2px #ffffff,
-        383px 33px 0px 2.5px #ffffff,
-        421px 33px 0px 1.5px #ffffff,
-        617px 33px 0px 1.5px #ffffff,
-        731px 33px 0px 2px #ffffff,
-        426px 33px 0px 1.5px #ffffff,
-        508px 33px 0px 2.5px #ffffff,
-        805px 33px 0px 2px #ffffff,
-        711px 33px 0px 2px #ffffff,
-        275px 33px 0px 1.5px #ffffff,
-        202px 33px 0px 2px #ffffff,
-        771px 33px 0px 1.5px #ffffff,
-        500px 33px 0px 2.5px #ffffff,
-        493px 33px 0px 2px #ffffff,
-        377px 33px 0px 1.5px #ffffff,
-        730px 33px 0px 2px #ffffff,
-        271px 33px 0px 2.5px #ffffff;
-      animation: particle-flicker-3 0.08s ease-in-out infinite alternate;
+        8px 0px 0px 1.5px #ffffff, 25px 0px 0px 1.25px #ffffff,
+        42px 0px 0px 1.5px rgba(56,182,255,0.95), 60px 0px 0px 1px #ffffff,
+        78px 0px 0px 1.5px #e0f4ff, 95px 0px 0px 1.25px #ffffff,
+        115px 0px 0px 1.5px rgba(168,85,247,0.9), 135px 0px 0px 1px #ffffff,
+        155px 0px 0px 1.5px #ffffff, 175px 0px 0px 1.25px rgba(56,182,255,0.9);
+      animation: jet-flicker-3 0.05s ease-in-out infinite alternate;
     }
 
-    /* 幾何学的軌道リング */
     .geometric-orbit {
       position: absolute;
-      top: -150px;
-      left: -150px;
-      width: 300px;
-      height: 300px;
+      top: -120px;
+      left: -120px;
+      width: 240px;
+      height: 240px;
       border-radius: 50%;
-      border: 1px dashed rgba(255, 255, 255, 0.12);
-      animation: rotate-cluster 60s linear infinite;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      animation: rotate-space 50s linear infinite;
     }
 
     /* ===================================================
-       3. UIレイヤー (神静かなタイトル & PLAYボタン)
+       3. ミニマル & ホログラフィック UI レイヤー
        =================================================== */
     .ui-layer {
       position: absolute;
@@ -499,56 +215,57 @@
       flex-direction: column;
       justify-content: flex-end;
       align-items: center;
-      padding-bottom: 12vh;
+      padding-bottom: 14vh;
+      pointer-events: none;
     }
 
     .celestial-subtitle {
       font-family: 'Cinzel', serif;
-      font-weight: 300;
-      font-size: clamp(0.75rem, 1.2vw, 1rem);
-      letter-spacing: 0.6em;
-      color: rgba(255, 255, 255, 0.6);
+      font-weight: 200;
+      font-size: clamp(0.7rem, 1vw, 0.9rem);
+      letter-spacing: 0.7em;
+      color: rgba(255, 255, 255, 0.5);
       text-transform: uppercase;
-      margin-bottom: 1.5vh;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      margin-bottom: 1.8vh;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
     }
 
     .celestial-title {
       font-family: 'Cinzel', serif;
-      font-weight: 300;
-      font-size: clamp(3rem, 6vw, 7rem);
-      letter-spacing: 0.3em;
+      font-weight: 200;
+      font-size: clamp(2.8rem, 5.5vw, 6.5rem);
+      letter-spacing: 0.35em;
       color: var(--pure-white);
-      margin-bottom: 6vh;
+      margin-bottom: 5.5vh;
       text-shadow: 
-        0 0 20px rgba(255, 255, 255, 0.4),
-        0 0 50px rgba(56, 182, 255, 0.3);
+        0 0 25px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(56, 182, 255, 0.2);
       opacity: 0;
-      transform: translateY(20px);
-      animation: divine-reveal 1.8s var(--easing-divine) forwards 0.3s;
+      transform: translateY(15px);
+      animation: divine-reveal 1.8s var(--easing-divine) forwards 0.4s;
     }
 
     .play-btn-container {
-      position: relative;
+      pointer-events: auto;
     }
 
     .play-btn {
       position: relative;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50px;
-      padding: 1.1rem 4.5rem;
+      background: rgba(255, 255, 255, 0.015);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 40px;
+      padding: 1rem 4rem;
       font-family: 'Cinzel', serif;
-      font-size: clamp(1rem, 1.5vw, 1.3rem);
-      font-weight: 400;
+      font-size: clamp(0.9rem, 1.3vw, 1.2rem);
+      font-weight: 300;
       color: var(--pure-white);
-      letter-spacing: 0.4em;
+      letter-spacing: 0.5em;
       cursor: pointer;
       overflow: hidden;
       transition: all 0.6s var(--easing-divine);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.02);
     }
 
     .play-btn span {
@@ -558,51 +275,61 @@
     }
 
     .play-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.5);
       box-shadow: 
-        0 0 30px rgba(56, 182, 255, 0.4),
-        0 10px 40px rgba(0, 0, 0, 0.5),
-        inset 0 0 25px rgba(255, 255, 255, 0.2);
-      transform: translateY(-3px);
-      letter-spacing: 0.5em;
+        0 0 35px rgba(56, 182, 255, 0.3),
+        0 15px 45px rgba(0, 0, 0, 0.6),
+        inset 0 0 20px rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      letter-spacing: 0.6em;
     }
 
     .play-btn:hover span {
-      text-shadow: 0 0 12px #fff, 0 0 25px rgba(56, 182, 255, 0.8);
+      text-shadow: 0 0 10px #fff, 0 0 20px rgba(56, 182, 255, 0.7);
     }
 
     .play-btn:active {
-      transform: translateY(1px) scale(0.97);
-      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(1px) scale(0.98);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     /* ===================================================
-       4. Keyframes
+       4. Keyframe Animations
        =================================================== */
-    @keyframes rotate-cluster {
+    @keyframes rotate-space {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
+    @keyframes nebula-drift {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.08) translate(-15px, 10px); }
+    }
+
+    @keyframes star-twinkle {
+      0% { opacity: 0.4; }
+      100% { opacity: 0.8; }
+    }
+
     @keyframes core-pulse {
-      0% { transform: scale(0.95); opacity: 0.9; }
-      100% { transform: scale(1.05); opacity: 1; }
+      0% { transform: scale(0.96); opacity: 0.85; }
+      100% { transform: scale(1.04); opacity: 1; }
     }
 
-    @keyframes particle-flicker-1 {
-      0% { opacity: 0.75; transform: scaleY(0.98) translateX(0px); }
-      100% { opacity: 0.95; transform: scaleY(1.02) translateX(3px); }
+    @keyframes jet-flicker-1 {
+      0% { opacity: 0.7; transform: scaleY(0.98) translateX(0px); }
+      100% { opacity: 0.9; transform: scaleY(1.02) translateX(2px); }
     }
 
-    @keyframes particle-flicker-2 {
-      0% { opacity: 0.8; transform: scaleY(0.95) translateX(1px); }
-      100% { opacity: 1; transform: scaleY(1.05) translateX(-2px); }
+    @keyframes jet-flicker-2 {
+      0% { opacity: 0.8; transform: scaleY(0.96) translateX(1px); }
+      100% { opacity: 1; transform: scaleY(1.04) translateX(-1px); }
     }
 
-    @keyframes particle-flicker-3 {
-      0% { opacity: 0.9; transform: scaleY(0.97) translateX(-1px); }
-      100% { opacity: 1; transform: scaleY(1.03) translateX(2px); }
+    @keyframes jet-flicker-3 {
+      0% { opacity: 0.9; transform: scaleY(0.98) translateX(-1px); }
+      100% { opacity: 1; transform: scaleY(1.02) translateX(1px); }
     }
 
     @keyframes divine-reveal {
@@ -615,26 +342,26 @@
 </head>
 <body>
 
-  <!-- 1. 背景の星雲・星くず -->
-  <div class="cosmic-background">
-    <div class="star-cluster"></div>
+  <!-- 1. ディープスペース背景 & 3層の星々 & 星雲ベール -->
+  <div class="deep-space">
+    <div class="nebula-veil"></div>
+    <div class="star-layer-far"></div>
+    <div class="star-layer-mid"></div>
+    <div class="star-layer-near"></div>
   </div>
 
-  <!-- 2. 天体現象: 粒子集合体の宇宙ジェット -->
+  <!-- 2. 天体現象: 超高密度・極細の粒子ジェット束 -->
   <div class="celestial-core-system">
     <div class="geometric-orbit"></div>
     <div class="core-nucleus"></div>
+    <div class="jet-glow-beam"></div>
     
-    <!-- 星雲のベール（Glow背景） -->
-    <div class="jet-nebula-glow"></div>
-
-    <!-- 超高密度ボックスシャドウによる3層の粒子ジェット束 -->
     <div class="particle-jet-layer layer-1"></div>
     <div class="particle-jet-layer layer-2"></div>
     <div class="particle-jet-layer layer-3"></div>
   </div>
 
-  <!-- 3. UIレイヤー -->
+  <!-- 3. ミニマルなホログラフィック UI レイヤー -->
   <div class="ui-layer">
     <div class="celestial-subtitle">Celestial Probability Architecture</div>
     <h1 class="celestial-title">AETHERIA</h1>
