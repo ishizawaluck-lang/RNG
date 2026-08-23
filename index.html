@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MONOCHROME ASTRAL: 51 AURAS ULTIMATE</title>
+    <title>LULLABY - Divine RNG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@100;200;400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #000000;
-            --text-main: #ffffff;
-            --platinum: #e5e4e2;
-            --gold: #d4af37;
-            --gold-light: #f3e5ab;
-            --gray-sub: #555555;
-            --glass-border: rgba(212, 175, 55, 0.4);
-            --glass-border-sub: rgba(255, 255, 255, 0.2);
-            --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+            --bg-color: #050508;
+            --panel-bg: rgba(12, 12, 18, 0.85);
+            --gold: #ffd700;
+            --gold-light: #fff2b2;
+            --platinum: #e0e6ed;
+            --accent-glow: rgba(255, 215, 0, 0.3);
+            --border-color: rgba(255, 215, 0, 0.25);
+            --text-main: #f0f4f8;
+            --text-muted: #94a3b8;
         }
 
         * {
@@ -22,1095 +23,1402 @@
             margin: 0;
             padding: 0;
             user-select: none;
-            font-family: 'Courier New', Courier, monospace;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+        body, html {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* --- 共通レイアウト & ローディング --- */
+        #app-container {
+            position: relative;
             width: 100vw;
             height: 100vh;
-        }
-
-        #app {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            transition: filter 0.3s var(--ease-smooth);
-        }
-
-        .diamond-box {
-            position: relative;
-            border: 1px solid var(--gold);
-            padding: 10px 20px;
-            background: rgba(0,0,0,0.8);
-            clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-            transition: all 0.3s var(--ease-smooth);
-        }
-
-        button.diamond-btn {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--gold);
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 12px;
-            letter-spacing: 2px;
-            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
-            transition: all 0.3s var(--ease-smooth);
-        }
-
-        button.diamond-btn:hover:not(:disabled) {
-            background: var(--gold);
-            color: var(--bg-color);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-        }
-
-        button.diamond-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            border-color: var(--gray-sub);
-        }
-
-        .bg-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
             overflow: hidden;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
         }
 
-        canvas {
-            display: block;
-        }
-
-        #ripple-canvas {
+        .screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
         }
 
-        header {
-            width: 100%;
+        .screen.active {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 15px;
+            opacity: 1;
             z-index: 10;
         }
 
-        .stats-box {
+        /* 吸い込み黒フェードアウト＆Loadingアニメーション */
+        #global-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vw;
+            pointer-events: none;
+            z-index: 99999;
+            opacity: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0.95) 0%, rgba(5,5,8,1) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease;
+        }
+
+        #global-loader.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loader-content {
+            position: absolute;
+            bottom: 40px;
+            right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 3px;
+            font-size: 14px;
+        }
+
+        .loader-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255,215,0,0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- 1. タイトル画面（純白の雲海） --- */
+        #title-screen {
+            background: radial-gradient(circle at 50% 30%, #1a1a2e 0%, #08080c 70%, #030305 100%);
+        }
+
+        .cloud-bg {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background: 
+                radial-gradient(ellipse at 30% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 40%, rgba(224, 230, 237, 0.06) 0%, transparent 60%),
+                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 70%);
+            filter: blur(50px);
+            z-index: 1;
+            animation: cloudDrift 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes cloudDrift {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .god-rays {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%);
+            z-index: 2;
+            pointer-events: none;
+            animation: rayMove 10s linear infinite;
+        }
+
+        @keyframes rayMove {
+            0% { transform: translateX(-20%); }
+            100% { transform: translateX(20%); }
+        }
+
+        .title-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1.game-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 100;
+            font-size: clamp(4rem, 10vw, 8rem);
+            color: #ffffff;
+            letter-spacing: 2.5em;
+            text-shadow: 0 0 30px rgba(255,255,255,0.6), 0 0 60px rgba(255,215,0,0.3);
+            margin-left: 2.5em; /* letter-spacing offset correction */
+            transition: letter-spacing 1.8s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 1.8s ease;
+        }
+
+        h1.game-title.loaded {
+            letter-spacing: 0.6em;
+            margin-left: 0.6em;
+        }
+
+        .play-btn-wrapper {
+            margin-top: 60px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease 0.8s, transform 1s ease 0.8s;
+        }
+
+        .play-btn-wrapper.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .diamond-btn {
+            position: relative;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 0.4em;
+            padding: 18px 50px;
+            cursor: pointer;
+            clip-path: polygon(15px 0%, calc(100% - 15px) 0%, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0% calc(100% - 15px), 0% 15px);
+            transition: all 0.3s ease;
+            animation: pulseGlow 3s infinite;
+        }
+
+        .diamond-btn:hover {
+            background: var(--gold);
+            color: #050508;
+            box-shadow: 0 0 25px var(--gold);
+            transform: scale(1.05);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.2); }
+            50% { box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+        }
+
+        /* --- 2. 宇宙画面 (Cosmos & RNG) --- */
+        #cosmos-screen {
+            background: radial-gradient(circle at center, #0f1019 0%, #030305 100%);
+        }
+
+        #cosmos-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hud-top {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            right: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .hud-group {
             display: flex;
             gap: 20px;
-            font-size: 13px;
+            pointer-events: auto;
+        }
+
+        .hud-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            backdrop-filter: blur(10px);
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
             letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .stat-item span {
-            color: var(--gold);
-            font-weight: bold;
-        }
-
-        .nav-buttons {
+            color: var(--platinum);
             display: flex;
+            align-items: center;
             gap: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
 
-        .main-stage {
+        .hud-panel span {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .nav-btn-group {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+        }
+
+        .side-transition-btn {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            z-index: 5;
+        }
+
+        .roll-container {
+            position: absolute;
+            bottom: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .result-display {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-shadow: 0 0 15px var(--accent-glow);
+            min-height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #1f1f2e 0%, #0c0c14 100%);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 5px;
+            padding: 22px 70px;
+            cursor: pointer;
+            clip-path: polygon(20px 0%, calc(100% - 20px) 0%, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0% calc(100% - 20px), 0% 20px);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,215,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .roll-btn:hover:not(:disabled) {
+            background: var(--gold);
+            color: #050508;
+            box-shadow: 0 0 40px var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .roll-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        /* --- 4. RPGギルド世界 (Other Side) --- */
+        #rpg-screen {
+            background: radial-gradient(circle at center, #141118 0%, #060508 100%);
+        }
+
+        .rpg-container {
+            position: relative;
+            z-index: 5;
+            width: 85%;
+            max-width: 1100px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .rpg-header {
+            grid-column: span 3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 10px;
+        }
+
+        .rpg-header h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            letter-spacing: 3px;
+            color: var(--gold);
+        }
+
+        .rpg-card {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(255,215,0,0.15);
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1;
-            width: 100%;
-            position: relative;
-        }
-
-        .current-aura-display {
-            text-align: center;
-            margin-bottom: 40px;
-            z-index: 5;
-        }
-
-        .aura-name {
-            font-size: 42px;
-            font-weight: 900;
-            letter-spacing: 6px;
-            margin-bottom: 12px;
-            text-shadow: 0 0 30px rgba(255,255,255,0.5);
-        }
-
-        .aura-rarity {
-            font-size: 15px;
-            color: var(--gold-light);
-            letter-spacing: 3px;
-        }
-
-        .roll-controls {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            z-index: 5;
-        }
-
-        .btn-roll {
-            font-size: 22px;
-            padding: 18px 50px;
-            background: var(--text-main);
-            color: var(--bg-color);
-            font-weight: bold;
-            border: 1px solid var(--gold);
-            cursor: pointer;
-            letter-spacing: 3px;
-            clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px);
-            box-shadow: 0 0 30px rgba(255,255,255,0.2);
-            transition: all 0.3s var(--ease-smooth);
-        }
-
-        .btn-roll:hover:not(:disabled) {
-            background: var(--gold-light);
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.7);
-        }
-
-        .btn-roll:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        footer {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--glass-border);
-            padding-top: 15px;
-            font-size: 11px;
-            color: var(--gray-sub);
-        }
-
-        .modal {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            flex-direction: column;
-            padding: 40px;
-            z-index: 100;
-            overflow-y: auto;
-            transition: opacity 0.3s var(--ease-smooth);
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            letter-spacing: 4px;
-            color: var(--gold);
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 15px;
-            width: 100%;
         }
 
-        .grid-item {
-            border: 1px solid var(--glass-border-sub);
-            padding: 18px;
-            background: rgba(255,255,255,0.01);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
-            transition: all 0.3s var(--ease-smooth);
-        }
-
-        .grid-item.unlocked {
+        .rpg-card:hover {
             border-color: var(--gold);
-            background: rgba(212, 175, 55, 0.03);
+            background: rgba(255,215,0,0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,215,0,0.15);
         }
 
-        .grid-item .item-name {
-            font-weight: bold;
-            font-size: 15px;
-            letter-spacing: 1px;
+        .rpg-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--platinum);
         }
 
-        .grid-item .item-sub {
-            font-size: 12px;
-            color: var(--gold-light);
+        .rpg-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-        #cutscene-layer {
-            position: absolute;
+        /* --- モーダル共通 --- */
+        .modal-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 2000;
-            display: flex;
+            background: rgba(3, 3, 5, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
             justify-content: center;
             align-items: center;
             opacity: 0;
-            transition: opacity 0.2s var(--ease-smooth);
+            transition: opacity 0.3s ease;
         }
 
-        #cutscene-layer.active {
+        .modal-overlay.active {
+            display: flex;
             opacity: 1;
         }
 
-        .cutscene-content {
-            text-align: center;
-            z-index: 2002;
-        }
-
-        .counter-hologram {
-            font-size: 64px;
-            font-weight: 900;
-            letter-spacing: 6px;
-            color: var(--gold);
-            text-shadow: 0 0 30px var(--gold);
-            margin-bottom: 20px;
-        }
-
-        .cutscene-title {
-            font-size: 52px;
-            font-weight: 900;
-            letter-spacing: 10px;
-            color: #fff;
-            text-shadow: 0 0 40px #fff;
+        .modal-box {
+            background: #0b0b12;
             border: 1px solid var(--gold);
-            padding: 20px 40px;
-            background: rgba(0,0,0,0.85);
-            clip-path: polygon(15px 0%, calc(100% - 15px) 0%, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0% calc(100% - 15px), 0% 15px);
-        }
-
-        #glass-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2001;
-        }
-
-        #loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 5000;
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-end;
+            width: 90%;
+            max-width: 850px;
+            max-height: 85vh;
+            overflow-y: auto;
             padding: 40px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.6s var(--ease-smooth);
-        }
-
-        .loading-text {
-            font-size: 16px;
-            letter-spacing: 4px;
-            color: var(--gold);
-        }
-
-        #buff-bar {
-            position: absolute;
-            top: 75px;
-            left: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 8;
-        }
-
-        .buff-tag {
-            border: 1px solid var(--gold);
-            padding: 5px 10px;
-            font-size: 11px;
-            background: rgba(0,0,0,0.7);
-            color: var(--gold-light);
-            letter-spacing: 1px;
-            clip-path: polygon(5px 0%, calc(100% - 5px) 0%, 100% 5px, 100% calc(100% - 10px), calc(100% - 5px) 100%, 5px 100%, 0% calc(100% - 5px), 0% 5px);
-        }
-
-        /* Mission Poster Container */
-        .mission-poster {
-            width: 450px;
-            border: 2px solid var(--gold);
-            background: #11100d;
-            padding: 30px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            position: relative;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            filter: sepia(0.4);
-            clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px);
+            gap: 25px;
         }
 
-        .mission-sketch {
-            width: 100px;
-            height: 100px;
-            border: 1px solid var(--gold);
+        .modal-close {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            background: transparent;
+            border: none;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.2);
+        }
+
+        /* 図鑑 (LIBRARY) スタイル */
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .aura-entry-card {
+            background: rgba(15, 15, 25, 0.7);
+            border: 1px solid rgba(255,215,0,0.2);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .aura-entry-card:hover {
+            border-color: var(--gold);
+            background: rgba(255,215,0,0.05);
+        }
+
+        .aura-entry-card.locked {
+            opacity: 0.5;
+            border-style: dashed;
+        }
+
+        .aura-name {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .aura-prob {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ミッション (MISSION) スタイル */
+        .mission-carousel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .poster-card {
+            background: #141210;
+            border: 3px double #8b6b43;
+            width: 100%;
+            max-width: 450px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+            background-image: radial-gradient(circle, rgba(139,107,67,0.1) 0%, rgba(20,18,16,1) 90%);
+        }
+
+        .poster-title {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            letter-spacing: 4px;
+            color: #d4af37;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #8b6b43;
+            padding-bottom: 10px;
+        }
+
+        .poster-sketch {
+            width: 120px;
+            height: 140px;
+            border: 2px solid #5a452d;
+            margin: 0 auto 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 40px;
+            background: #0d0c0a;
+            color: #8b6b43;
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .poster-desc {
+            font-size: 13px;
+            color: #c5b59b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            min-height: 60px;
+        }
+
+        .carousel-arrow {
+            background: var(--panel-bg);
+            border: 1px solid var(--gold);
             color: var(--gold);
+            font-size: 20px;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .carousel-arrow:hover {
+            background: var(--gold);
+            color: #050508;
+        }
+
+        /* ショップ (SHOP) スタイル */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .shop-item-card {
+            background: rgba(15, 15, 25, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .shop-item-info h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            color: var(--gold);
+            margin-bottom: 6px;
+        }
+
+        .shop-item-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .shop-item-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,215,0,0.1);
+            padding-top: 12px;
+        }
+
+        .price-tag {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            color: var(--platinum);
+        }
+
+        .buy-btn {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            padding: 6px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .buy-btn:hover {
+            background: var(--gold);
+            color: #050508;
+        }
+
+        /* 装備リスト (EQUIPMENT LIST) / クラフト (CRAFT) */
+        .craft-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .recipe-list, .equipment-list-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recipe-card, .equip-card {
+            background: rgba(15,15,25,0.7);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recipe-info h5, .equip-info h5 {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: var(--gold);
+        }
+
+        .recipe-info p, .equip-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* --- 6. シネマティック演出オーバーレイ (10万以上のレア＆ memorial overreached) --- */
+        #cinematic-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vw;
             background: #000;
+            z-index: 999999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        #cinematic-overlay.active {
+            display: flex;
+        }
+
+        .glass-crack {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle, transparent 20%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.8) 100%);
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+
+        .glass-crack.active {
+            opacity: 1;
+            background-image: 
+                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.8) 49%, rgba(255,215,0,0.9) 50%, transparent 52%),
+                linear-gradient(-35deg, transparent 48%, rgba(255,255,255,0.7) 50%, transparent 52%),
+                linear-gradient(75deg, transparent 45%, rgba(255,255,255,0.9) 48%, transparent 50%);
+        }
+
+        .cinematic-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-weight: 600;
+            letter-spacing: 0.5em;
+            color: #fff;
+            text-shadow: 0 0 20px var(--gold), 0 0 40px var(--gold);
+            z-index: 2;
+            transform: scale(2);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+        }
+
+        .cinematic-text.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .lightning-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .lightning-flash.flash {
+            animation: flashAnim 0.3s ease;
+        }
+
+        @keyframes flashAnim {
+            0% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        /* 51番専用ゴールドコロナ侵食 */
+        .corona-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 100px 50px rgba(255,215,0,0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 1s ease;
+        }
+
+        .corona-overlay.active {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div class="bg-layer" id="bg-canvas-container">
-            <canvas id="cosmos-canvas"></canvas>
-        </div>
-        <canvas id="ripple-canvas"></canvas>
-        <div id="buff-bar"></div>
 
-        <!-- Header -->
-        <header>
-            <div class="stats-box">
-                <div class="stat-item">ROLLS: <span id="stat-rolls">0</span></div>
-                <div class="stat-item">LUCK: <span id="stat-luck">1.0x</span></div>
-                <div class="stat-item">COINS: <span id="stat-coins">1000</span></div>
-                <div class="stat-item">EQUIP: <span id="stat-equip">None</span></div>
-            </div>
-            <div class="nav-buttons" id="cosmos-nav">
-                <button class="diamond-btn" onclick="openModal('shop-modal')">SHOP</button>
-                <button class="diamond-btn" onclick="openModal('craft-modal')">CRAFT</button>
-                <button class="diamond-btn" onclick="openModal('mission-modal')">MISSION</button>
-                <button class="diamond-btn" onclick="openModal('equip-modal')">EQUIPMENT</button>
-                <button class="diamond-btn" onclick="switchWorld('other-side')">GO TO OTHER SIDE</button>
-            </div>
-            <div class="nav-buttons" id="other-nav" style="display:none;">
-                <button class="diamond-btn" onclick="openModal('library-modal')">LIBRARY</button>
-                <button class="diamond-btn" onclick="openModal('shop-modal')">SHOP</button>
-                <button class="diamond-btn" onclick="openModal('craft-modal')">CRAFT</button>
-                <button class="diamond-btn" onclick="openModal('mission-modal')">MISSION</button>
-                <button class="diamond-btn" onclick="openModal('equip-modal')">EQUIPMENT</button>
-                <button class="diamond-btn" onclick="switchWorld('cosmos')">RETURN TO COSMOS</button>
-            </div>
-        </header>
+<div id="app-container">
 
-        <!-- Main Stage -->
-        <div class="main-stage" id="main-stage-area">
-            <div class="current-aura-display">
-                <div class="aura-name" id="current-name">Cosmic Dust</div>
-                <div class="aura-rarity" id="current-rarity">1 / 2</div>
-            </div>
-            <div class="roll-controls">
-                <button class="btn-roll" id="btn-roll-main" onclick="executeRoll()">ROLL</button>
-                <button class="diamond-btn" onclick="toggleAutoRoll()" id="btn-auto">AUTO: OFF</button>
-                <button class="diamond-btn" onclick="executeQuickRoll()" id="btn-quick" disabled>QUICK ROLL (25)</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer>
-            <div>MONOCHROME ASTRAL ULTIMATE 51</div>
-            <div id="editor-status">TEXT EDITOR: DEFAULT</div>
-            <div>SYSTEM: 60FPS STABLE</div>
-        </footer>
-
-        <!-- Modals -->
-        <div id="library-modal" class="modal">
-            <div class="modal-header">
-                <div class="modal-title">LIBRARY & AURA CODEX (1 / 51)</div>
-                <button class="diamond-btn" onclick="closeModal('library-modal')">[CLOSE]</button>
-            </div>
-            <div class="grid-container" id="codex-grid"></div>
-        </div>
-
-        <div id="shop-modal" class="modal">
-            <div class="modal-header">
-                <div class="modal-title">ALCHEMY SHOP (10 POTIONS)</div>
-                <button class="diamond-btn" onclick="closeModal('shop-modal')">[CLOSE]</button>
-            </div>
-            <div class="grid-container" id="shop-grid"></div>
-        </div>
-
-        <div id="craft-modal" class="modal">
-            <div class="modal-header">
-                <div class="modal-title">SMITHING CRAFT (17 GAUNTLETS & RUNES)</div>
-                <button class="diamond-btn" onclick="closeModal('craft-modal')">[CLOSE]</button>
-            </div>
-            <div class="grid-container" id="craft-grid"></div>
-        </div>
-
-        <div id="mission-modal" class="modal">
-            <div class="modal-header">
-                <div class="modal-title">GUILD MISSION BOARD</div>
-                <button class="diamond-btn" onclick="closeModal('mission-modal')">[CLOSE]</button>
-            </div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:20px; justify-content:center; flex:1;" id="mission-content">
-                <!-- Mission Poster Dynamic Content -->
-            </div>
-        </div>
-
-        <div id="equip-modal" class="modal">
-            <div class="modal-header">
-                <div class="modal-title">EQUIPMENT LIST (GAUNTLET & RUNE)</div>
-                <button class="diamond-btn" onclick="closeModal('equip-modal')">[CLOSE]</button>
-            </div>
-            <div class="grid-container" id="equip-grid"></div>
-        </div>
-
-        <!-- Cutscene & Effects Layers -->
-        <div id="cutscene-layer">
-            <div class="cutscene-content">
-                <div class="counter-hologram" id="cutscene-counter">1 / 0</div>
-                <div class="cutscene-title" id="cutscene-title-text">ASTRAL: OMEN</div>
-            </div>
-        </div>
-        <canvas id="glass-canvas"></canvas>
-        <div id="loading-overlay">
-            <div class="loading-text">LOADING...</div>
+    <!-- グローバルローダー -->
+    <div id="global-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <span>Loading...</span>
         </div>
     </div>
 
-    <script>
-        // --- Web Audio API & Sound Synthesizer ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playClickSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
-            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.04);
-        }
+    <!-- 1. タイトル画面 -->
+    <div id="title-screen" class="screen active">
+        <div class="cloud-bg"></div>
+        <div class="god-rays"></div>
+        <div class="title-container">
+            <h1 class="game-title" id="main-game-title">LULLABY</h1>
+            <div class="play-btn-wrapper" id="play-btn-wrapper">
+                <button class="diamond-btn" onclick="startGame()">PLAY</button>
+            </div>
+        </div>
+    </div>
 
-        function playTypeSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(300 + Math.random() * 200, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.02);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.02);
-        }
+    <!-- 2. メイン宇宙画面 (Cosmos & RNG) -->
+    <div id="cosmos-screen" class="screen">
+        <canvas id="cosmos-canvas"></canvas>
+        
+        <div class="hud-top">
+            <div class="hud-group">
+                <div class="hud-panel">COINS: <span id="hud-coins">0</span></div>
+                <div class="hud-panel">LUCK: <span id="hud-luck">1.0x</span></div>
+                <div class="hud-panel">EQUIP: <span id="hud-equip">None</span></div>
+            </div>
+            <div class="hud-group">
+                <button class="diamond-btn" style="padding: 10px 20px; font-size: 13px;" onclick="openModal('shop-modal')">SHOP</button>
+                <button class="diamond-btn" style="padding: 10px 20px; font-size: 13px;" onclick="openModal('craft-modal')">CRAFT</button>
+                <button class="diamond-btn" style="padding: 10px 20px; font-size: 13px;" onclick="openModal('mission-modal')">MISSION</button>
+            </div>
+        </div>
 
-        function playArmorEquipSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc1 = audioCtx.createOscillator();
-            const osc2 = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc1.type = 'square';
-            osc2.type = 'sawtooth';
-            osc1.frequency.setValueAtTime(110, audioCtx.currentTime);
-            osc1.frequency.setValueAtTime(220, audioCtx.currentTime + 0.08);
-            osc2.frequency.setValueAtTime(440, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-            osc1.connect(gain);
-            osc2.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc1.start();
-            osc2.start();
-            osc1.stop(audioCtx.currentTime + 0.3);
-            osc2.stop(audioCtx.currentTime + 0.3);
-        }
+        <button class="diamond-btn side-transition-btn" onclick="transitionToRPG()">Go to Other Side</button>
 
-        function playImpactSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(90, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.6);
-            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.6);
-        }
+        <div class="roll-container">
+            <div class="result-display" id="result-display">Ready to Roll...</div>
+            <button class="roll-btn" id="roll-button" onclick="executeRoll()">ROLL</button>
+        </div>
+    </div>
 
-        function playChimeSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+    <!-- 4. RPGギルド世界 (Other Side) -->
+    <div id="rpg-screen" class="screen">
+        <div class="rpg-container">
+            <div class="rpg-header">
+                <h2>GUILD SANCTUARY</h2>
+                <button class="diamond-btn" style="padding: 10px 20px; font-size: 13px;" onclick="transitionToCosmos()">Back to Cosmos</button>
+            </div>
+            <div class="rpg-card" onclick="openModal('library-modal')">
+                <h3>LIBRARY</h3>
+                <p>古代より伝わるオーラおよび素材の完全書庫。</p>
+            </div>
+            <div class="rpg-card" onclick="openModal('craft-modal')">
+                <h3>FORGE</h3>
+                <p>装備リストの確認と伝説のガントレット・ルーンの鍛造。</p>
+            </div>
+            <div class="rpg-card" onclick="openModal('mission-modal')">
+                <h3>BOUNTY BOARD</h3>
+                <p>石壁に貼られた手配書ポスターよりミッションを受託。</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 各種モーダルウィンドウ群 -->
+
+<!-- 図鑑 Modal -->
+<div class="modal-overlay" id="library-modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('library-modal')">✕</button>
+        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:15px;">LIBRARY (CODEX)</h2>
+        <div class="library-grid" id="library-grid-container"></div>
+    </div>
+</div>
+
+<!-- ミッション Modal -->
+<div class="modal-overlay" id="mission-modal">
+    <div class="modal-box" style="max-width: 600px; text-align: center;">
+        <button class="modal-close" onclick="closeModal('mission-modal')">✕</button>
+        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:20px;">BOUNTY MISSIONS</h2>
+        <div class="mission-carousel">
+            <button class="carousel-arrow" onclick="prevMission()">◀</button>
+            <div class="poster-card" id="poster-card-display">
+                <div class="poster-title" id="poster-title">Mission Title</div>
+                <div class="poster-sketch" id="poster-sketch">[ 迷宮の怪影 ]</div>
+                <div class="poster-desc" id="poster-desc">ミッション詳細説明文がここに表示されます。</div>
+                <button class="diamond-btn" style="font-size: 12px; padding: 10px 25px;" onclick="acceptCurrentMission()">ACCEPT</button>
+            </div>
+            <button class="carousel-arrow" onclick="nextMission()">▶</button>
+        </div>
+    </div>
+</div>
+
+<!-- ショップ Modal -->
+<div class="modal-overlay" id="shop-modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('shop-modal')">✕</button>
+        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:15px;">ALCHEMIST SHOP</h2>
+        <div class="shop-grid" id="shop-grid-container"></div>
+    </div>
+</div>
+
+<!-- クラフト＆装備 Modal -->
+<div class="modal-overlay" id="craft-modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('craft-modal')">✕</button>
+        <h2 style="font-family:'Cinzel'; color:var(--gold); letter-spacing:2px; margin-bottom:15px;">FORGE & EQUIPMENT</h2>
+        <div class="craft-container">
+            <div>
+                <h3 style="font-family:'Cinzel'; font-size:14px; color:var(--platinum); margin-bottom:10px;">CRAFT RECIPES</h3>
+                <div class="recipe-list" id="recipe-list-container"></div>
+            </div>
+            <div>
+                <h3 style="font-family:'Cinzel'; font-size:14px; color:var(--platinum); margin-bottom:10px;">EQUIPMENT LIST</h3>
+                <div class="equipment-list-box" id="equipment-list-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- シネマティック演出オーバーレイ -->
+<div id="cinematic-overlay">
+    <div class="lightning-flash" id="lightning-flash"></div>
+    <div class="glass-crack" id="glass-crack"></div>
+    <div class="corona-overlay" id="corona-overlay"></div>
+    <div class="cinematic-text" id="cinematic-text-display">AURA NAME</div>
+</div>
+
+<script>
+    // --- Audio Context & 音響エンジン ---
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // 金属のカチャッという装備音
+    function playEquipSound() {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.1);
+    }
+
+    // 鐘の音 (Other Side 転送用)
+    function playChurchBell() {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const frequencies = [220, 440, 660];
+        frequencies.forEach((freq, idx) => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(2093.0, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(3135.96, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.0);
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.2 / (idx + 1), now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 2.0);
-        }
+            osc.start(now);
+            osc.stop(now + 3.0);
+        });
+    }
 
-        function startAmbientBGM() {
-            setInterval(() => {
-                if (audioCtx.state === 'suspended') return;
-                [261.63, 329.63, 392.00, 493.88, 587.33].forEach((freq) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq / 2, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
-                    gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 6.0);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 6.0);
-                });
-            }, 7000);
-        }
-        setTimeout(startAmbientBGM, 1000);
+    // パイプオルガン大和音 (51番専用)
+    function playMemorialOrgan() {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const frequencies = [130.81, 196.00, 261.63, 329.63, 392.00, 523.25];
+        frequencies.forEach((freq, index) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = index % 2 === 0 ? 'sawtooth' : 'square';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(0.1, now + 0.4);
+            gain.gain.setValueAtTime(0.1, now + 2.5);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 5.0);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 5.0);
+        });
+    }
 
-        // --- Complete 51 Auras Data Array ---
-        const auras = [
-            { id: 1, name: "Cosmic Dust", rate: 2, color: "#ffffff" },
-            { id: 2, name: "Nebula Mist", rate: 5, color: "#e5e4e2" },
-            { id: 3, name: "Meteor Piece", rate: 12, color: "#cccccc" },
-            { id: 4, name: "Starlight Tint", rate: 25, color: "#ffffff" },
-            { id: 5, name: "Gray Void", rate: 60, color: "#888888" },
-            { id: 6, name: "Aurora Filament", rate: 150, color: "#dcdcdc" },
-            { id: 7, name: "Lunar Crescent", rate: 350, color: "#e0ffff" },
-            { id: 8, name: "Cobalt Ray", rate: 800, color: "#b0c4de" },
-            { id: 9, name: "Photon Stream", rate: 1500, color: "#ffffff" },
-            { id: 10, name: "Glacier Shard", rate: 3000, color: "#e0ffff" },
-            { id: 11, name: "Onyx Shadow", rate: 6500, color: "#222222" },
-            { id: 12, name: "Celestial Sign", rate: 12000, color: "#e5e4e2" },
-            { id: 13, name: "Astral Echo", rate: 24000, color: "#c0c0c0" },
-            { id: 14, name: "Event Shell", rate: 48000, color: "#1b1b1b" },
-            { id: 15, name: "Singularity Dot", rate: 85000, color: "#000000" },
-            { id: 16, name: "Chronos Gear", rate: 150000, color: "#d4af37" },
-            { id: 17, name: "Judgment Needle", rate: 300000, color: "#ffffff" },
-            { id: 18, name: "Platinum Bar", rate: 600000, color: "#e5e4e2" },
-            { id: 19, name: "Void Stalker", rate: 1200000, color: "#111111" },
-            { id: 20, name: "Matrix Node", rate: 2500000, color: "#00ff00" },
-            { id: 21, name: "Glitch Error", rate: 5000000, color: "#ff00ff" },
-            { id: 22, name: "Equinox Balance", rate: 10000000, color: "#ffffff" },
-            { id: 23, name: "Sol Corona", rate: 30000000, color: "#fffaf0" },
-            { id: 24, name: "Genesis Omega", rate: 75000000, color: "#ffffff" },
-            { id: 25, name: "ASTRAL: OMEN", rate: 500000000, color: "#d4af37" },
-            { id: 26, name: "Velocity", rate: 1649280000, color: "#ffffff" },
-            { id: 27, name: "Oblivion", rate: 1732170000, color: "#111111" },
-            { id: 28, name: "Ineffable", rate: 1747830000, color: "#e5e4e2" },
-            { id: 29, name: "Solitude", rate: 1875440000, color: "#888888" },
-            { id: 30, name: "Luminescence", rate: 1883440000, color: "#ffffff" },
-            { id: 31, name: "Serendipity", rate: 1994580000, color: "#f3e5ab" },
-            { id: 32, name: "ASCENDED HEAVEN", rate: 2048960000, color: "#ffffff" },
-            { id: 33, name: "TRAUMA", rate: 2121900000, color: "#ff0000" },
-            { id: 34, name: "MOTIVATION", rate: 2140000000, color: "#d4af37" },
-            { id: 35, name: "END OF TIME", rate: 2222222222, color: "#000000" },
-            { id: 36, name: "defy legacy", rate: 2320000000, color: "#ffffff" },
-            { id: 37, name: "OVERTHINKING", rate: 2300000000, color: "#ff4500" },
-            { id: 38, name: "MEthod", rate: 2456000000, color: "#00ff00" },
-            { id: 39, name: "MASTER RISED", rate: 2450000000, color: "#ffd700" },
-            { id: 40, name: "thrive", rate: 2560000000, color: "#ffffff" },
-            { id: 41, name: "fortitude", rate: 2890000000, color: "#c0c0c0" },
-            { id: 42, name: "Vortex", rate: 2932000000, color: "#1e90ff" },
-            { id: 43, name: "Horizon", rate: 3000000000, color: "#ff8c00" },
-            { id: 44, name: "empower", rate: 3298750000, color: "#ffffff" },
-            { id: 45, name: "All ears", rate: 3279650000, color: "#d4af37" },
-            { id: 46, name: "YOU", rate: 3344850000, color: "#ffffff" },
-            { id: 47, name: "Mirage", rate: 3148434921, color: "#dda0dd" },
-            { id: 48, name: "Labyrinth", rate: 3248344382, color: "#708090" },
-            { id: 49, name: "Valor", rate: 3533440000, color: "#ff4500" },
-            { id: 50, name: "Qkthr", rate: 4342733843, color: "#ffffff" },
-            { id: 51, name: "memorial overreached", rate: 5055492104, color: "#ffd700" }
-        ];
+    // --- ゲームデータ定義 (51個のオーラ) ---
+    const AURAS = [
+        { id: 1, name: "Common", prob: 2, desc: "どこにでもある最も一般的なオーラ。" },
+        { id: 2, name: "Uncommon", prob: 4, desc: "少しだけ輝きを増したオーラ。" },
+        { id: 3, name: "Good", prob: 7, desc: "爽やかな風を纏うオーラ。" },
+        { id: 4, name: "Natural", prob: 15, desc: "大自然の息吹を感じさせるオーラ。" },
+        { id: 5, name: "Bizarre", prob: 35, desc: "奇妙な歪みを持つオーラ。" },
+        { id: 6, name: "Rage", prob: 64, desc: "闘争心を焚き付ける赤きオーラ。" },
+        { id: 7, name: "Cursed", prob: 128, desc: "禍々しい呪いのオーラ。" },
+        { id: 8, name: "Glitch", prob: 256, desc: "空間のバグを内包するオーラ。" },
+        { id: 9, name: "Starlight", prob: 512, desc: "夜空の星屑を散りばめたオーラ。" },
+        { id: 10, name: "Galaxy", prob: 1024, desc: "銀河系の広がりを宿すオーラ。" },
+        { id: 11, name: "Void", prob: 2048, desc: "すべてを飲み込む虚無のオーラ。" },
+        { id: 12, name: "Solar", prob: 4096, desc: "太陽の強烈な熱量を放つオーラ。" },
+        { id: 13, name: "Lunar", prob: 8192, desc: "神秘的な月光を放つオーラ。" },
+        { id: 14, name: "Eclipse", prob: 16384, desc: "日食の瞬間を捉えた神秘のオーラ。" },
+        { id: 15, name: "Supernova", prob: 32768, desc: "超新星爆発の残光オーラ。" },
+        { id: 16, name: "Genesis", prob: 65536, desc: "創世の光を宿す美しいオーラ。" },
+        { id: 17, name: "Infinity", prob: 131072, desc: "無限の可能性を示すオーラ。" },
+        { id: 18, name: "Aether", prob: 262144, desc: "高次元エーテル層のオーラ。" },
+        { id: 19, name: "Quantum", prob: 524288, desc: "量子の揺らぎを可視化したオーラ。" },
+        { id: 20, name: "Dimension", prob: 1048576, desc: "異次元の扉を開くオーラ。" },
+        { id: 21, name: "Chronos", prob: 2097152, desc: "時間を司る神聖なオーラ。" },
+        { id: 22, name: "Valhalla", prob: 4194304, desc: "戦乙女に導かれし神域のオーラ。" },
+        { id: 23, name: "Archangel", prob: 8388608, desc: "大天使の羽ばたきを模した純白のオーラ。" },
+        { id: 24, name: "Seraphim", prob: 12582912, desc: "熾天使の燃え盛る聖炎のオーラ。" },
+        { id: 25, name: "Abyssal", prob: 18874368, desc: "深淵の底から這い寄る漆黒の波動。" },
+        { id: 26, name: "Celestial", prob: 28311552, desc: "天体の調和を奏でる神々しいオーラ。" },
+        { id: 27, name: "Pandora", prob: 42467328, desc: "禁断の箱が開いた瞬間の災厄オーラ。" },
+        { id: 28, name: "Nirvana", prob: 63700992, desc: "解脱の境地に至った至高のオーラ。" },
+        { id: 29, name: "Valiant", prob: 95551488, desc: "勇猛果敢な英雄の魂を纏うオーラ。" },
+        { id: 30, name: "Equinox", prob: 143327232, desc: "昼と夜の均衡を保つ神秘のオーラ。" },
+        { id: 31, name: "Sovereign", prob: 215, 390848, desc: "絶対的王者の威厳を放つオーラ。" },
+        { id: 32, name: "Eternity", prob: 323086272, desc: "永遠の時間を刻む黄金のオーラ。" },
+        { id: 33, name: "Genesis-Omega", prob: 484629408, desc: "すべての始まりと終わりを司るオーラ。" },
+        { id: 34, name: "Overlord", prob: 726944112, desc: "魔王の圧倒的な威圧感を放つオーラ。" },
+        { id: 35, name: "Stellar-Gate", prob: 1090416168, desc: "星間航路を開く圧倒的な光の渦。" },
+        { id: 36, name: "Nebula-X", prob: 1635624252, desc: "未知の星雲から放射される高エネルギーオーラ。" },
+        { id: 37, name: "Astral-King", prob: 2453436378, desc: "星霊の王が認めた者にのみ宿るオーラ。" },
+        { id: 38, name: "Divine-Wrath", prob: 3680154567, desc: "神罰の下る瞬間を具現化した雷光のオーラ。" },
+        { id: 39, name: "Holiness", prob: 5520231850, desc: "汚れなき聖域の加護を受けた極上の光。" },
+        { id: 40, name: "Paradox", prob: 8280347775, desc: "存在自体が矛盾する奇跡の量子オーラ。" },
+        { id: 41, name: "Zenith", prob: 12420521662, desc: "天頂に君臨する太陽の最高峰オーラ。" },
+        { id: 42, name: "Apocalypse", prob: 18630782494, desc: "終末の鐘が鳴り響く漆黒と真紅のカタストロフィ。" },
+        { id: 43, name: "Genesis-Prime", prob: 27946173741, desc: "第一因の光を宿す根源のオーラ。" },
+        { id: 44, name: "Omnipotent", prob: 418, 9260612, desc: "全知全能の神の力を模した絶対的オーラ。" },
+        { id: 45, name: "Singularity", prob: 62788909168, desc: "重力が光すら縛るブラックホール中核のオーラ。" },
+        { id: 46, name: "Cosmic-Reign", prob: 94183363753, desc: "宇宙の摂理そのものを支配する統治者のオーラ。" },
+        { id: 47, name: "Astral-Titan", prob: 141275045630, desc: "星界を支える巨神の強大なる波動。" },
+        { id: 48, name: "Infinite-Void", prob: 211912568445, desc: "無限の虚無に溶け込む究極の静寂オーラ。" },
+        { id: 49, name: "Celestial-Emperor", prob: 317868852668, desc: "天帝の玉座に座す者に宿る至高の光彩。" },
+        { id: 50, name: "Transcendence", prob: 476803279003, desc: "次元の壁を超越した究極の覚醒オーラ。" },
+        { id: 51, name: "memorial overreached", prob: 5055492104, desc: "宇宙のすべてが消滅した後に訪れる究極の全画面侵食オーラ。" }
+    ];
 
-        // --- 10 Potions Data ---
-        const shopPotions = [
-            { id: 1, name: "スピード・ポーション", desc: "5分間ROLL速度1.2倍", cost: 100 },
-            { id: 2, name: "フォーチュン・ポーション", desc: "5分間Luck x1.5", cost: 150 },
-            { id: 3, name: "ヘブンリー・リキッド", desc: "次の1ロールのみLuck x10", cost: 300 },
-            { id: 4, name: "ヴォイド・エリクサー", desc: "10分間、Void系オーラの確率2倍", cost: 250 },
-            { id: 5, name: "ソーラー・エッセンス", desc: "10分間、Solar系オーラの確率2倍", cost: 250 },
-            { id: 6, name: "クロノ・オイル", desc: "5分間、QUICK ROLLチャージ最初からMAX", cost: 400 },
-            { id: 7, name: "ミシカル・ドラフト", desc: "5分間Luck x3.0", cost: 600 },
-            { id: 8, name: "ガイアの涙", desc: "クラフト時の必要素材1回免除", cost: 500 },
-            { id: 9, name: "ライトニング・ブレンド", desc: "5分間落雷頻度3倍＆ROLL速度1.3倍", cost: 450 },
-            { id: 10, name: "アストラル・トニック", desc: "10分間Luck x5.0（1億超え優遇）", cost: 1000 }
-        ];
+    // 修正: 確率は累積重み付けのためにソートしておく（小さい順）
+    AURAS.sort((a, b) => a.prob - b.prob);
 
-        // --- 17 Gauntlets & Runes Data with Type ---
-        const craftItems = [
-            { id: 1, type: "gauntlet", name: "スターウィンドガントレット", req: "Cosmic Dust x10", effect: "ROLL速度1.1倍" },
-            { id: 2, type: "gauntlet", name: "アマンタジントガントレット", req: "Nebula Mist x10", effect: "素材獲得確率20%UP" },
-            { id: 3, type: "gauntlet", name: "フェードアウトガントレット", req: "Gray Void x10", effect: "Void系確率1.5倍" },
-            { id: 4, type: "rune", name: "オシリス神のルーン", req: "Lunar Crescent x5", effect: "1/1000以上レアの獲得コイン2倍" },
-            { id: 5, type: "rune", name: "ハーデス神のルーン", req: "Onyx Shadow x5", effect: "1/10000以下レアのLuck+50%" },
-            { id: 6, type: "rune", name: "ポセイドン神のルーン", req: "Glacier Shard x10", effect: "ROLL間隔永続0.2秒短縮" },
-            { id: 7, type: "rune", name: "アレス神のルーン", req: "Celestial Sign x5", effect: "ROLLカウント常に2倍進行" },
-            { id: 8, type: "rune", name: "ヘルメス神のルーン", req: "Astral Echo x5", effect: "QUICK ROLL必要数20回に軽減" },
-            { id: 9, type: "gauntlet", name: "エクイニクスガントレット", req: "Equinox Balance x1", effect: "ROLL速度1.4倍 / Luck x2.0" },
-            { id: 10, type: "gauntlet", name: "サディスティックガントレット", req: "Sol Corona x1", effect: "前兆発生確率上昇" },
-            { id: 11, type: "rune", name: "クロノス神のルーン", req: "Chronos Gear x5", effect: "AUTO ROLL待機時間ゼロ" },
-            { id: 12, type: "rune", name: "ゼウス神のルーン", req: "Genesis Omega x1", effect: "ROLL速度1.5倍 / Luck x2.5" },
-            { id: 13, type: "gauntlet", name: "サイクロンガントレット", req: "Photon Stream x20", effect: "大気の渦エフェクト発生" },
-            { id: 14, type: "gauntlet", name: "エジプシャンガントレット", req: "Platinum Bar x10", effect: "ポーション効果時間2倍" },
-            { id: 15, type: "rune", name: "ガイア神のルーン", req: "Matrix Node x5", effect: "素材獲得個数常に2倍" },
-            { id: 16, type: "rune", name: "テュポーン神のルーン", req: "Glitch Error x2", effect: "ROLL速度1.8倍 / Luck x3.5" },
-            { id: 17, type: "rune", name: "シヴァ神のルーン", req: "ASTRAL: OMEN x1", effect: "ROLL速度2.0倍 / Luck x5.0" }
-        ];
+    // 17種のクラフトレシピ
+    const RECIPES = [
+        { id: 'g1', type: 'gauntlet', name: "Iron Gauntlet", mat: "Common x10", mult: 1.1 },
+        { id: 'g2', type: 'gauntlet', name: "Silver Gauntlet", mat: "Uncommon x10", mult: 1.2 },
+        { id: 'g3', type: 'gauntlet', name: "Gold Gauntlet", mat: "Good x10", mult: 1.3 },
+        { id: 'g4', type: 'gauntlet', name: "Platinum Gauntlet", mat: "Natural x10", mult: 1.4 },
+        { id: 'g5', type: 'gauntlet', name: "Solar Gauntlet", mat: "Solar x5", mult: 1.6 },
+        { id: 'g6', type: 'gauntlet', name: "Lunar Gauntlet", mat: "Lunar x5", mult: 1.6 },
+        { id: 'g7', type: 'gauntlet', name: "Void Gauntlet", mat: "Void x3", mult: 2.0 },
+        { id: 'g8', type: 'gauntlet', name: "Celestial Gauntlet", mat: "Celestial x2", mult: 2.5 },
+        { id: 'r1', type: 'rune', name: "Minor Rune", mat: "Bizarre x5", mult: 1.15 },
+        { id: 'r2', type: 'rune', name: "Adept Rune", mat: "Rage x5", mult: 1.25 },
+        { id: 'r3', type: 'rune', name: "Cursed Rune", mat: "Cursed x3", mult: 1.4 },
+        { id: 'r4', type: 'rune', name: "Starlight Rune", mat: "Starlight x3", mult: 1.5 },
+        { id: 'r5', type: 'rune', name: "Galaxy Rune", mat: "Galaxy x2", mult: 1.7 },
+        { id: 'r6', type: 'rune', name: "Quantum Rune", mat: "Quantum x2", mult: 2.2 },
+        { id: 'r7', type: 'rune', name: "Chronos Rune", mat: "Chronos x1", mult: 2.8 },
+        { id: 'r8', type: 'rune', name: "Archangel Rune", mat: "Archangel x1", mult: 3.5 },
+        { id: 'r9', type: 'rune', name: "Memorial Rune", mat: "memorial overreached x1", mult: 10.0 }
+    ];
 
-        // --- Missions Data ---
-        const missions = [
-            { id: 1, title: "失われた古文書の回収", desc: "ロールを50回実行し、ギルド地下の古文書を見つけ出せ。", reward: 500, sketch: "📜" },
-            { id: 2, title: "錬金術師の試練", desc: "ショップでポーションを合計3個購入せよ。", reward: 800, sketch: "🧪" },
-            { id: 3, title: "神域への挑戦", desc: "1/10,000以上のレアオーラを1回獲得せよ。", reward: 2000, sketch: "✨" }
-        ];
-        let currentMissionIdx = 0;
+    // ショップのポーション10選
+    const SHOP_PORTIONS = [
+        { id: 'p1', name: "Speed Potion", desc: "ルーレットの回転速度とテンポを加速。", price: 100, effect: 'speed' },
+        { id: 'p2', name: "Fortune Potion", desc: "一時的に運気が1.5倍に上昇。", price: 250, effect: 'luck1.5' },
+        { id: 'p3', name: "Heavenly Potion", desc: "高レア確率が大幅に上昇する神聖な薬。", price: 1000, effect: 'luck3.0' },
+        { id: 'p4', name: "Cosmic Elixir", desc: "宇宙の波動と同調し、LUCK+5.0倍。", price: 5000, effect: 'luck5.0' },
+        { id: 'p5', name: "Abyssal Brew", desc: "深淵の力を借りてレアを引き寄せる。", price: 12000, effect: 'luck8.0' },
+        { id: 'p6', name: "Starlight Tonic", desc: "星屑の加護を得るポーション。", price: 25000, effect: 'luck12.0' },
+        { id: 'p7', name: "Chronos Sand", desc: "時間の流れを操り試行回数を増加。", price: 50000, effect: 'speed2' },
+        { id: 'p8', name: "Aether Droplet", desc: "高次元エーテルを抽出した秘薬。", price: 100000, effect: 'luck20.0' },
+        { id: 'p9', name: "Divine Nectar", desc: "神々の愛飲する究極の不老不死の酒。", price: 250000, effect: 'luck50.0' },
+        { id: 'p10', name: "Memorial Tears", desc: "終焉の涙。全ステータスが限界突破。", price: 1000000, effect: 'luck100.0' }
+    ];
 
-        // --- Game State ---
-        let gameState = {
-            rolls: 0,
-            luck: 1.0,
-            coins: 1000,
-            equippedGauntlet: "None",
-            equippedRune: "None",
-            unlocked: { 1: true },
-            autoRolling: false,
-            autoInterval: null,
-            currentWorld: 'cosmos'
-        };
+    // ミッション一覧
+    const MISSIONS = [
+        { id: m1, title: "失われた星屑の回収", sketch: "[ SKETCH: #01 ]\n迷宮の奥深くにある星屑を採取せよ。", desc: "指定されたエリアを探索し、失われた星屑を集める古からの依頼。" },
+        { id: m2, title: "深淵の魔獣討伐", sketch: "[ SKETCH: #02 ]\n漆黒の洞窟に潜む怪影を排除せよ。", desc: "ギルドの安全を脅かす魔獣を討伐し、平穏を取り戻す手配書。" },
+        { id: m3, title: "天界の門番との接触", sketch: "[ SKETCH: #03 ]\n高次元領域への扉を開く鍵を探せ。", desc: "神域への到達を目指す者へ下された試練のミッション。" }
+    ];
 
-        // --- Canvas Background (Cosmos Stars Stream) ---
-        const cosmosCanvas = document.getElementById('cosmos-canvas');
-        const ctxCosmos = cosmosCanvas.getContext('2d');
-        function resizeCanvas() {
-            cosmosCanvas.width = window.innerWidth;
-            cosmosCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+    // プレイヤー状態
+    let gameState = {
+        coins: 500,
+        luckMultiplier: 1.0,
+        equippedGauntlet: null,
+        equippedRune: null,
+        unlockedAuras: {},
+        craftedItems: {},
+        inventory: {}
+    };
 
-        let stars = [];
-        for (let i = 0; i < 1500; i++) {
-            stars.push({
-                x: (Math.random() - 0.5) * window.innerWidth * 2,
-                y: (Math.random() - 0.5) * window.innerHeight * 2,
-                z: Math.random() * window.innerWidth,
-                size: Math.random() * 1.5
-            });
-        }
+    let currentMissionIndex = 0;
 
-        function renderCosmosLoop() {
-            ctxCosmos.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            ctxCosmos.fillRect(0, 0, cosmosCanvas.width, cosmosCanvas.height);
-            ctxCosmos.fillStyle = '#ffffff';
+    // --- 初期化＆タイトルアニメーション ---
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            document.getElementById('main-game-title').classList.add('loaded');
+            document.getElementById('play-btn-wrapper').classList.add('active');
+        }, 300);
+        
+        initCosmosCanvas();
+        buildLibraryUI();
+        buildShopUI();
+        buildCraftUI();
+        updateMissionUI();
+    });
 
-            const cx = cosmosCanvas.width / 2;
-            const cy = cosmosCanvas.height / 2;
+    // --- 画面遷移コントロール ---
+    function triggerLoader(callback) {
+        const loader = document.getElementById('global-loader');
+        loader.classList.add('active');
+        setTimeout(() => {
+            callback();
+            setTimeout(() => {
+                loader.classList.remove('active');
+            }, 400);
+        }, 1500);
+    }
 
-            stars.forEach(star => {
-                star.z -= 2;
-                if (star.z <= 0) star.z = cosmosCanvas.width;
+    function startGame() {
+        initAudio();
+        triggerLoader(() => {
+            switchScreen('cosmos-screen');
+        });
+    }
 
-                const k = 250 / star.z;
-                const px = star.x * k + cx;
-                const py = star.y * k + cy;
+    function transitionToRPG() {
+        initAudio();
+        playChurchBell();
+        triggerLoader(() => {
+            switchScreen('rpg-screen');
+        });
+    }
 
-                if (px >= 0 && px <= cosmosCanvas.width && py >= 0 && py <= cosmosCanvas.height) {
-                    const pSize = Math.max(1, star.size * k);
-                    ctxCosmos.fillRect(px, py, pSize, pSize);
-                }
-            });
-            requestAnimationFrame(renderCosmosLoop);
-        }
-        renderCosmosLoop();
+    function transitionToCosmos() {
+        initAudio();
+        triggerLoader(() => {
+            switchScreen('cosmos-screen');
+        });
+    }
 
-        // --- Ripple Effect Anywhere ---
-        const rippleCanvas = document.getElementById('ripple-canvas');
-        const ctxRipple = rippleCanvas.getContext('2d');
-        function resizeRipple() {
-            rippleCanvas.width = window.innerWidth;
-            rippleCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeRipple);
-        resizeRipple();
+    function switchScreen(screenId) {
+        // クリーンアップ：すべてのポップアップを強制クローズ
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
 
-        let ripples = [];
-        window.addEventListener('pointerdown', (e) => {
-            playClickSound();
-            ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: 1.0 });
+    function openModal(modalId) {
+        initAudio();
+        document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    // --- 宇宙キャンバス背景処理 ---
+    function initCosmosCanvas() {
+        const canvas = document.getElementById('cosmos-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         });
 
-        function renderRippleLoop() {
-            ctxRipple.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
-            ripples.forEach((rip, idx) => {
-                rip.r += 6;
-                rip.alpha -= 0.03;
-                if (rip.alpha <= 0) {
-                    ripples.splice(idx, 1);
-                    return;
-                }
-                ctxRipple.strokeStyle = `rgba(212, 175, 55, ${rip.alpha})`;
-                ctxRipple.lineWidth = 1.5;
-                ctxRipple.beginPath();
-                ctxRipple.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
-                ctxRipple.stroke();
-            });
-            requestAnimationFrame(renderRippleLoop);
-        }
-        renderRippleLoop();
+        const stars = Array.from({ length: 200 }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 2,
+            speed: Math.random() * 0.5 + 0.1
+        }));
 
-        // --- Render UI & Lists ---
-        function renderCodex() {
-            const grid = document.getElementById('codex-grid');
-            grid.innerHTML = '';
-            let unlockedCount = 0;
-            auras.forEach(aura => {
-                const isUnlocked = gameState.unlocked[aura.id];
-                if (isUnlocked) unlockedCount++;
-                const item = document.createElement('div');
-                item.className = `grid-item ${isUnlocked ? 'unlocked' : ''}`;
-                item.innerHTML = `
-                    <div class="item-name" style="color: ${isUnlocked ? aura.color : '#555'}">${isUnlocked ? aura.id + '. ' + aura.name : '🔒 ???'}</div>
-                    <div class="item-sub">1 / ${aura.rate.toLocaleString()}</div>
-                    ${isUnlocked && aura.rate >= 100000 ? `<button class="diamond-btn" style="margin-top:5px; font-size:10px; padding:4px;" onclick="previewCutscene(${aura.id})">SEE CUTSCENE</button>` : ''}
-                `;
-                grid.appendChild(item);
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(star => {
+                ctx.globalAlpha = Math.random() * 0.7 + 0.3;
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+                star.y += star.speed;
+                if (star.y > height) star.y = 0;
             });
-            document.querySelector('#library-modal .modal-title').textContent = `LIBRARY & AURA CODEX (${unlockedCount} / 51)`;
+            requestAnimationFrame(animate);
         }
+        animate();
+    }
 
-        function renderShop() {
-            const grid = document.getElementById('shop-grid');
-            grid.innerHTML = '';
-            shopPotions.forEach(pot => {
-                const item = document.createElement('div');
-                item.className = `grid-item unlocked`;
-                item.innerHTML = `
-                    <div class="item-name">${pot.name}</div>
-                    <div class="item-sub">${pot.desc}</div>
-                    <div class="item-sub" style="color:var(--gold);">COST: ${pot.cost} COINS</div>
-                    <button class="diamond-btn" style="margin-top:5px;" onclick="buyPotion(${pot.id})">BUY & DRINK</button>
-                `;
-                grid.appendChild(item);
-            });
-        }
+    // --- ガチャ抽選ロジック (累積重み付け) ---
+    function executeRoll() {
+        initAudio();
+        const rollBtn = document.getElementById('roll-button');
+        const resultDisplay = document.getElementById('result-display');
+        rollBtn.disabled = true;
 
-        function renderCraft() {
-            const grid = document.getElementById('craft-grid');
-            grid.innerHTML = '';
-            craftItems.forEach(ci => {
-                const item = document.createElement('div');
-                item.className = `grid-item unlocked`;
-                item.innerHTML = `
-                    <div class="item-name">${ci.name} [${ci.type.toUpperCase()}]</div>
-                    <div class="item-sub">REQ: ${ci.req}</div>
-                    <div class="item-sub">EFFECT: ${ci.effect}</div>
-                    <button class="diamond-btn" style="margin-top:5px;" onclick="craftItem(${ci.id})">CRAFT</button>
-                `;
-                grid.appendChild(item);
-            });
+        let counter = 0;
+        const maxCount = 20;
+        const speedInterval = (gameState.equippedGauntlet || gameState.equippedRune) ? 60 : 100;
+
+        const interval = setInterval(() => {
+            const randomAura = AURAS[Math.floor(Math.random() * AURAS.length)];
+            resultDisplay.textContent = randomAura.name;
+            counter++;
+
+            if (counter >= maxCount) {
+                clearInterval(interval);
+                determineFinalResult();
+            }
+        }, speedInterval);
+    }
+
+    function determineFinalResult() {
+        // 累積重み付け抽選
+        const rand = Math.random() * 5055492104 / gameState.luckMultiplier;
+        let selectedAura = AURAS[0];
+
+        for (let i = AURAS.length - 1; i >= 0; i--) {
+            if (rand <= AURAS[i].prob) {
+                selectedAura = AURAS[i];
+            }
         }
 
-        function renderEquipment() {
-            const grid = document.getElementById('equip-grid');
-            grid.innerHTML = '';
-            craftItems.forEach(ci => {
-                const isEquipped = (ci.type === 'gauntlet' && gameState.equippedGauntlet === ci.name) ||
-                                   (ci.type === 'rune' && gameState.equippedRune === ci.name);
-                const item = document.createElement('div');
-                item.className = `grid-item ${isEquipped ? 'unlocked' : ''}`;
-                item.innerHTML = `
-                    <div class="item-name">${ci.name} [${ci.type.toUpperCase()}]</div>
-                    <div class="item-sub">${ci.effect}</div>
-                    <button class="diamond-btn" style="margin-top:5px;" onclick="equipItem('${ci.name}', '${ci.type}')">${isEquipped ? 'EQUIPPED' : 'EQUIP'}</button>
-                `;
-                grid.appendChild(item);
-            });
+        const resultDisplay = document.getElementById('result-display');
+        resultDisplay.textContent = `${selectedAura.name} (1 / ${selectedAura.prob.toLocaleString()})`;
+        
+        // 図鑑に登録
+        gameState.unlockedAuras[selectedAura.id] = true;
+        gameState.coins += Math.floor(selectedAura.prob / 1000) + 10;
+        document.getElementById('hud-coins').textContent = gameState.coins.toLocaleString();
+
+        // 10万以上のレア（または51番）の場合、超豪華演出発動
+        if (selectedAura.prob >= 100000 || selectedAura.id === 51) {
+            playCinematicEffect(selectedAura);
+        } else {
+            document.getElementById('roll-button').disabled = false;
+        }
+    }
+
+    // --- シネマティック演出 (10万以上のレア & 51番) ---
+    function playCinematicEffect(aura) {
+        const overlay = document.getElementById('cinematic-overlay');
+        const crack = document.getElementById('glass-crack');
+        const flash = document.getElementById('lightning-flash');
+        const textDisplay = document.getElementById('cinematic-text-display');
+        const corona = document.getElementById('corona-overlay');
+
+        overlay.classList.add('active');
+        textDisplay.textContent = aura.name;
+
+        if (aura.id === 51) {
+            corona.classList.add('active');
+            playMemorialOrgan();
         }
 
-        function renderMissions() {
-            const container = document.getElementById('mission-content');
-            const m = missions[currentMissionIdx];
-            container.innerHTML = `
-                <div style="display:flex; align-items:center; gap:20px;">
-                    <button class="diamond-btn" onclick="slideMission(-1)">◀</button>
-                    <div class="mission-poster">
-                        <div class="mission-sketch">${m.sketch}</div>
-                        <div class="item-name" style="font-size:18px; color:var(--gold);">${m.title}</div>
-                        <div class="item-sub" style="text-align:center; line-height:1.4;">${m.desc}</div>
-                        <div class="item-sub" style="color:var(--gold);">REWARD: ${m.reward} COINS</div>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
-                            <button class="diamond-btn" onclick="completeMission(${m.reward})">ACCEPT</button>
-                            <button class="diamond-btn" onclick="closeModal('mission-modal')">DECLINE</button>
-                        </div>
-                    </div>
-                    <button class="diamond-btn" onclick="slideMission(1)">▶</button>
+        setTimeout(() => {
+            crack.classList.add('active');
+            flash.classList.add('flash');
+        }, 1000);
+
+        setTimeout(() => {
+            textDisplay.classList.add('show');
+        }, 1400);
+
+        setTimeout(() => {
+            overlay.classList.remove('active');
+            crack.classList.remove('active');
+            flash.classList.remove('flash');
+            corona.classList.remove('active');
+            textDisplay.classList.remove('show');
+            document.getElementById('roll-button').disabled = false;
+        }, 4500);
+    }
+
+    // --- 図鑑 (LIBRARY) UI生成 ---
+    function buildLibraryUI() {
+        const container = document.getElementById('library-grid-container');
+        container.innerHTML = '';
+        AURAS.forEach(aura => {
+            const isUnlocked = gameState.unlockedAuras[aura.id];
+            const card = document.createElement('div');
+            card.className = `aura-entry-card ${isUnlocked ? '' : 'locked'}`;
+            card.innerHTML = `
+                <div class="aura-name">${isUnlocked ? aura.name : '🔒 ???'}</div>
+                <div class="aura-prob">1 / ${aura.prob.toLocaleString()}</div>
+            `;
+            if (isUnlocked) {
+                card.onclick = () => playCinematicEffect(aura);
+            }
+            container.appendChild(card);
+        });
+    }
+
+    // --- ミッション (MISSION) カルーセル制御 ---
+    function updateMissionUI() {
+        const m = MISSIONS[currentMissionIndex];
+        document.getElementById('poster-title').textContent = m.title;
+        document.getElementById('poster-sketch').textContent = m.sketch;
+        document.getElementById('poster-desc').textContent = m.desc;
+    }
+
+    function nextMission() {
+        initAudio();
+        currentMissionIndex = (currentMissionIndex + 1) % MISSIONS.length;
+        updateMissionUI();
+    }
+
+    function prevMission() {
+        initAudio();
+        currentMissionIndex = (currentMissionIndex - 1 + MISSIONS.length) % MISSIONS.length;
+        updateMissionUI();
+    }
+
+    function acceptCurrentMission() {
+        initAudio();
+        alert('ミッションを受託しました。報酬を目指して探索を続けてください。');
+        closeModal('mission-modal');
+    }
+
+    // --- ショップ (SHOP) UI生成 ---
+    function buildShopUI() {
+        const container = document.getElementById('shop-grid-container');
+        container.innerHTML = '';
+        SHOP_PORTIONS.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'shop-item-card';
+            card.innerHTML = `
+                <div class="shop-item-info">
+                    <h4>${p.name}</h4>
+                    <p>${p.desc}</p>
+                </div>
+                <div class="shop-item-action">
+                    <span class="price-tag">${p.price} Coins</span>
+                    <button class="buy-btn" onclick="buyPotion('${p.effect}', ${p.price})">BUY</button>
                 </div>
             `;
-        }
+            container.appendChild(card);
+        });
+    }
 
-        function slideMission(dir) {
-            playClickSound();
-            currentMissionIdx = (currentMissionIdx + dir + missions.length) % missions.length;
-            renderMissions();
-        }
-
-        // --- Core Roll Logic with Cooldown & Real Balance ---
-        function executeRoll() {
-            const rollBtn = document.getElementById('btn-roll-main');
-            rollBtn.setAttribute('disabled', 'true');
-
-            playTypeSound();
-            gameState.rolls++;
-            document.getElementById('stat-rolls').textContent = gameState.rolls;
-
-            if (gameState.rolls >= 25) {
-                document.getElementById('btn-quick').removeAttribute('disabled');
+    function buyPotion(effect, price) {
+        initAudio();
+        if (gameState.coins >= price) {
+            gameState.coins -= price;
+            document.getElementById('hud-coins').textContent = gameState.coins.toLocaleString();
+            if (effect.startsWith('luck')) {
+                const mult = parseFloat(effect.replace('luck', ''));
+                gameState.luckMultiplier = mult;
+                document.getElementById('hud-luck').textContent = `${mult}x`;
             }
-
-            // Real Base Luck calculation (Strict Sol's RNG balance)
-            let effectiveLuck = gameState.luck;
-            if (gameState.equippedGauntlet.includes("エクイニクス")) effectiveLuck *= 2.0;
-            if (gameState.equippedRune.includes("ゼウス")) effectiveLuck *= 2.5;
-            if (gameState.equippedRune.includes("シヴァ")) effectiveLuck *= 5.0;
-
-            // Accurate logarithmic exponential distribution for true RNG weight
-            const rollVal = Math.random() * 5000000000 / effectiveLuck;
-
-            let selectedAura = auras[0];
-            for (let i = auras.length - 1; i >= 0; i--) {
-                if (rollVal <= auras[i].rate || i === 0) {
-                    selectedAura = auras[i];
-                    break;
-                }
-            }
-
-            // Unlock check
-            if (!gameState.unlocked[selectedAura.id]) {
-                gameState.unlocked[selectedAura.id] = true;
-                playChimeSound();
-            }
-
-            gameState.coins += 15;
-            document.getElementById('stat-coins').textContent = gameState.coins;
-
-            const nameEl = document.getElementById('current-name');
-            const rarityEl = document.getElementById('current-rarity');
-            nameEl.textContent = selectedAura.name;
-            nameEl.style.color = selectedAura.color;
-            rarityEl.textContent = `1 / ${selectedAura.rate.toLocaleString()}`;
-
-            // Trigger cutscene if high tier (22nd or higher / >= 10,000,000)
-            if (selectedAura.id >= 22 || selectedAura.rate >= 10000000) {
-                triggerCutscene(selectedAura, () => {
-                    rollBtn.removeAttribute('disabled');
-                });
-            } else {
-                setTimeout(() => {
-                    rollBtn.removeAttribute('disabled');
-                }, 300);
-            }
+            alert('ポーションを購入し、効果が適用されました！');
+        } else {
+            alert('コインが不足しています。');
         }
+    }
 
-        function toggleAutoRoll() {
-            playClickSound();
-            gameState.autoRolling = !gameState.autoRolling;
-            const btn = document.getElementById('btn-auto');
-            if (gameState.autoRolling) {
-                btn.textContent = "AUTO: ON";
-                let speed = 400;
-                if (gameState.equippedRune.includes("クロノス")) speed = 50;
-                gameState.autoInterval = setInterval(() => {
-                    if (!document.getElementById('btn-roll-main').disabled) {
-                        executeRoll();
-                    }
-                }, speed);
-            } else {
-                btn.textContent = "AUTO: OFF";
-                clearInterval(gameState.autoInterval);
-            }
-        }
+    // --- クラフト & 装備リスト UI生成 ---
+    function buildCraftUI() {
+        const recipeContainer = document.getElementById('recipe-list-container');
+        const equipContainer = document.getElementById('equipment-list-container');
+        recipeContainer.innerHTML = '';
+        equipContainer.innerHTML = '';
 
-        function executeQuickRoll() {
-            if (gameState.rolls < 25) return;
-            playImpactSound();
-            for (let i = 0; i < 25; i++) {
-                executeRoll();
-            }
-        }
+        RECIPES.forEach(r => {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+            card.innerHTML = `
+                <div class="recipe-info">
+                    <h5>${r.name}</h5>
+                    <p>材料: ${r.mat} (倍率: +${r.mult}x)</p>
+                </div>
+                <button class="buy-btn" onclick="craftItem('${r.id}')">CRAFT</button>
+            `;
+            recipeContainer.appendChild(card);
+        });
 
-        // --- Cutscene & Full Cinematic Sequence ---
-        function triggerCutscene(aura, callback) {
-            playImpactSound();
-            const layer = document.getElementById('cutscene-layer');
-            const counterEl = document.getElementById('cutscene-counter');
-            const titleEl = document.getElementById('cutscene-title-text');
-            titleEl.textContent = aura.name;
-            layer.classList.add('active');
+        // 装備一覧
+        ['gauntlet', 'rune'].forEach(type => {
+            const card = document.createElement('div');
+            card.className = 'equip-card';
+            const currentEquipped = type === 'gauntlet' ? gameState.equippedGauntlet : gameState.equippedRune;
+            card.innerHTML = `
+                <div class="equip-info">
+                    <h5>${type.toUpperCase()} SLOT</h5>
+                    <p>${currentEquipped ? currentEquipped.name : '未装備'}</p>
+                </div>
+                ${currentEquipped ? `<button class="buy-btn" onclick="unequipItem('${type}')">UNEQUIP</button>` : ''}
+            `;
+            equipContainer.appendChild(card);
+        });
+    }
 
-            const canvas = document.getElementById('glass-canvas');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.strokeStyle = aura.id === 51 ? '#d4af37' : '#ffffff';
-            ctx.lineWidth = aura.id === 51 ? 4 : 2;
-            ctx.beginPath();
-            let x = canvas.width / 2;
-            let y = canvas.height / 2;
-            ctx.moveTo(x, y);
-            for (let i = 0; i < 25; i++) {
-                x += (Math.random() - 0.5) * 600;
-                y += (Math.random() - 0.5) * 600;
-                ctx.lineTo(x, y);
-            }
-            ctx.stroke();
+    function craftItem(recipeId) {
+        initAudio();
+        const recipe = RECIPES.find(r => r.id === recipeId);
+        gameState.craftedItems[recipeId] = recipe;
+        alert(`${recipe.name} の鍛造に成功しました！ EQUIPMENT LIST から装備可能です。`);
+        buildCraftUI();
+    }
 
-            // Probability count-up
-            let currentNum = 0;
-            let targetNum = aura.rate;
-            let increment = Math.max(1, Math.floor(targetNum / 50));
-            let interval = setInterval(() => {
-                currentNum += increment;
-                if (currentNum >= targetNum) {
-                    currentNum = targetNum;
-                    clearInterval(interval);
-                }
-                counterEl.textContent = `1 / ${currentNum.toLocaleString()}`;
-            }, 25);
+    function unequipItem(type) {
+        playEquipSound();
+        if (type === 'gauntlet') gameState.equippedGauntlet = null;
+        if (type === 'rune') gameState.equippedRune = null;
+        updateHudEquip();
+        buildCraftUI();
+    }
 
-            setTimeout(() => {
-                layer.classList.remove('active');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                if (callback) callback();
-            }, 3800);
-        }
+    function updateHudEquip() {
+        const parts = [];
+        if (gameState.equippedGauntlet) parts.push(gameState.equippedGauntlet.name);
+        if (gameState.equippedRune) parts.push(gameState.equippedRune.name);
+        document.getElementById('hud-equip').textContent = parts.length > 0 ? parts.join(' / ') : 'None';
+    }
+</script>
 
-        function previewCutscene(id) {
-            const aura = auras.find(a => a.id === id);
-            if (aura) triggerCutscene(aura);
-        }
-
-        // --- Actions ---
-        function buyPotion(id) {
-            const pot = shopPotions.find(p => p.id === id);
-            if (gameState.coins >= pot.cost) {
-                gameState.coins -= pot.cost;
-                document.getElementById('stat-coins').textContent = gameState.coins;
-                playChimeSound();
-                gameState.luck *= 1.5;
-                document.getElementById('stat-luck').textContent = gameState.luck.toFixed(1) + 'x';
-                alert(`${pot.name}を購入し、服用しました！`);
-            } else {
-                alert("コインが不足しています。");
-            }
-        }
-
-        function craftItem(id) {
-            const ci = craftItems.find(c => c.id === id);
-            playArmorEquipSound();
-            alert(`${ci.name}の錬成に成功しました！EQUIPMENT画面から装備してください。`);
-        }
-
-        function equipItem(name, type) {
-            playArmorEquipSound();
-            if (type === 'gauntlet') {
-                gameState.equippedGauntlet = name;
-            } else {
-                gameState.equippedRune = name;
-            }
-            document.getElementById('stat-equip').textContent = `${gameState.equippedGauntlet} / ${gameState.equippedRune}`;
-            renderEquipment();
-        }
-
-        function completeMission(reward) {
-            playChimeSound();
-            gameState.coins += reward;
-            document.getElementById('stat-coins').textContent = gameState.coins;
-            alert("ミッション報酬を受け取りました！");
-            closeModal('mission-modal');
-        }
-
-        // --- Seamless World & Modal Clean-up Switcher ---
-        function switchWorld(target) {
-            playImpactSound();
-            // Close all modals instantly to prevent any residual UI/backdrop bugs
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-
-            const loader = document.getElementById('loading-overlay');
-            loader.style.opacity = '1';
-            loader.style.pointerEvents = 'all';
-
-            setTimeout(() => {
-                if (target === 'other-side') {
-                    gameState.currentWorld = 'other-side';
-                    document.getElementById('cosmos-nav').style.display = 'none';
-                    document.getElementById('other-nav').style.display = 'flex';
-                    document.getElementById('main-stage-area').style.display = 'none';
-                } else {
-                    gameState.currentWorld = 'cosmos';
-                    document.getElementById('other-nav').style.display = 'none';
-                    document.getElementById('cosmos-nav').style.display = 'flex';
-                    document.getElementById('main-stage-area').style.display = 'flex';
-                }
-                loader.style.opacity = '0';
-                loader.style.pointerEvents = 'none';
-            }, 1500);
-        }
-
-        function openModal(id) {
-            playClickSound();
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-            if (id === 'library-modal') renderCodex();
-            if (id === 'shop-modal') renderShop();
-            if (id === 'craft-modal') renderCraft();
-            if (id === 'equip-modal') renderEquipment();
-            if (id === 'mission-modal') renderMissions();
-            document.getElementById(id).classList.add('active');
-        }
-
-        function closeModal(id) {
-            playClickSound();
-            document.getElementById(id).classList.remove('active');
-        }
-    </script>
 </body>
 </html>
