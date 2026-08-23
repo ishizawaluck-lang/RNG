@@ -33,37 +33,57 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            background: radial-gradient(circle at center, #080412 0%, #000000 75%);
+            background: #000000;
             perspective: 1200px;
             overflow: hidden;
             padding: 35px 40px;
             transform-style: preserve-3d;
         }
 
-        /* === 漆黒の背景 === */
+        /* === 1. 漆黒の背景 ＆ コズミック・オーロラ === */
         .deep-space-bg {
             position: absolute;
             inset: -30%;
             width: 160%;
             height: 160%;
-            background: radial-gradient(circle at 50% 50%, rgba(15, 8, 30, 0.9) 0%, transparent 60%);
-            opacity: 0.6;
-            filter: blur(90px);
+            background: radial-gradient(circle at 50% 50%, rgba(10, 5, 20, 0.8) 0%, #000000 75%);
             z-index: 1;
             pointer-events: none;
         }
 
-        /* === スターダスト用キャンバス === */
-        #starfield-canvas {
+        .cosmic-aurora {
+            position: absolute;
+            inset: -20%;
+            width: 140%;
+            height: 140%;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.22;
+            filter: blur(80px);
+            background: 
+                radial-gradient(circle at 15% 30%, rgba(245, 158, 11, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 85% 70%, rgba(56, 189, 248, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.25) 0%, transparent 50%);
+            animation: auroraShift 18s ease-in-out infinite alternate;
+        }
+
+        @keyframes auroraShift {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+            50% { transform: scale(1.08) translate(-3%, 2%) rotate(3deg); }
+            100% { transform: scale(0.95) translate(3%, -2%) rotate(-3deg); }
+        }
+
+        /* === 2. Canvasスターダスト ＆ 星雲ガス ＆ 彗星描画レイヤー === */
+        #universe-canvas {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
-            z-index: 2;
+            z-index: 3;
             pointer-events: none;
         }
 
-        /* === 惑星レイヤー（彗星テイル付き中景） === */
+        /* === 3. 惑星レイヤー（彗星テイル付き中景） === */
         .parallax-layer {
             position: absolute;
             inset: 0;
@@ -73,7 +93,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 3;
+            z-index: 4;
             transition: transform 0.1s ease-out;
         }
 
@@ -109,23 +129,22 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 惑星からの光の彗星（テイル・エフェクト） */
         .planet-tail {
             position: absolute;
             top: 15%;
             right: calc(8% + 280px);
-            width: 180px;
-            height: 30px;
-            background: linear-gradient(to left, rgba(253,224,71,0.4), rgba(56,189,248,0.1), transparent);
+            width: 200px;
+            height: 35px;
+            background: linear-gradient(to left, rgba(253,224,71,0.5), rgba(56,189,248,0.15), transparent);
             transform: rotate(-25deg);
-            filter: blur(8px);
-            opacity: 0.7;
+            filter: blur(10px);
+            opacity: 0.75;
             animation: tailPulse 3s ease-in-out infinite alternate;
         }
 
         @keyframes tailPulse {
-            0% { opacity: 0.4; transform: rotate(-25deg) scaleX(0.9); }
-            100% { opacity: 0.8; transform: rotate(-25deg) scaleX(1.2); }
+            0% { opacity: 0.45; transform: rotate(-25deg) scaleX(0.9); }
+            100% { opacity: 0.85; transform: rotate(-25deg) scaleX(1.25); }
         }
 
         .planet-sub {
@@ -137,7 +156,7 @@
             box-shadow: inset 12px 12px 25px rgba(0,0,0,0.9), 0 0 15px rgba(56, 189, 248, 0.2);
         }
 
-        /* === ホログラム風宇宙ステータスUI === */
+        /* === 4. ホログラム風宇宙ステータスUI === */
         .holo-ui {
             position: absolute;
             font-family: 'Montserrat', sans-serif;
@@ -162,7 +181,7 @@
             54% { opacity: 0.6; }
         }
 
-        /* === ヘッダータイトル ＆ ホログラム・ノイズ覚醒演出 === */
+        /* === 5. ヘッダータイトル（ホログラム・ノイズ覚醒付きイントロ） === */
         .header-area {
             position: relative;
             z-index: 20;
@@ -189,15 +208,15 @@
                 letter-spacing: 2.2em;
                 text-shadow: 0 0 0px rgba(253, 224, 71, 0);
                 transform: translateY(-10px);
-                filter: blur(10px);
+                filter: blur(12px);
             }
             30% {
-                opacity: 0.4;
-                text-shadow: -4px 0 #38bdf8, 4px 0 #fde047; /* 覚醒ノイズ（色収差） */
+                opacity: 0.35;
+                text-shadow: -5px 0 #38bdf8, 5px 0 #fde047;
             }
             70% {
                 opacity: 0.8;
-                text-shadow: 2px 0 rgba(56,189,248,0.5), -2px 0 rgba(253,224,71,0.5);
+                text-shadow: 2px 0 rgba(56,189,248,0.6), -2px 0 rgba(253,224,71,0.6);
                 filter: blur(1px);
             }
             100% {
@@ -209,7 +228,7 @@
             }
         }
 
-        /* === 巨大太陽魔法陣コア ＆ 拡張された光線群 === */
+        /* === 6. 巨大太陽魔法陣コア（完全波線化・色収差パルス） === */
         .magic-circle-container {
             position: absolute;
             top: 50%;
@@ -217,7 +236,7 @@
             width: 800px;
             height: 800px;
             margin: -400px 0 0 -400px;
-            z-index: 4;
+            z-index: 5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -248,13 +267,13 @@
             animation: coreAberration 4s ease-in-out infinite;
         }
 
-        /* コアの残像フリッカー（色収差パルス） */
+        /* 色収差パルス（残像エフェクト） */
         @keyframes coreAberration {
             0%, 100% {
                 box-shadow: 0 0 25px #ffffff, 0 0 60px #ffffff, 0 0 120px #fef08a, 0 0 220px #f59e0b;
             }
             50% {
-                box-shadow: 0 0 40px #ffffff, 0 0 90px #38bdf8, 0 0 160px #fde047, 0 0 300px rgba(56,189,248,0.7), 0 0 450px rgba(253,224,71,0.6);
+                box-shadow: 0 0 45px #ffffff, 0 0 95px #38bdf8, 0 0 170px #fde047, 0 0 320px rgba(56,189,248,0.75), 0 0 480px rgba(253,224,71,0.65);
             }
         }
 
@@ -272,7 +291,7 @@
 
         @keyframes gravityWaveExpand {
             0% { width: 100px; height: 100px; opacity: 1; transform: scale(1); }
-            100% { width: 850px; height: 850px; opacity: 0; transform: scale(1.1); border-color: rgba(56, 189, 248, 0.2); }
+            100% { width: 900px; height: 900px; opacity: 0; transform: scale(1.1); border-color: rgba(56, 189, 248, 0.2); }
         }
 
         .orbit-path {
@@ -318,42 +337,32 @@
             background: repeating-conic-gradient(from 0deg, rgba(253,224,71,0.25) 0deg 15deg, transparent 15deg 30deg);
         }
 
-        /* 拡張された光線・波線レイヤー（1.4倍の長さに拡大） */
+        /* 完全波線化された有機的うねりフレア波線レイヤー */
         .sun-spikes-layer {
             position: absolute;
             inset: 0;
             z-index: 6;
-            animation: rotateCounter 50s linear infinite;
+            animation: rotateCounter 45s linear infinite;
         }
 
-        .spike {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 3.5px;
-            height: 600px; /* 従来の420pxから約1.4倍に延長し四隅へ到達 */
-            background: linear-gradient(to top, transparent, rgba(255,255,255,0.95), #fde047, transparent);
-            transform-origin: top center;
-            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-        }
-
-        /* 新規追加：うねる波線ウェーブ・エネルギー光線 */
         .wave-spike {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 6px;
-            height: 620px;
-            background: radial-gradient(circle, rgba(56,189,248,0.8) 0%, rgba(253,224,71,0.4) 50%, transparent 100%);
+            width: 5px;
+            height: 680px; /* 画面端まで突き抜ける特大スケール */
+            background: linear-gradient(to top, transparent, rgba(56,189,248,0.7) 30%, rgba(253,224,71,0.95) 70%, #ffffff 100%);
             transform-origin: top center;
-            filter: blur(2px);
-            opacity: 0.75;
-            animation: wavePulse 2.5s ease-in-out infinite alternate;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+            filter: blur(1px);
+            opacity: 0.85;
+            animation: waveFlow var(--duration, 3s) ease-in-out infinite alternate;
         }
 
-        @keyframes wavePulse {
-            0% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(0.5); opacity: 0.4; }
-            100% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(1.8); opacity: 0.9; }
+        @keyframes waveFlow {
+            0% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(0.4) skewX(-5deg); opacity: 0.5; }
+            50% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(1.8) skewX(8deg); opacity: 0.95; }
+            100% { transform: rotate(var(--rot, 0deg)) translateY(-50%) scaleX(0.8) skewX(-3deg); opacity: 0.7; }
         }
 
         .outer-sigil-system {
@@ -385,7 +394,7 @@
         @keyframes rotateClockwise { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes rotateCounter { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
-        /* === フッター：PLAYボタン === */
+        /* === 7. フッター：PLAYボタン === */
         .footer-area {
             position: relative;
             z-index: 20;
@@ -435,7 +444,7 @@
             100% { border-color: rgba(253, 224, 71, 0.7); box-shadow: 0 0 25px rgba(253, 224, 71, 0.35); }
         }
 
-        /* === 超新星爆発（ホワイトアウト）演出 === */
+        /* === 8. 超新星爆発（ホワイトアウト）連動演出 === */
         .screen-container.is-triggered .sun-core {
             animation: supernovaCore 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
         }
@@ -449,7 +458,8 @@
         .screen-container.is-triggered .holo-ui,
         .screen-container.is-triggered .planet,
         .screen-container.is-triggered .parallax-layer,
-        .screen-container.is-triggered .planet-tail {
+        .screen-container.is-triggered .planet-tail,
+        .screen-container.is-triggered .cosmic-aurora {
             transition: opacity 0.4s ease-out;
             opacity: 0 !important;
         }
@@ -457,7 +467,7 @@
         @keyframes supernovaCore {
             0% { transform: scale(1); }
             30% { transform: scale(2.2); filter: brightness(1.5); }
-            100% { transform: scale(40); filter: brightness(3.5); opacity: 1; }
+            100% { transform: scale(45); filter: brightness(4); opacity: 1; }
         }
 
         .flash-overlay {
@@ -487,23 +497,24 @@
         <div class="holo-ui ui-bottom-right">RNG_SEED: 0x9F4A7B_AX</div>
 
         <div class="deep-space-bg"></div>
+        <div class="cosmic-aurora"></div>
 
-        <!-- Canvasスターダスト -->
-        <canvas id="starfield-canvas"></canvas>
+        <!-- Canvas統合背景（星雲ガス・星くず吸い込みストリーム・不定期の彗星） -->
+        <canvas id="universe-canvas"></canvas>
 
-        <!-- 惑星レイヤー（彗星テイル付き） -->
+        <!-- 惑星レイヤー（彗星テイル付き中景） -->
         <div class="parallax-layer" id="planetLayer" data-depth="0.02">
             <div class="planet-tail"></div>
             <div class="planet planet-main"></div>
             <div class="planet planet-sub"></div>
         </div>
 
-        <!-- ヘッダータイトル（ホログラム・ノイズ覚醒つき） -->
+        <!-- ヘッダータイトル（ホログラム覚醒イントロ） -->
         <header class="header-area" id="headerArea" data-depth="0.06">
             <h1 class="game-title">ASTRAL</h1>
         </header>
 
-        <!-- 巨大太陽魔法陣コア（拡張光線＆ウェーブ波線） -->
+        <!-- 巨大太陽魔法陣コア（完全波線化フレア波動） -->
         <div class="magic-circle-container" id="magicCore" data-depth="-0.03">
             <div class="orbit-path orbit-1"><div class="orbit-satellite"></div></div>
             <div class="orbit-path orbit-2"><div class="orbit-satellite" style="width: 6px; height: 6px; background: #38bdf8; box-shadow: 0 0 10px #38bdf8;"></div></div>
@@ -512,16 +523,12 @@
             <div class="outer-sigil-system"><div class="sigil-wing"></div></div>
             
             <div class="sun-spikes-layer">
-                <!-- 32本の拡張された直線光の槍 -->
+                <!-- 32本の完全波線化・うねるフレア光線 -->
                 <script>
                     for(let i=0; i<32; i++) {
-                        document.write(`<div class="spike" style="transform: rotate(${i * (360/32)}deg) translateY(-50%);"></div>`);
-                    }
-                </script>
-                <!-- 16本のうねる波線エネルギーウェーブ -->
-                <script>
-                    for(let i=0; i<16; i++) {
-                        document.write(`<div class="wave-spike" style="--rot: ${i * (360/16) + 10}deg;"></div>`);
+                        const rot = i * (360/32);
+                        const duration = (2.0 + (i % 5) * 0.4).toFixed(1);
+                        document.write(`<div class="wave-spike" style="--rot: ${rot}deg; --duration: ${duration}s;"></div>`);
                     }
                 </script>
             </div>
@@ -538,7 +545,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('starfield-canvas');
+            const canvas = document.getElementById('universe-canvas');
             const ctx = canvas.getContext('2d');
             const container = document.getElementById('screenContainer');
             const playBtn = document.getElementById('playBtn');
@@ -551,8 +558,21 @@
                 height = canvas.height = window.innerHeight;
             });
 
-            // 1500個の極小スターダストの動的生成と吸い込み制御
-            const STAR_COUNT = 1500;
+            // --- 1. 星雲ガス（Cosmic Dust Clouds）の初期化 ---
+            const nebulaClouds = [];
+            for(let i = 0; i < 5; i++) {
+                nebulaClouds.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 300 + 200,
+                    color: i % 2 === 0 ? 'rgba(16, 185, 129, 0.04)' : 'rgba(168, 85, 247, 0.04)',
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2
+                });
+            }
+
+            // --- 2. スターダスト・ストリーム（1600個の星） ---
+            const STAR_COUNT = 1600;
             const stars = [];
             let isSupernova = false;
 
@@ -561,17 +581,53 @@
                     x: (Math.random() - 0.5) * width * 2,
                     y: (Math.random() - 0.5) * height * 2,
                     z: Math.random() * width,
-                    size: Math.random() * 1.0 + 0.4,
-                    color: Math.random() > 0.8 ? (Math.random() > 0.5 ? '#fde047' : '#38bdf8') : '#ffffff',
-                    speed: Math.random() * 2.5 + 1.5
+                    size: Math.random() * 1.1 + 0.3,
+                    color: Math.random() > 0.75 ? (Math.random() > 0.5 ? '#fde047' : '#38bdf8') : '#ffffff',
+                    speed: Math.random() * 2.2 + 1.2
                 });
             }
 
-            function animateStars() {
+            // --- 3. 不定期な彗星（シューティングスター）の管理 ---
+            let comets = [];
+            let cometTimer = 0;
+
+            function spawnComet() {
+                comets.push({
+                    x: Math.random() * width,
+                    y: -50,
+                    vx: (Math.random() - 0.5) * 8 - 6,
+                    vy: Math.random() * 8 + 6,
+                    length: Math.random() * 120 + 80,
+                    alpha: 0.8
+                });
+            }
+
+            // --- 60fpsメインアニメーションループ ---
+            function animateUniverse() {
                 ctx.clearRect(0, 0, width, height);
                 const centerX = width / 2;
                 const centerY = height / 2;
 
+                // A. 星雲ガスの描画と変形
+                for(let i = 0; i < nebulaClouds.length; i++) {
+                    let cloud = nebulaClouds[i];
+                    cloud.x += cloud.vx;
+                    cloud.y += cloud.vy;
+                    if(cloud.x < -cloud.radius) cloud.x = width + cloud.radius;
+                    if(cloud.x > width + cloud.radius) cloud.x = -cloud.radius;
+                    if(cloud.y < -cloud.radius) cloud.y = height + cloud.radius;
+                    if(cloud.y > height + cloud.radius) cloud.y = -cloud.radius;
+
+                    const grad = ctx.createRadialGradient(cloud.x, cloud.y, 10, cloud.x, cloud.y, cloud.radius);
+                    grad.addColorStop(0, cloud.color);
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(cloud.x, cloud.y, cloud.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // B. スターダストの吸い込み・吹き飛び処理
                 for (let i = 0; i < stars.length; i++) {
                     let star = stars[i];
 
@@ -583,7 +639,7 @@
                             star.y = (Math.random() - 0.5) * height * 2;
                         }
                     } else {
-                        star.z += star.speed * 12;
+                        star.z += star.speed * 14;
                     }
 
                     const k = 300 / star.z;
@@ -591,7 +647,7 @@
                     const py = star.y * k + centerY;
 
                     if (px >= 0 && px <= width && py >= 0 && py <= height) {
-                        const pSize = Math.max(0.1, star.size * k * (isSupernova ? 2.5 : 1));
+                        const pSize = Math.max(0.1, star.size * k * (isSupernova ? 2.8 : 1));
                         const opacity = Math.min(1, (width - star.z) / width);
 
                         ctx.fillStyle = star.color;
@@ -602,11 +658,43 @@
                     }
                 }
                 ctx.globalAlpha = 1.0;
-                requestAnimationFrame(animateStars);
-            }
-            animateStars();
 
-            // 3Dマウスパララックス効果
+                // C. 10〜15秒に一度の不定期な彗星の生成・描画
+                cometTimer++;
+                if (cometTimer > 700 && Math.random() < 0.02) {
+                    spawnComet();
+                    cometTimer = 0;
+                }
+
+                for (let i = comets.length - 1; i >= 0; i--) {
+                    let c = comets[i];
+                    c.x += c.vx;
+                    c.y += c.vy;
+                    c.alpha -= 0.008;
+
+                    if (c.alpha <= 0 || c.x < 0 || c.y > height) {
+                        comets.splice(i, 1);
+                        continue;
+                    }
+
+                    const cometGrad = ctx.createLinearGradient(c.x, c.y, c.x - c.vx * 15, c.y - c.vy * 15);
+                    cometGrad.addColorStop(0, `rgba(255, 255, 255, ${c.alpha})`);
+                    cometGrad.addColorStop(0.5, `rgba(56, 189, 248, ${c.alpha * 0.6})`);
+                    cometGrad.addColorStop(1, 'transparent');
+
+                    ctx.strokeStyle = cometGrad;
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(c.x, c.y);
+                    ctx.lineTo(c.x - c.vx * 12, c.y - c.vy * 12);
+                    ctx.stroke();
+                }
+
+                requestAnimationFrame(animateUniverse);
+            }
+            animateUniverse();
+
+            // --- 4. 3Dマウスパララックス効果（マウス＆スマホジャイロ） ---
             let mouseX = 0;
             let mouseY = 0;
             let currentX = 0;
@@ -643,7 +731,7 @@
             }
             updateParallax();
 
-            // 超新星爆発演出
+            // --- 5. 超新星爆発（ホワイトアウト）連動トリガー ---
             playBtn.addEventListener('click', () => {
                 if (isSupernova) return;
                 isSupernova = true;
