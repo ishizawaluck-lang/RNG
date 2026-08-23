@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASTRAL RESONANCE: MYTHIC RNG</title>
-    <!-- Google Fonts: Cinzel Decorative & Montserrat -->
+    <title>ASTRAL</title>
+    <!-- Google Fonts: Syncopate & Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -21,7 +21,7 @@
             height: 100%;
             overflow: hidden;
             font-family: 'Montserrat', sans-serif;
-            background-color: #020205;
+            background-color: #000000;
             color: #ffffff;
         }
 
@@ -33,35 +33,71 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            background: radial-gradient(circle at center, #110d24 0%, #05040a 60%, #020205 100%);
+            background: radial-gradient(circle at center, #050508 0%, #000000 70%);
             perspective: 1200px;
             overflow: hidden;
-            padding: 30px 0;
+            padding: 40px 0;
         }
 
-        /* === 1. 背景の宇宙と青白い星雲 === */
-        .nebula-bg {
+        /* === 2. 漆黒の背景とダークな星雲 === */
+        .deep-space-bg {
             position: absolute;
-            inset: -30%;
-            width: 160%;
-            height: 160%;
+            inset: -20%;
+            width: 140%;
+            height: 140%;
             background: 
-                radial-gradient(ellipse at 40% 40%, rgba(56, 189, 248, 0.22) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 60%, rgba(147, 51, 234, 0.18) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 80%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
-            opacity: 0.85;
-            filter: blur(70px);
+                radial-gradient(circle at 50% 50%, rgba(10, 10, 20, 0.8) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 70%, rgba(20, 20, 35, 0.4) 0%, transparent 50%);
+            opacity: 0.5;
+            filter: blur(80px);
             z-index: 1;
-            animation: nebulaDrift 15s ease-in-out infinite alternate;
             pointer-events: none;
         }
 
-        @keyframes nebulaDrift {
-            0% { transform: scale(1) translate(0, 0); }
-            100% { transform: scale(1.08) translate(-2%, 2%); }
+        /* 微細な星々 */
+        .stars-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(1px 1px at 30px 60px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 150px 200px, rgba(253,224,71,0.5), transparent),
+                radial-gradient(1.2px 1.2px at 280px 110px, rgba(255,255,255,0.6), transparent);
+            background-size: 250px 250px;
+            opacity: 0.6;
         }
 
-        /* === ヘッダー：タイトル ===. */
+        /* === 3. 惑星（シルエット・天体）の追加 === */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* 巨大なメイン惑星（右奥） */
+        .planet-main {
+            top: 15%;
+            right: 10%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle at 30% 30%, #08080c 0%, #000000 70%);
+            /* コアからの逆光によるエッジの極細ゴールド/ホワイトの光輪 */
+            box-shadow: inset -15px -15px 30px rgba(0,0,0,0.9), 0 0 15px rgba(253, 224, 71, 0.15), 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 小さな衛星（左下） */
+        .planet-sub {
+            bottom: 12%;
+            left: 12%;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle at 70% 70%, #050508 0%, #000000 80%);
+            box-shadow: inset 10px 10px 20px rgba(0,0,0,0.9), 0 0 10px rgba(56, 189, 248, 0.15);
+        }
+
+        /* === 1. ヘッダー：極細・超広間隔のタイトル === */
         .header-area {
             position: relative;
             z-index: 10;
@@ -70,153 +106,116 @@
         }
 
         .game-title {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: clamp(1.2rem, 3vw, 2.4rem);
-            font-weight: 900;
-            letter-spacing: 0.4em;
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 100;
+            letter-spacing: 0.65em;
             text-transform: uppercase;
-            background: linear-gradient(135deg, #ffffff 20%, #fde047 60%, #ca8a04 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(253, 224, 71, 0.4);
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px rgba(253, 224, 71, 0.2);
+            padding-left: 0.65em; /* letter-spacing分のズレ相殺 */
         }
 
-        /* === 2. 魔法陣コアの完全再現（センター配置） ===. */
+        /* === 中央：神聖な太陽の魔法陣コア === */
         .magic-circle-container {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 650px;
-            height: 650px;
-            margin: -325px 0 0 -325px;
-            z-index: 3;
+            width: 600px;
+            height: 600px;
+            margin: -300px 0 0 -300px;
+            z-index: 4;
             display: flex;
             justify-content: center;
             align-items: center;
             pointer-events: none;
         }
 
-        /* ① 中心：目もくらむ純白の太陽（Core） */
         .sun-core {
             position: absolute;
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             background: #ffffff;
             border-radius: 50%;
             box-shadow: 
                 0 0 15px #ffffff,
                 0 0 35px #ffffff,
                 0 0 70px #fef08a,
-                0 0 110px #f59e0b,
-                0 0 160px rgba(245, 158, 11, 0.7),
-                0 0 220px rgba(217, 70, 239, 0.4);
+                0 0 120px #f59e0b,
+                0 0 180px rgba(245, 158, 11, 0.6);
             z-index: 10;
-            animation: corePulse 3.5s ease-in-out infinite alternate;
+            animation: corePulse 4s ease-in-out infinite alternate;
         }
 
         @keyframes corePulse {
-            0% {
-                transform: scale(0.96);
-                box-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff, 0 0 60px #fef08a, 0 0 100px #f59e0b;
-            }
-            100% {
-                transform: scale(1.05);
-                box-shadow: 0 0 20px #ffffff, 0 0 45px #ffffff, 0 0 90px #fef08a, 0 0 140px #f59e0b, 0 0 200px rgba(245, 158, 11, 0.9);
-            }
+            0% { transform: scale(0.95); opacity: 0.9; }
+            100% { transform: scale(1.06); opacity: 1; filter: drop-shadow(0 0 20px #fff); }
         }
 
-        /* ② 内環：古代ルーンと幾何学の二重円（Inner Rings） */
-        .inner-rune-ring-1 {
+        .inner-rune-ring {
             position: absolute;
-            width: 170px;
-            height: 170px;
-            border: 1px solid rgba(253, 224, 71, 0.7);
+            width: 180px;
+            height: 180px;
+            border: 1px solid rgba(253, 224, 71, 0.6);
             border-radius: 50%;
             z-index: 9;
-            box-shadow: 0 0 15px rgba(253, 224, 71, 0.4);
-            animation: rotateClockwise 25s linear infinite;
+            box-shadow: 0 0 15px rgba(253, 224, 71, 0.3);
+            animation: rotateClockwise 30s linear infinite;
         }
 
-        .inner-rune-ring-1::before {
+        .inner-rune-ring::before {
             content: '';
             position: absolute;
             inset: -8px;
-            border: 1.5px dashed rgba(255, 255, 255, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.4);
             border-radius: 50%;
-            background: repeating-conic-gradient(from 0deg, rgba(253,224,71,0.25) 0deg 15deg, transparent 15deg 30deg);
+            background: repeating-conic-gradient(from 0deg, rgba(253,224,71,0.2) 0deg 15deg, transparent 15deg 30deg);
         }
 
-        .inner-rune-ring-2 {
-            position: absolute;
-            width: 230px;
-            height: 230px;
-            border: 1px dotted rgba(245, 158, 11, 0.6);
-            border-radius: 50%;
-            z-index: 8;
-            animation: rotateCounter 35s linear infinite;
-        }
-
-        /* ③ 中層：30本以上の全方位に突き刺さる光の槍（Spikes） */
         .sun-spikes-layer {
             position: absolute;
             inset: 0;
-            z-index: 7;
-            animation: rotateCounter 60s linear infinite;
+            z-index: 8;
+            animation: rotateCounter 50s linear infinite;
         }
 
         .spike {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 3px;
-            height: 310px;
-            background: linear-gradient(to top, transparent, rgba(255,255,255,0.9), #fde047, transparent);
+            width: 2.5px;
+            height: 290px;
+            background: linear-gradient(to top, transparent, rgba(255,255,255,0.8), #fde047, transparent);
             transform-origin: top center;
             clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
         }
 
-        /* 32本の光線を生成（長短を変化させる） */
-        .spike:nth-child(n) { transform: rotate(calc(n * 11.25deg)) translateY(-50%); }
-        .spike:nth-child(even) { height: 240px; width: 2px; opacity: 0.7; }
-        .spike:nth-child(3n) { height: 340px; background: linear-gradient(to top, transparent, #ffffff, #38bdf8, transparent); }
+        .spike:nth-child(n) { transform: rotate(calc(n * 15deg)) translateY(-50%); }
 
-        /* ④ 外層：炎と翼のゴールド神紋（Outer Golden Sigils）★最重要再現 */
         .outer-sigil-system {
             position: absolute;
-            width: 540px;
-            height: 540px;
+            width: 500px;
+            height: 500px;
             border-radius: 50%;
-            z-index: 6;
-            animation: rotateClockwise 50s linear infinite;
+            z-index: 7;
+            animation: rotateClockwise 60s linear infinite;
         }
 
-        /* 炎や翼のような複雑な有機的シルエットをCSSで力技構築 */
         .sigil-wing {
             position: absolute;
-            inset: 20px;
-            border: 2px solid rgba(245, 158, 11, 0.6);
+            inset: 10px;
+            border: 1.5px solid rgba(245, 158, 11, 0.5);
             border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.3), inset 0 0 25px rgba(245, 158, 11, 0.3);
-            animation: pulseWing 4s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25), inset 0 0 20px rgba(245, 158, 11, 0.25);
         }
 
         .sigil-wing::before {
             content: '';
             position: absolute;
-            inset: -30px;
-            border: 1.5px solid rgba(253, 224, 71, 0.5);
+            inset: -35px;
+            border: 1px solid rgba(253, 224, 71, 0.35);
             border-radius: 60% 40% 50% 50% / 40% 60% 50% 50%;
-            transform: rotate(30deg);
-            background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%);
-        }
-
-        .sigil-wing::after {
-            content: '';
-            position: absolute;
-            inset: -60px;
-            border: 1px dashed rgba(56, 189, 248, 0.4);
-            border-radius: 50%;
-            transform: rotate(-15deg);
+            transform: rotate(25deg);
         }
 
         @keyframes rotateClockwise {
@@ -229,152 +228,99 @@
             100% { transform: rotate(-360deg); }
         }
 
-        @keyframes pulseWing {
-            0% { transform: scale(1) rotate(0deg); opacity: 0.85; }
-            100% { transform: scale(1.04) rotate(2deg); opacity: 1; filter: drop-shadow(0 0 10px #fde047); }
-        }
-
-        /* === フッター：PLAYボタン === */
+        /* === 4. フッター：極限までミニマルなPLAYボタン === */
         .footer-area {
             position: relative;
             z-index: 10;
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .play-btn-container {
-            position: relative;
-            display: inline-block;
-            border-radius: 40px;
-        }
-
-        .play-btn-container::before {
-            content: '';
-            position: absolute;
-            inset: -6px;
-            background: linear-gradient(45deg, #f59e0b, #38bdf8, #a855f7, #f59e0b);
-            background-size: 300% 300%;
-            border-radius: 45px;
-            z-index: -1;
-            opacity: 0.6;
-            filter: blur(12px);
-            animation: btnGlow 4s ease infinite, colorFlow 8s linear infinite;
+            margin-bottom: 25px;
         }
 
         .play-btn {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Syncopate', sans-serif;
             position: relative;
             display: inline-block;
-            padding: 15px 50px;
-            font-size: 1rem;
+            padding: 14px 45px;
+            font-size: 0.85rem;
             font-weight: 400;
-            letter-spacing: 0.4em;
+            letter-spacing: 0.5em;
             color: #ffffff;
-            background: rgba(10, 5, 20, 0.85);
-            border: 1px solid rgba(253, 224, 71, 0.6);
-            border-radius: 40px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 30px;
             cursor: pointer;
             outline: none;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 0 10px rgba(253, 224, 71, 0.2);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            animation: btnPulse 3s ease-in-out infinite alternate;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding-left: calc(45px + 0.5em); /* letter-spacingのバランス調整 */
         }
 
         .play-btn:hover {
-            background: rgba(30, 15, 50, 0.95);
-            border-color: #ffffff;
-            color: #fffbeb;
-            box-shadow: 0 0 35px rgba(253, 224, 71, 0.8), 0 0 60px rgba(56, 189, 248, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(253, 224, 71, 0.8);
+            box-shadow: 0 0 25px rgba(253, 224, 71, 0.4), inset 0 0 10px rgba(253, 224, 71, 0.2);
+            letter-spacing: 0.6em;
             transform: translateY(-2px);
-            letter-spacing: 0.45em;
         }
 
-        .play-btn-container:hover::before {
-            opacity: 0.9;
-            filter: blur(16px);
-            animation: btnGlow 1.5s ease infinite, colorFlow 3s linear infinite;
-        }
-
-        @keyframes btnGlow {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.04); opacity: 0.9; }
-        }
-
-        @keyframes colorFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes btnPulse {
+            0% {
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+            }
+            100% {
+                border-color: rgba(253, 224, 71, 0.6);
+                box-shadow: 0 0 20px rgba(253, 224, 71, 0.25);
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="screen-container">
-        <!-- 背景の宇宙と星雲 -->
-        <div class="nebula-bg"></div>
+        <!-- 漆黒の背景＆星々 -->
+        <div class="deep-space-bg"></div>
+        <div class="stars-layer"></div>
 
-        <!-- ヘッダー：タイトル -->
+        <!-- 惑星（シルエット・逆光エッジ発光） -->
+        <div class="planet planet-main"></div>
+        <div class="planet planet-sub"></div>
+
+        <!-- ヘッダー：極細タイトル -->
         <header class="header-area">
-            <h1 class="game-title">ASTRAL RESONANCE: MYTHIC RNG</h1>
+            <h1 class="game-title">ASTRAL</h1>
         </header>
 
-        <!-- 魔法陣コアの完全再現構造 -->
+        <!-- 神聖な太陽の魔法陣コア -->
         <div class="magic-circle-container">
-            <!-- ④ 外層：ゴールドの神紋・翼レイヤー (逆回転) -->
             <div class="outer-sigil-system">
                 <div class="sigil-wing"></div>
             </div>
-
-            <!-- ③ 中層：30本以上の光の槍 (スパイク) -->
             <div class="sun-spikes-layer">
-                <!-- 32本の光線展開 -->
                 <div class="spike" style="transform: rotate(0deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(11.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(22.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(33.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(45deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(56.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(67.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(78.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(90deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(101.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(112.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(123.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(135deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(146.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(157.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(168.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(180deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(191.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(202.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(213.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(225deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(236.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(247.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(258.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(270deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(281.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(292.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(303.75deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(315deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(326.25deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(337.5deg) translateY(-50%);"></div>
-                <div class="spike" style="transform: rotate(348.75deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(24deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(48deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(72deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(96deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(120deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(144deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(168deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(192deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(216deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(240deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(264deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(288deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(312deg) translateY(-50%);"></div>
+                <div class="spike" style="transform: rotate(336deg) translateY(-50%);"></div>
             </div>
-
-            <!-- ② 内環：古代ルーン文字の環 -->
-            <div class="inner-rune-ring-2"></div>
-            <div class="inner-rune-ring-1"></div>
-
-            <!-- ① 中心：目もくらむ純白の太陽 -->
+            <div class="inner-rune-ring"></div>
             <div class="sun-core"></div>
         </div>
 
-        <!-- フッター：PLAYボタン -->
+        <!-- フッター：ミニマルPLAYボタン -->
         <footer class="footer-area">
-            <div class="play-btn-container">
-                <button class="play-btn">PLAY</button>
-            </div>
+            <button class="play-btn">PLAY</button>
         </footer>
     </div>
 
