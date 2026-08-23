@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASTRAL - COSMIC ROULETTE & GUILD</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>MONOCHROME ASTRAL: 51 AURAS ULTIMATE</title>
     <style>
         :root {
-            --bg-color: #030307;
-            --gold-primary: #f3e5ab;
-            --gold-secondary: #c5a059;
-            --gold-glow: rgba(243, 229, 171, 0.4);
-            --text-main: #e2e8f0;
-            --font-cinzel: 'Cinzel', serif;
-            --font-rajdhani: 'Rajdhani', sans-serif;
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --platinum: #e5e4e2;
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --gray-sub: #555555;
+            --glass-border: rgba(212, 175, 55, 0.4);
+            --glass-border-sub: rgba(255, 255, 255, 0.2);
+            --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         * {
@@ -21,2021 +22,1032 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: var(--font-rajdhani);
-            min-height: 100vh;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #bg-canvas, #fx-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none;
-            z-index: 1;
         }
-        #fx-canvas { z-index: 3; }
 
         #app {
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            z-index: 2;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 40px;
-            overflow: hidden;
+            padding: 20px;
+            transition: filter 0.3s var(--ease-smooth);
         }
 
-        /* INTRO SCREEN */
-        #intro-screen {
-            position: absolute;
-            inset: 0;
-            background: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .intro-title {
-            font-family: var(--font-cinzel);
-            font-size: 4.5rem;
-            font-weight: 700;
-            letter-spacing: 1.5em;
-            color: var(--gold-primary);
-            text-shadow: 0 0 30px var(--gold-glow);
-            margin-bottom: 20px;
-            animation: titleIntro 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: scale(1.1);
-        }
-
-        @keyframes titleIntro {
-            0% { opacity: 0; letter-spacing: 2.5em; transform: scale(1.2); filter: blur(10px); }
-            100% { opacity: 1; letter-spacing: 1.2em; transform: scale(1); filter: blur(0); }
-        }
-
-        .intro-sub {
-            font-size: 1.1rem;
-            letter-spacing: 0.5em;
-            color: var(--gold-secondary);
-            margin-bottom: 50px;
-            opacity: 0;
-            animation: fadeIn 1.5s 1s forwards;
-        }
-
-        .play-btn {
+        /* Diamond Button & UI Shaping */
+        .diamond-box {
             position: relative;
+            border: 1px solid var(--gold);
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.8);
+            clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .diamond-box:hover {
+            border-color: var(--gold-light);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        button.diamond-btn {
             background: transparent;
-            border: 1px solid var(--gold-secondary);
-            color: var(--gold-primary);
-            font-family: var(--font-cinzel);
-            font-size: 1.2rem;
-            letter-spacing: 0.4em;
-            padding: 16px 50px;
+            color: var(--text-main);
+            border: 1px solid var(--gold);
+            padding: 10px 20px;
             cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 2px;
+            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        button.diamond-btn:hover {
+            background: var(--gold);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        /* Background Canvas Layers */
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
             overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0;
-            animation: fadeIn 1.5s 1.5s forwards;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
         }
 
-        .play-btn::before {
-            content: '';
+        canvas {
+            display: block;
+        }
+
+        #ripple-canvas {
             position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(243,229,171,0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .play-btn:hover {
-            background: rgba(197, 160, 89, 0.15);
-            box-shadow: 0 0 25px var(--gold-glow);
-            border-color: var(--gold-primary);
-            letter-spacing: 0.5em;
-        }
-
-        .play-btn:hover::before { left: 100%; }
-
-        /* LOADING VIEWS */
-        #loading-view {
-            position: absolute;
-            inset: 0;
-            background: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            transition: opacity 0.8s ease;
+            z-index: 9999;
         }
 
-        /* RPG FANTASY LOADING SCREEN */
-        #rpg-loading-view {
-            position: absolute;
-            inset: 0;
-            background: #080503;
+        /* Header UI */
+        header {
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 60;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1s ease;
-        }
-
-        .magic-circle {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            border: 2px dashed var(--gold-secondary);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: spin 10s linear infinite;
-            box-shadow: 0 0 40px var(--gold-glow);
-            margin-bottom: 30px;
-        }
-
-        .magic-circle::before {
-            content: '';
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            border: 1px solid var(--gold-primary);
-            transform: rotate(45deg);
-        }
-
-        .magic-core-dot {
-            width: 30px;
-            height: 30px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            box-shadow: 0 0 30px var(--gold-primary);
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 2px solid rgba(197,160,89,0.2);
-            border-top-color: var(--gold-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .loading-text {
-            font-family: var(--font-cinzel);
-            font-size: 0.9rem;
-            letter-spacing: 0.3em;
-            color: var(--gold-secondary);
-        }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* MAIN GAME UI (COSMOS) */
-        #main-game {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 30px 50px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1.5s ease;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+            z-index: 10;
+        }
+
+        .stats-box {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .stat-item span {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Main Stage */
+        .main-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+            position: relative;
+        }
+
+        .current-aura-display {
+            text-align: center;
+            margin-bottom: 40px;
             z-index: 5;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            align-items: center;
-            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
-            padding-bottom: 15px;
-        }
-
-        .logo {
-            font-family: var(--font-cinzel);
-            font-size: 1.5rem;
-            letter-spacing: 0.5em;
-            color: var(--gold-primary);
-        }
-
-        .stats-container {
-            display: flex;
-            gap: 30px;
-            font-size: 1rem;
-            letter-spacing: 0.2em;
-            color: var(--gold-secondary);
-        }
-
-        .stats-container span { color: var(--gold-primary); font-weight: 700; }
-
-        /* Diamond Icon Button */
-        .diamond-btn {
-            position: absolute;
-            top: 25px;
-            right: 40px;
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--gold-secondary);
-            background: rgba(3,3,7,0.8);
-            transform: rotate(45deg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: 0.3s;
-            z-index: 25;
-        }
-        .diamond-btn:hover {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 15px var(--gold-glow);
-        }
-        .diamond-btn span {
-            transform: rotate(-45deg);
-            font-size: 0.8rem;
-            color: var(--gold-primary);
-            font-family: var(--font-cinzel);
-        }
-
-        /* Center Stage */
-        .stage {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .sun-core {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, #fff 0%, var(--gold-primary) 40%, rgba(197,160,89,0.2) 70%, transparent 100%);
-            border-radius: 50%;
-            box-shadow: 0 0 50px var(--gold-glow);
-            transition: transform 0.1s ease;
-        }
-
-        .roulette-ring {
-            position: absolute;
-            width: 280px;
-            height: 280px;
-            border: 1px dashed rgba(197, 160, 89, 0.4);
-            border-radius: 50%;
-            animation: spin 30s linear infinite;
-        }
-
-        .roulette-ring.fast {
-            animation: spin 0.8s linear infinite;
-        }
-
-        .aura-display {
-            position: absolute;
-            bottom: -60px;
-            text-align: center;
-            width: 400px;
-        }
-
         .aura-name {
-            font-family: var(--font-cinzel);
-            font-size: 1.6rem;
-            letter-spacing: 0.3em;
-            color: var(--gold-primary);
-            text-shadow: 0 0 15px var(--gold-glow);
-            min-height: 40px;
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            margin-bottom: 12px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
         }
 
-        .aura-rate {
-            font-size: 0.9rem;
-            letter-spacing: 0.2em;
-            color: var(--gold-secondary);
-            margin-top: 5px;
+        .aura-rarity {
+            font-size: 15px;
+            color: var(--gold-light);
+            letter-spacing: 3px;
         }
 
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .action-btn {
-            background: rgba(3, 3, 7, 0.8);
-            border: 1px solid var(--gold-secondary);
-            color: var(--gold-primary);
-            font-family: var(--font-cinzel);
-            font-size: 0.9rem;
-            letter-spacing: 0.2em;
-            padding: 12px 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover:not(:disabled) {
-            background: rgba(197, 160, 89, 0.2);
-            box-shadow: 0 0 20px var(--gold-glow);
-            border-color: var(--gold-primary);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* OTHER SIDE (GUILD BACKALLEY VIEW) */
-        #other-side-view {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #120d09 0%, #080503 100%);
-            z-index: 15;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 60px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1.2s ease;
-        }
-
-        #other-side-view.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .stone-wall-overlay {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle at 50% 30%, rgba(197, 160, 89, 0.08) 0%, transparent 70%),
-                              linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8));
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .guild-content-layer {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .guild-header {
-            font-family: var(--font-cinzel);
-            font-size: 1.8rem;
-            letter-spacing: 0.5em;
-            color: var(--gold-primary);
-            text-shadow: 0 0 20px var(--gold-glow);
-            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-            width: 100%;
-            text-align: center;
-            padding-bottom: 15px;
-        }
-
-        .guild-center-stage {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lantern-lamp {
-            width: 80px;
-            height: 140px;
-            background: linear-gradient(180deg, #2c1d11 0%, #170e08 100%);
-            border: 2px solid var(--gold-secondary);
-            border-radius: 40px 40px 10px 10px;
-            box-shadow: 0 0 30px rgba(243, 229, 171, 0.2);
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .lantern-glow {
-            width: 40px;
-            height: 60px;
-            background: var(--gold-primary);
-            border-radius: 20px;
-            box-shadow: 0 0 40px var(--gold-primary), 0 0 80px var(--gold-glow);
-            animation: lampFlicker 3s infinite alternate;
-        }
-
-        @keyframes lampFlicker {
-            0% { opacity: 0.8; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1.05); }
-        }
-
-        .guild-menu-grid {
-            display: flex;
-            gap: 25px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        /* SUB-VIEWS (MISSION & SHOP & CRAFT) */
-        .sub-view {
-            position: absolute;
-            inset: 0;
-            background: var(--bg-color);
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 60px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease;
-        }
-
-        .sub-view.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .sub-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-            padding-bottom: 20px;
-        }
-
-        .sub-title {
-            font-family: var(--font-cinzel);
-            font-size: 1.8rem;
-            letter-spacing: 0.4em;
-            color: var(--gold-primary);
-        }
-
-        .back-btn {
-            background: transparent;
-            border: 1px solid var(--gold-secondary);
-            color: var(--gold-primary);
-            font-family: var(--font-cinzel);
-            font-size: 0.9rem;
-            letter-spacing: 0.2em;
-            padding: 10px 25px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .back-btn:hover { background: rgba(197,160,89,0.2); }
-
-        /* MISSION BOARD DESIGN */
-        .mission-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .wooden-board {
-            width: 650px;
-            height: 380px;
-            background: linear-gradient(135deg, #2c1d11 0%, #170e08 100%);
-            border: 8px solid #3d2616;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            padding: 30px;
-        }
-
-        .parchment {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f4ecd8 0%, #e6d5b8 100%);
-            color: #2c1d11;
-            padding: 35px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-        }
-
-        .parchment-title {
-            font-family: var(--font-cinzel);
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            border-bottom: 2px solid #5c3a21;
-            padding-bottom: 10px;
-        }
-
-        .parchment-desc {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        .parchment-reward {
-            font-family: var(--font-cinzel);
-            font-size: 1rem;
-            color: #8c5830;
-            font-weight: 700;
-        }
-
-        .nav-arrow {
-            background: rgba(197, 160, 89, 0.2);
-            border: 1px solid var(--gold-secondary);
-            color: var(--gold-primary);
-            font-size: 1.5rem;
-            width: 50px; height: 50px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.3s;
-        }
-        .nav-arrow:hover { background: rgba(197, 160, 89, 0.4); }
-
-        .quest-action-btn {
-            background: #3d2616;
-            color: #f3e5ab;
-            border: 1px solid #c5a059;
-            font-family: var(--font-cinzel);
-            font-size: 1rem;
-            letter-spacing: 0.2em;
-            padding: 12px 35px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .quest-action-btn:hover { background: #5c3a21; }
-        .quest-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* SHOP GRID & POTIONS */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            flex: 1;
-            align-content: center;
-            padding: 0 40px;
-        }
-
-        .shop-card {
-            border: 1px solid rgba(197, 160, 89, 0.3);
-            background: rgba(255,255,255,0.02);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .shop-card:hover {
-            border-color: var(--gold-primary);
-            background: rgba(197, 160, 89, 0.05);
-            box-shadow: 0 0 20px var(--gold-glow);
-            transform: translateY(-5px);
-        }
-
-        .shop-card .name {
-            font-family: var(--font-cinzel);
-            font-size: 1.1rem;
-            letter-spacing: 0.2em;
-            color: var(--gold-primary);
-            margin-bottom: 10px;
-        }
-
-        .shop-card .desc {
-            font-size: 0.95rem;
-            color: var(--text-main);
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .shop-card .price {
-            font-family: var(--font-cinzel);
-            font-size: 1rem;
-            color: var(--gold-secondary);
-        }
-
-        /* CRAFT VIEW */
-        .craft-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 30px;
-            flex: 1;
-            padding: 20px 0;
-            overflow: hidden;
-        }
-
-        .craft-sidebar {
-            border: 1px solid rgba(197, 160, 89, 0.3);
-            background: rgba(255,255,255,0.01);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .craft-recipe-item {
-            padding: 15px;
-            border: 1px solid rgba(197, 160, 89, 0.2);
-            background: rgba(3,3,7,0.5);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .craft-recipe-item:hover, .craft-recipe-item.selected {
-            border-color: var(--gold-primary);
-            background: rgba(197, 160, 89, 0.1);
-        }
-        .craft-recipe-item .title {
-            font-family: var(--font-cinzel);
-            font-size: 1.05rem;
-            letter-spacing: 0.15em;
-            color: var(--gold-primary);
-        }
-
-        .craft-main-panel {
-            border: 1px solid rgba(197, 160, 89, 0.3);
-            background: rgba(255,255,255,0.01);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-        }
-
-        .craft-requirements {
+        .roll-controls {
             display: flex;
             gap: 20px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            justify-content: center;
+            align-items: center;
+            z-index: 5;
         }
 
-        .material-slot {
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            background: rgba(3,3,7,0.8);
-            padding: 20px;
-            width: 180px;
+        .btn-roll {
+            font-size: 22px;
+            padding: 18px 50px;
+            background: var(--text-main);
+            color: var(--bg-color);
+            font-weight: bold;
+            border: 1px solid var(--gold);
+            cursor: pointer;
+            letter-spacing: 3px;
+            clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px);
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .btn-roll:hover {
+            background: var(--gold-light);
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.7);
+        }
+
+        /* Footer */
+        footer {
+            width: 100%;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 15px;
+            font-size: 11px;
+            color: var(--gray-sub);
+        }
+
+        /* Modals & Popups */
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
             flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .material-slot .m-name {
-            font-family: var(--font-cinzel);
-            font-size: 0.95rem;
-            color: var(--gold-primary);
-        }
-        .material-slot .m-count {
-            font-size: 0.9rem;
-            color: var(--gold-secondary);
-        }
-
-        /* MODALS */
-        #qty-modal, #codex-modal, #digest-modal, #material-popup, #cutscene-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(3, 3, 7, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        #qty-modal.active, #codex-modal.active, #digest-modal.active, #material-popup.active, #cutscene-modal.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-box {
-            width: 550px;
-            max-height: 80vh;
-            border: 1px solid var(--gold-secondary);
-            background: rgba(5, 5, 12, 0.95);
             padding: 40px;
+            z-index: 100;
+            overflow-y: auto;
+            transition: opacity 0.3s var(--ease-smooth);
+        }
+
+        .modal.active {
             display: flex;
-            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            position: relative;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
         }
 
         .modal-title {
-            font-family: var(--font-cinzel);
-            font-size: 1.3rem;
-            letter-spacing: 0.3em;
-            color: var(--gold-primary);
-            margin-bottom: 20px;
-            text-align: center;
+            font-size: 20px;
+            letter-spacing: 4px;
+            color: var(--gold);
         }
 
-        .modal-close {
-            position: absolute;
-            top: 20px; right: 25px;
-            background: none; border: none;
-            color: var(--gold-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .modal-close:hover { color: var(--gold-primary); }
-
-        .codex-tabs {
-            display: flex;
+        /* Codex & Shop Grids */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
             width: 100%;
-            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-            margin-bottom: 20px;
         }
 
-        .codex-tab {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            font-family: var(--font-cinzel);
-            font-size: 0.95rem;
-            letter-spacing: 0.2em;
-            color: var(--gold-secondary);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .codex-tab.active {
-            color: var(--gold-primary);
-            border-bottom: 2px solid var(--gold-primary);
-            background: rgba(197, 160, 89, 0.05);
-        }
-
-        .codex-list {
-            width: 100%;
-            overflow-y: auto;
+        .grid-item {
+            border: 1px solid var(--glass-border-sub);
+            padding: 18px;
+            background: rgba(255,255,255,0.01);
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-height: 50vh;
-            padding-right: 5px;
+            gap: 8px;
+            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+            transition: all 0.3s var(--ease-smooth);
         }
 
-        .codex-item {
+        .grid-item.unlocked {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.03);
+        }
+
+        .grid-item .item-name {
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        .grid-item .item-sub {
+            font-size: 12px;
+            color: var(--gold-light);
+        }
+
+        /* Cutscene & Special Layers */
+        #cutscene-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            padding: 15px 20px;
-            border: 1px solid rgba(197, 160, 89, 0.2);
-            background: rgba(255,255,255,0.01);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .codex-item:hover { border-color: var(--gold-primary); background: rgba(197,160,89,0.03); }
-        .codex-item.unlocked { border-color: rgba(197, 160, 89, 0.6); }
-
-        .codex-item-info .name {
-            font-family: var(--font-cinzel);
-            font-size: 1.1rem;
-            letter-spacing: 0.2em;
-            color: var(--gold-primary);
+            opacity: 0;
+            transition: opacity 0.2s var(--ease-smooth);
         }
 
-        .codex-item-info .rate {
-            font-size: 0.85rem;
-            letter-spacing: 0.1em;
-            color: var(--gold-secondary);
-            margin-top: 3px;
+        #cutscene-layer.active {
+            opacity: 1;
         }
 
-        .codex-item-status {
-            font-family: var(--font-cinzel);
-            font-size: 0.9rem;
-            letter-spacing: 0.2em;
-        }
-        .codex-item.unlocked .codex-item-status { color: var(--gold-primary); }
-        .codex-item:not(.unlocked) .codex-item-status { color: rgba(255,255,255,0.3); }
-
-        #cutscene-modal {
-            background: #000;
-            z-index: 200;
-        }
         .cutscene-content {
             text-align: center;
-            max-width: 600px;
+            z-index: 2002;
+        }
+
+        .counter-hologram {
+            font-size: 64px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: var(--gold);
+            text-shadow: 0 0 30px var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .cutscene-title {
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 10px;
+            color: #fff;
+            text-shadow: 0 0 40px #fff;
+            border: 1px solid var(--gold);
+            padding: 20px 40px;
+            background: rgba(0,0,0,0.85);
+            clip-path: polygon(15px 0%, calc(100% - 15px) 0%, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0% calc(100% - 15px), 0% 15px);
+        }
+
+        #glass-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2001;
+        }
+
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 5000;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
             padding: 40px;
-            z-index: 201;
-        }
-        .cutscene-text {
-            font-family: var(--font-cinzel);
-            font-size: 1.3rem;
-            letter-spacing: 0.3em;
-            color: var(--gold-primary);
-            line-height: 1.8;
-            margin-bottom: 30px;
             opacity: 0;
-            animation: fadeIn 2s forwards;
+            pointer-events: none;
+            transition: opacity 0.6s var(--ease-smooth);
         }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: var(--gold-secondary); }
-
-        .glitch-effect { animation: glitchAnim 0.15s infinite; }
-        @keyframes glitchAnim {
-            0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
-            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
-            40% { transform: translate(5px, -3px); filter: invert(0.2); }
-            60% { transform: translate(-3px, -5px); filter: hue-rotate(180deg); }
-            80% { transform: translate(3px, 3px); filter: hue-rotate(270deg); }
-            100% { transform: translate(0, 0); filter: hue-rotate(360deg); }
+        .loading-text {
+            font-size: 16px;
+            letter-spacing: 4px;
+            color: var(--gold);
         }
 
-        .whiteout {
-            position: fixed;
-            inset: 0; background: #fff; z-index: 1000;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        /* Active Buff Bar */
+        #buff-bar {
+            position: absolute;
+            top: 75px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 8;
         }
-        .whiteout.active { opacity: 1; }
+
+        .buff-tag {
+            border: 1px solid var(--gold);
+            padding: 5px 10px;
+            font-size: 11px;
+            background: rgba(0,0,0,0.7);
+            color: var(--gold-light);
+            letter-spacing: 1px;
+            clip-path: polygon(5px 0%, calc(100% - 5px) 0%, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0% calc(100% - 5px), 0% 5px);
+        }
     </style>
 </head>
 <body>
-
-    <div class="whiteout" id="whiteout"></div>
-    <canvas id="bg-canvas"></canvas>
-    <canvas id="fx-canvas"></canvas>
-
     <div id="app">
-        <!-- DIAMOND SETTINGS / CODEX BUTTON -->
-        <div class="diamond-btn" id="diamond-codex-btn" title="CODEX">
-            <span>◇</span>
+        <div class="bg-layer" id="bg-canvas-container">
+            <canvas id="cosmos-canvas"></canvas>
         </div>
+        <canvas id="ripple-canvas"></canvas>
+        <div id="buff-bar"></div>
 
-        <!-- INTRO SCREEN -->
-        <div id="intro-screen">
-            <h1 class="intro-title">ASTRAL</h1>
-            <div class="intro-sub">COSMIC ROULETTE & GUILD</div>
-            <button class="play-btn" id="start-btn">INITIALIZE</button>
-        </div>
-
-        <!-- STANDARD LOADING VIEW (FOR SUB-SPACES) -->
-        <div id="loading-view">
-            <div class="loading-spinner"></div>
-            <div class="loading-text" id="loading-text">Loading...</div>
-        </div>
-
-        <!-- RPG FANTASY LOADING VIEW (FOR OTHER SIDE TRANSITION) -->
-        <div id="rpg-loading-view">
-            <div class="magic-circle">
-                <div class="magic-core-dot"></div>
+        <!-- Header -->
+        <header>
+            <div class="stats-box">
+                <div class="stat-item">ROLLS: <span id="stat-rolls">0</span></div>
+                <div class="stat-item">LUCK: <span id="stat-luck">1.0x</span></div>
+                <div class="stat-item">COINS: <span id="stat-coins">0</span></div>
+                <div class="stat-item">EQUIP: <span id="stat-equip">None</span></div>
             </div>
-            <div class="loading-text">Loading...</div>
-        </div>
-
-        <!-- MAIN GAME UI (COSMOS) -->
-        <div id="main-game">
-            <header>
-                <div class="logo">ASTRAL</div>
-                <div class="stats-container">
-                    <div>ROLLS: <span id="stat-rolls">0</span></div>
-                    <div>COINS: <span id="stat-coins">500</span></div>
-                    <div>AURA: <span id="stat-discovered">1</span> / 25</div>
-                </div>
-            </header>
-
-            <div class="stage" id="stage">
-                <div class="sun-core" id="sun-core"></div>
-                <div class="roulette-ring" id="roulette-ring"></div>
-                <div class="aura-display">
-                    <div class="aura-name" id="aura-name">READY</div>
-                    <div class="aura-rate" id="aura-rate">1 / 1</div>
-                </div>
+            <div class="nav-buttons" id="cosmos-nav">
+                <button class="diamond-btn" onclick="openModal('codex-modal')">CODEX</button>
+                <button class="diamond-btn" onclick="openModal('shop-modal')">SHOP</button>
+                <button class="diamond-btn" onclick="openModal('craft-modal')">CRAFT</button>
+                <button class="diamond-btn" onclick="openModal('mission-modal')">MISSION</button>
+                <button class="diamond-btn" onclick="openModal('equip-modal')">EQUIPMENT</button>
+                <button class="diamond-btn" onclick="switchWorld('other-side')">GO TO OTHER SIDE</button>
             </div>
+            <div class="nav-buttons" id="other-nav" style="display:none;">
+                <button class="diamond-btn" onclick="openModal('codex-modal')">CODEX</button>
+                <button class="diamond-btn" onclick="openModal('shop-modal')">SHOP</button>
+                <button class="diamond-btn" onclick="openModal('craft-modal')">CRAFT</button>
+                <button class="diamond-btn" onclick="openModal('mission-modal')">MISSION</button>
+                <button class="diamond-btn" onclick="openModal('equip-modal')">EQUIPMENT</button>
+                <button class="diamond-btn" onclick="switchWorld('cosmos')">RETURN TO COSMOS</button>
+            </div>
+        </header>
 
-            <div class="controls">
-                <button class="action-btn" id="roll-btn">ROLL</button>
-                <button class="action-btn" id="auto-btn">AUTO ROLL</button>
-                <button class="action-btn" id="quick-btn" disabled>QUICK ROLL</button>
-                <button class="action-btn" id="other-side-btn">Go to Other Side</button>
+        <!-- Main Stage -->
+        <div class="main-stage" id="main-stage-area">
+            <div class="current-aura-display">
+                <div class="aura-name" id="current-name">Cosmic Dust</div>
+                <div class="aura-rarity" id="current-rarity">1 / 2</div>
+            </div>
+            <div class="roll-controls">
+                <button class="btn-roll" onclick="executeRoll()">ROLL</button>
+                <button class="diamond-btn" onclick="toggleAutoRoll()" id="btn-auto">AUTO: OFF</button>
+                <button class="diamond-btn" onclick="executeQuickRoll()" id="btn-quick" disabled>QUICK ROLL (25)</button>
             </div>
         </div>
 
-        <!-- OTHER SIDE (GUILD BACKALLEY VIEW) -->
-        <div id="other-side-view">
-            <div class="stone-wall-overlay"></div>
-            <div class="guild-content-layer">
-                <div class="guild-header">GUILD SANCTUARY</div>
-                <div class="guild-center-stage">
-                    <div class="lantern-lamp"><div class="lantern-glow"></div></div>
-                    <div style="font-family: var(--font-cinzel); font-size: 1.2rem; letter-spacing: 0.3em; color: var(--gold-secondary);">
-                        冒険者たちの集う場所。クエストを受け、武具を錬成せよ。
-                    </div>
-                    <div class="lantern-lamp"><div class="lantern-glow"></div></div>
-                </div>
-                <div class="guild-menu-grid">
-                    <button class="action-btn" id="guild-mission-btn">MISSION</button>
-                    <button class="action-btn" id="guild-shop-btn">SHOP</button>
-                    <button class="action-btn" id="guild-craft-btn">CRAFT</button>
-                    <button class="action-btn" id="guild-return-btn">RETURN TO COSMOS</button>
-                </div>
+        <!-- Footer -->
+        <footer>
+            <div>MONOCHROME ASTRAL ULTIMATE 51</div>
+            <div id="editor-status">TEXT EDITOR: DEFAULT</div>
+            <div>SYSTEM: 60FPS STABLE</div>
+        </footer>
+
+        <!-- Modals -->
+        <div id="codex-modal" class="modal">
+            <div class="modal-header">
+                <div class="modal-title">AURA CODEX (1 / 51)</div>
+                <button class="diamond-btn" onclick="closeModal('codex-modal')">[CLOSE]</button>
+            </div>
+            <div class="grid-container" id="codex-grid"></div>
+        </div>
+
+        <div id="shop-modal" class="modal">
+            <div class="modal-header">
+                <div class="modal-title">ALCHEMY SHOP (10 POTIONS)</div>
+                <button class="diamond-btn" onclick="closeModal('shop-modal')">[CLOSE]</button>
+            </div>
+            <div class="grid-container" id="shop-grid"></div>
+        </div>
+
+        <div id="craft-modal" class="modal">
+            <div class="modal-header">
+                <div class="modal-title">SMITHING CRAFT (17 GAUNTLETS & RUNES)</div>
+                <button class="diamond-btn" onclick="closeModal('craft-modal')">[CLOSE]</button>
+            </div>
+            <div class="grid-container" id="craft-grid"></div>
+        </div>
+
+        <div id="mission-modal" class="modal">
+            <div class="modal-header">
+                <div class="modal-title">GUILD MISSION BOARD</div>
+                <button class="diamond-btn" onclick="closeModal('mission-modal')">[CLOSE]</button>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:20px; justify-content:center; flex:1;" id="mission-content">
+                <!-- Mission Poster Dynamic Content -->
             </div>
         </div>
 
-        <!-- MISSION VIEW -->
-        <div class="sub-view" id="mission-view">
-            <div class="sub-header">
-                <div class="sub-title">MISSION BOARD</div>
-                <button class="back-btn" id="mission-back-btn">BACK</button>
+        <div id="equip-modal" class="modal">
+            <div class="modal-header">
+                <div class="modal-title">EQUIPMENT LIST</div>
+                <button class="diamond-btn" onclick="closeModal('equip-modal')">[CLOSE]</button>
             </div>
-            <div class="mission-container">
-                <div class="wooden-board">
-                    <div class="parchment" id="parchment-box">
-                        <div>
-                            <div class="parchment-title" id="quest-title">クエストタイトル</div>
-                            <div class="parchment-desc" id="quest-desc" style="margin-top: 15px;">クエストの説明がここに表示されます。</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <div class="parchment-reward" id="quest-reward">報酬: 100 コイン</div>
-                            <button class="quest-action-btn" id="quest-action-btn">ACCEPT</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: center; gap: 40px; padding-bottom: 10px;">
-                <button class="nav-arrow" id="quest-prev">◀</button>
-                <button class="nav-arrow" id="quest-next">▶</button>
-            </div>
+            <div class="grid-container" id="equip-grid"></div>
         </div>
 
-        <!-- SHOP VIEW -->
-        <div class="sub-view" id="shop-view">
-            <div class="sub-header">
-                <div class="sub-title">MYSTIC SHOP</div>
-                <button class="back-btn" id="shop-back-btn">BACK</button>
-            </div>
-            <div class="shop-grid">
-                <div class="shop-card" onclick="openShopQty(0)">
-                    <div>
-                        <div class="name">幸運のポーション I</div>
-                        <div class="desc">5分間、超レアオーラの出現確率が2倍に上昇する聖水。</div>
-                    </div>
-                    <div class="price">150 コイン</div>
-                </div>
-                <div class="shop-card" onclick="openShopQty(1)">
-                    <div>
-                        <div class="name">アストラル触媒</div>
-                        <div class="desc">宇宙の共鳴を高め、より高品質な素材を引き寄せる触媒。</div>
-                    </div>
-                    <div class="price">400 コイン</div>
-                </div>
-                <div class="shop-card" onclick="openShopQty(2)">
-                    <div>
-                        <div class="name">虚無のエッセンス</div>
-                        <div class="desc">極めて希少な次元の裂け目から抽出された純粋な魔力結晶。</div>
-                    </div>
-                    <div class="price">1200 コイン</div>
-                </div>
-            </div>
-            <div style="text-align: center; font-size: 0.9rem; color: var(--gold-secondary); letter-spacing: 0.2em;">アイテムを選択して購入数を決定してください</div>
-        </div>
-
-        <!-- CRAFT VIEW -->
-        <div class="sub-view" id="craft-view">
-            <div class="sub-header">
-                <div class="sub-title">FORGE & CRAFT</div>
-                <button class="back-btn" id="craft-back-btn">BACK</button>
-            </div>
-            <div class="craft-layout">
-                <div class="craft-sidebar" id="craft-recipe-list"></div>
-                <div class="craft-main-panel">
-                    <div>
-                        <div id="craft-selected-title" style="font-family: var(--font-cinzel); font-size: 1.5rem; color: var(--gold-primary); letter-spacing: 0.2em;">武具を選択してください</div>
-                        <div id="craft-selected-desc" style="font-size: 1rem; color: var(--text-main); margin-top: 10px;"></div>
-                    </div>
-                    <div class="craft-requirements" id="craft-slots-container"></div>
-                    <div style="display: flex; gap: 20px;">
-                        <button class="action-btn" id="auto-add-btn">AUTO ADD</button>
-                        <button class="action-btn" id="execute-craft-btn" disabled style="background: rgba(197,160,89,0.2);">CRAFT</button>
-                    </div>
-                </div>
+        <!-- Cutscene & Effects Layers -->
+        <div id="cutscene-layer">
+            <div class="cutscene-content">
+                <div class="counter-hologram" id="cutscene-counter">1 / 0</div>
+                <div class="cutscene-title" id="cutscene-title-text">ASTRAL: OMEN</div>
             </div>
         </div>
-    </div>
-
-    <!-- CODEX MODAL -->
-    <div id="codex-modal">
-        <div class="modal-box" style="width: 700px;">
-            <button class="modal-close" id="codex-close-btn">&times;</button>
-            <div class="modal-title">CODEX</div>
-            <div class="codex-tabs">
-                <button class="codex-tab active" onclick="switchCodexTab('aura')">AURA CODEX</button>
-                <button class="codex-tab" onclick="switchCodexTab('material')">MATERIAL CODEX</button>
-            </div>
-            <div class="codex-list" id="codex-list"></div>
-        </div>
-    </div>
-
-    <!-- MATERIAL DETAIL POPUP -->
-    <div id="material-popup">
-        <div class="modal-box">
-            <button class="modal-close" onclick="document.getElementById('material-popup').classList.remove('active')">&times;</button>
-            <div class="modal-title" id="mat-pop-title">素材名</div>
-            <div style="font-size: 1.05rem; line-height: 1.6; text-align: center; color: var(--text-main); margin-bottom: 25px;" id="mat-pop-desc">素材の説明文</div>
-            <div style="font-size: 0.9rem; color: var(--gold-secondary); margin-bottom: 20px;">所持数: <span id="mat-pop-count">0</span> 個</div>
-            <button class="action-btn" id="mat-pop-cutscene-btn" style="display: none;" onclick="playCutscene()">SEE CUTSCENE</button>
-        </div>
-    </div>
-
-    <!-- CUTSCENE MODAL -->
-    <div id="cutscene-modal">
-        <div class="cutscene-content">
-            <div class="cutscene-text" id="cutscene-text-box">カットシーンテキスト</div>
-            <button class="action-btn" onclick="closeCutscene()">CLOSE</button>
-        </div>
-    </div>
-
-    <!-- QUANTITY POPUP MODAL -->
-    <div id="qty-modal">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeShopQty()">&times;</button>
-            <div class="modal-title" id="qty-item-name">個数の選択</div>
-            <div style="display: flex; align-items: center; gap: 25px; margin-bottom: 30px;">
-                <button class="action-btn" onclick="adjustQty(-1)">-</button>
-                <div style="font-family: var(--font-cinzel); font-size: 1.8rem; color: var(--gold-primary); width: 60px; text-align: center;" id="qty-display">1</div>
-                <button class="action-btn" onclick="adjustQty(1)">+</button>
-            </div>
-            <div style="display: flex; gap: 15px; width: 100%;">
-                <button class="action-btn" style="flex:1;" onclick="closeShopQty()">CANCEL</button>
-                <button class="action-btn" style="flex:1; background: rgba(197,160,89,0.3);" onclick="confirmPurchase()">BUY</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- QUICK ROLL DIGEST MODAL -->
-    <div id="digest-modal">
-        <div class="modal-box" style="width: 600px;">
-            <button class="modal-close" onclick="document.getElementById('digest-modal').classList.remove('active')">&times;</button>
-            <div class="modal-title">QUICK ROLL RESULTS</div>
-            <div class="codex-list" id="digest-list" style="max-height: 50vh;"></div>
+        <canvas id="glass-canvas"></canvas>
+        <div id="loading-overlay">
+            <div class="loading-text">LOADING...</div>
         </div>
     </div>
 
     <script>
-        const AURAS = [
-            { id: 0, name: "スターダスト・エコー", rate: 1, weight: 899990, unlocked: true },
-            { id: 1, name: "ステラー・ヴォルテックス", rate: 10, weight: 100000, unlocked: false },
-            { id: 2, name: "ディメンショナル・リフト", rate: 1000, weight: 900, unlocked: false },
-            { id: 3, name: "スパシアル・レゾナンス", rate: 100000, weight: 89, unlocked: false },
-            { id: 4, name: "グラビテーショナル・コラプス", rate: 1000000, weight: 9, unlocked: false },
-            { id: 5, name: "スーパーノヴァ・レムナント", rate: 10000000, weight: 0.9, unlocked: false },
-            { id: 6, name: "ビッグバン・オメガ", rate: 100000000, weight: 0.1, unlocked: false }
-        ];
-        for (let i = 7; i < 25; i++) {
-            AURAS.push({ id: i, name: `アストラル・フラグメント ${i+1}`, rate: Math.pow(10, Math.min(8, i)), weight: Math.max(0.001, 1 / Math.pow(10, i)), unlocked: false });
-        }
-
-        const MATERIALS = [
-            { id: 'iron', name: '星脈の鉄鉱石', desc: '数億年前に爆縮した超新星の残骸が冷却されて生まれた神秘の鉱物。', count: 0, rare: false },
-            { id: 'crystal', name: '虚無の結晶', desc: '次元の裂け目から零れ落ちる不確定な魔力の結晶体。', count: 0, rare: true, cutscene: '虚無の結晶は、次元の狭間で光と闇が衝突した瞬間にのみ形成される禁断の結晶である。その輝きは観測者の精神と同調する。' },
-            { id: 'core', name: '恒星の心臓核', desc: '若き恒星の中心で燃え盛る永遠の炎を宿したコア。', count: 0, rare: true, cutscene: '恒星の心臓核は、星系全体のエネルギーを凝縮した莫大な熱量を放つ。かつて神々が武具の動力源として用いたとされる。' }
-        ];
-
-        const GAUNTLETS = [
-            { id: 'g1', name: '星霊のガントレット', desc: '星屑の加護を纏い、オーラの引き寄せを高める基本の錬成武具。', req: { iron: 5 }, crafted: false },
-            { id: 'g2', name: '深淵の魔甲', desc: '虚無の力を収束し、高次元のオーラを強制的に引き出す魔導武具。', req: { iron: 10, crystal: 3 }, crafted: false },
-            { id: 'g3', name: '創世神の篭手', desc: 'ビッグバンの理を内包する究極の神造兵装。', req: { iron: 25, crystal: 10, core: 5 }, crafted: false }
-        ];
-
-        let totalRolls = 0;
-        let totalCoins = 500;
-        let unlockedCount = 1;
-        let isRolling = false;
-        let isAutoRolling = false;
-        let activeCodexTab = 'aura';
-        let selectedRecipeIndex = 0;
-        let currentMaterialForPop = null;
-
-        let inventory = { 0: 0, 1: 0, 2: 0 };
-        let selectedShopItem = 0;
-        let purchaseQty = 1;
-
-        const QUESTS = [
-            { id: 0, title: "ステラー・ハーベスト", desc: "通常ロールを10回行い、大宇宙から星屑のエネルギーを収穫せよ。", goal: 10, progress: 0, reward: 100, accepted: false, completed: false },
-            { id: 1, title: "星間探査の旅", desc: "図鑑で3種類以上の異なるオーラを発見せよ。", goal: 3, progress: 1, reward: 300, accepted: false, completed: false },
-            { id: 2, title: "絶対共鳴の到達", desc: "累計ロール回数が50回に達するまで次元を揺るがせ。", goal: 50, progress: 0, reward: 800, accepted: false, completed: false }
-        ];
-        let currentQuestIndex = 0;
-
-        try {
-            const saved = localStorage.getItem('astral_save_v4');
-            if (saved) {
-                const data = JSON.parse(saved);
-                totalRolls = data.rolls || 0;
-                totalCoins = data.coins || 500;
-                if (data.unlocked) { AURAS.forEach((a, i) => { a.unlocked = data.unlocked[i] || a.unlocked; }); }
-                if (data.materials) { MATERIALS.forEach((m, i) => { m.count = data.materials[i] || 0; }); }
-                if (data.gauntlets) { GAUNTLETS.forEach((g, i) => { g.crafted = data.gauntlets[i] || false; }); }
-                if (data.quests) {
-                    QUESTS.forEach((q, i) => {
-                        if (data.quests[i]) { q.accepted = data.quests[i].accepted; q.completed = data.quests[i].completed; q.progress = data.quests[i].progress; }
-                    });
-                }
-                unlockedCount = AURAS.filter(a => a.unlocked).length;
-            }
-        } catch(e) {}
-
-        function saveGame() {
-            try {
-                const data = {
-                    rolls: totalRolls,
-                    coins: totalCoins,
-                    unlocked: AURAS.map(a => a.unlocked),
-                    materials: MATERIALS.map(m => m.count),
-                    gauntlets: GAUNTLETS.map(g => g.crafted),
-                    quests: QUESTS.map(q => ({ accepted: q.accepted, completed: q.completed, progress: q.progress }))
-                };
-                localStorage.setItem('astral_save_v4', JSON.stringify(data));
-            } catch(e) {}
-        }
-
-        /* WEB AUDIO API */
-        let audioCtx = null;
-        let masterGain = null;
-        let ambientGain = null;
-        let isAudioInitialized = false;
-
-        function initAudio() {
-            if (isAudioInitialized) return;
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-
-            masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            masterGain.connect(audioCtx.destination);
-
-            let delayNode = audioCtx.createDelay();
-            delayNode.delayTime.setValueAtTime(0.8, audioCtx.currentTime);
-            let delayFeedback = audioCtx.createGain();
-            delayFeedback.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            let delayFilter = audioCtx.createBiquadFilter();
-            delayFilter.type = 'lowpass';
-            delayFilter.frequency.setValueAtTime(800, audioCtx.currentTime);
-
-            delayNode.connect(delayFilter);
-            delayFilter.connect(delayFeedback);
-            delayFeedback.connect(delayNode);
-            delayNode.connect(masterGain);
-
-            ambientGain = audioCtx.createGain();
-            ambientGain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-
-            let lfo = audioCtx.createOscillator();
-            lfo.frequency.setValueAtTime(1 / 16, audioCtx.currentTime);
-            let lfoG = audioCtx.createGain();
-            lfoG.gain.setValueAtTime(0.04, audioCtx.currentTime);
-            lfo.connect(lfoG);
-            lfoG.connect(ambientGain.gain);
-            lfo.start();
-
-            const chordFreqs = [130.81, 196.00, 246.94, 293.66, 329.63];
-            chordFreqs.forEach((f, idx) => {
-                let osc = audioCtx.createOscillator();
-                osc.type = (idx % 2 === 0) ? 'sine' : 'triangle';
-                osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-                osc.connect(ambientGain);
-                osc.start();
-            });
-
-            ambientGain.connect(masterGain);
-            ambientGain.connect(delayNode);
-
-            setInterval(() => {
-                if (!audioCtx || audioCtx.state !== 'running') return;
-                playAngelChime(1318.51);
-            }, 30000);
-
-            isAudioInitialized = true;
-        }
-
-        function playAngelChime(freq) {
-            if (!audioCtx) return;
-            let osc = audioCtx.createOscillator();
-            let g = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-            g.gain.setValueAtTime(0, audioCtx.currentTime);
-            g.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 3.0);
-            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 6.0);
-
-            osc.connect(g);
-            g.connect(masterGain);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 6.0);
-        }
-
-        function playCathedralBell() {
-            if (!audioCtx) return;
-            let osc = audioCtx.createOscillator();
-            let g = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
-            osc.connect(g);
-            g.connect(masterGain);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 2.5);
-        }
-
-        function playMechanicalClick() {
-            if (!audioCtx || audioCtx.state !== 'running') return;
-            let osc = audioCtx.createOscillator();
-            let g = audioCtx.createGain();
+        // --- Web Audio API & Sound Synthesizer ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClickSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(250 + Math.random() * 80, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.03);
-
-            g.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.03);
-
-            osc.connect(g);
-            g.connect(masterGain);
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.03);
+            osc.stop(audioCtx.currentTime + 0.04);
         }
 
-        let tensionOsc = null;
-        let tensionGain = null;
-
-        function startTensionAudio(tier) {
-            if (!audioCtx) return;
-            try {
-                if (tensionOsc) stopTensionAudio();
-                tensionOsc = audioCtx.createOscillator();
-                tensionGain = audioCtx.createGain();
-                tensionOsc.type = (tier >= 3) ? 'sawtooth' : 'triangle';
-                tensionOsc.frequency.setValueAtTime(110, audioCtx.currentTime);
-                tensionGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-                tensionGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 2.0);
-
-                tensionOsc.connect(tensionGain);
-                tensionGain.connect(masterGain);
-                tensionOsc.start();
-                tensionOsc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 2.0);
-            } catch(e) {}
+        function playTypeSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300 + Math.random() * 200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.02);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.02);
         }
 
-        function stopTensionAudio() {
-            if (tensionOsc) {
-                try { tensionOsc.stop(); tensionOsc.disconnect(); } catch(e) {}
-                tensionOsc = null;
-            }
+        function playArmorEquipSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc1.type = 'square';
+            osc2.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(110, audioCtx.currentTime);
+            osc1.frequency.setValueAtTime(220, audioCtx.currentTime + 0.08);
+            osc2.frequency.setValueAtTime(440, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc1.start();
+            osc2.start();
+            osc1.stop(audioCtx.currentTime + 0.3);
+            osc2.stop(audioCtx.currentTime + 0.3);
         }
 
-        function playClimaxHit(tier) {
-            if (!audioCtx) return;
-            stopTensionAudio();
-            playAngelChime(1760);
+        function playImpactSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(90, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.6);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.6);
         }
 
-        /* CANVAS GRAPHICS & VISUAL ENGINE */
-        const bgCanvas = document.getElementById('bg-canvas');
-        const bgCtx = bgCanvas.getContext('2d');
-        const fxCanvas = document.getElementById('fx-canvas');
-        const fxCtx = fxCanvas.getContext('2d');
-
-        let width, height;
-        function resize() {
-            width = bgCanvas.width = fxCanvas.width = window.innerWidth;
-            height = bgCanvas.height = fxCanvas.height = window.innerHeight;
+        function playChimeSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(2093.0, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(3135.96, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.0);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.0);
         }
-        window.addEventListener('resize', resize);
-        resize();
+
+        // Ambient Church Pipe Organ Chord Loop
+        function startAmbientBGM() {
+            setInterval(() => {
+                if (audioCtx.state === 'suspended') return;
+                [261.63, 329.63, 392.00, 493.88, 587.33].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq / 2, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.015, audioCtx.currentTime + 2.0);
+                    gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 6.0);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 6.0);
+                });
+            }, 7000);
+        }
+        setTimeout(startAmbientBGM, 1000);
+
+        // --- Complete 51 Auras Data Array ---
+        const auras = [
+            { id: 1, name: "Cosmic Dust", rate: 2, color: "#ffffff" },
+            { id: 2, name: "Nebula Mist", rate: 5, color: "#e5e4e2" },
+            { id: 3, name: "Meteor Piece", rate: 12, color: "#cccccc" },
+            { id: 4, name: "Starlight Tint", rate: 25, color: "#ffffff" },
+            { id: 5, name: "Gray Void", rate: 60, color: "#888888" },
+            { id: 6, name: "Aurora Filament", rate: 150, color: "#dcdcdc" },
+            { id: 7, name: "Lunar Crescent", rate: 350, color: "#e0ffff" },
+            { id: 8, name: "Cobalt Ray", rate: 800, color: "#b0c4de" },
+            { id: 9, name: "Photon Stream", rate: 1500, color: "#ffffff" },
+            { id: 10, name: "Glacier Shard", rate: 3000, color: "#e0ffff" },
+            { id: 11, name: "Onyx Shadow", rate: 6500, color: "#222222" },
+            { id: 12, name: "Celestial Sign", rate: 12000, color: "#e5e4e2" },
+            { id: 13, name: "Astral Echo", rate: 24000, color: "#c0c0c0" },
+            { id: 14, name: "Event Shell", rate: 48000, color: "#1b1b1b" },
+            { id: 15, name: "Singularity Dot", rate: 85000, color: "#000000" },
+            { id: 16, name: "Chronos Gear", rate: 150000, color: "#d4af37" },
+            { id: 17, name: "Judgment Needle", rate: 300000, color: "#ffffff" },
+            { id: 18, name: "Platinum Bar", rate: 600000, color: "#e5e4e2" },
+            { id: 19, name: "Void Stalker", rate: 1200000, color: "#111111" },
+            { id: 20, name: "Matrix Node", rate: 2500000, color: "#00ff00" },
+            { id: 21, name: "Glitch Error", rate: 5000000, color: "#ff00ff" },
+            { id: 22, name: "Equinox Balance", rate: 10000000, color: "#ffffff" },
+            { id: 23, name: "Sol Corona", rate: 30000000, color: "#fffaf0" },
+            { id: 24, name: "Genesis Omega", rate: 75000000, color: "#ffffff" },
+            // 25 - 51 User-specified Deity / Divine Auras
+            { id: 25, name: "ASTRAL: OMEN", rate: 500000000, color: "#d4af37" },
+            { id: 26, name: "Velocity", rate: 1649280000, color: "#ffffff" },
+            { id: 27, name: "Oblivion", rate: 1732170000, color: "#111111" },
+            { id: 28, name: "Ineffable", rate: 1747830000, color: "#e5e4e2" },
+            { id: 29, name: "Solitude", rate: 1875440000, color: "#888888" },
+            { id: 30, name: "Luminescence", rate: 1883440000, color: "#ffffff" },
+            { id: 31, name: "Serendipity", rate: 1994580000, color: "#f3e5ab" },
+            { id: 32, name: "ASCENDED HEAVEN", rate: 2048960000, color: "#ffffff" },
+            { id: 33, name: "TRAUMA", rate: 2121900000, color: "#ff0000" },
+            { id: 34, name: "MOTIVATION", rate: 2140000000, color: "#d4af37" },
+            { id: 35, name: "END OF TIME", rate: 2222222222, color: "#000000" },
+            { id: 36, name: "defy legacy", rate: 2320000000, color: "#ffffff" },
+            { id: 37, name: "OVERTHINKING", rate: 2300000000, color: "#ff4500" },
+            { id: 38, name: "MEthod", rate: 2456000000, color: "#00ff00" },
+            { id: 39, name: "MASTER RISED", rate: 2450000000, color: "#ffd700" },
+            { id: 40, name: "thrive", rate: 2560000000, color: "#ffffff" },
+            { id: 41, name: "fortitude", rate: 2890000000, color: "#c0c0c0" },
+            { id: 42, name: "Vortex", rate: 2932000000, color: "#1e90ff" },
+            { id: 43, name: "Horizon", rate: 3000000000, color: "#ff8c00" },
+            { id: 44, name: "empower", rate: 3298750000, color: "#ffffff" },
+            { id: 45, name: "All ears", rate: 3279650000, color: "#d4af37" },
+            { id: 46, name: "YOU", rate: 3344850000, color: "#ffffff" },
+            { id: 47, name: "Mirage", rate: 3148434921, color: "#dda0dd" },
+            { id: 48, name: "Labyrinth", rate: 3248344382, color: "#708090" },
+            { id: 49, name: "Valor", rate: 3533440000, color: "#ff4500" },
+            { id: 50, name: "Qkthr", rate: 4342733843, color: "#ffffff" },
+            { id: 51, name: "memorial overreached", rate: 5055492104, color: "#ffd700" }
+        ];
+
+        // --- 10 Potions Data ---
+        const shopPotions = [
+            { id: 1, name: "スピード・ポーション", desc: "5分間ROLL速度1.2倍", cost: 100 },
+            { id: 2, name: "フォーチュン・ポーション", desc: "5分間Luck x1.5", cost: 150 },
+            { id: 3, name: "ヘブンリー・リキッド", desc: "次の1ロールのみLuck x10", cost: 300 },
+            { id: 4, name: "ヴォイド・エリクサー", desc: "10分間、Void系オーラの確率2倍", cost: 250 },
+            { id: 5, name: "ソーラー・エッセンス", desc: "10分間、Solar系オーラの確率2倍", cost: 250 },
+            { id: 6, name: "クロノ・オイル", desc: "5分間、QUICK ROLLチャージ最初からMAX", cost: 400 },
+            { id: 7, name: "ミシカル・ドラフト", desc: "5分間Luck x3.0", cost: 600 },
+            { id: 8, name: "ガイアの涙", desc: "クラフト時の必要素材1回免除", cost: 500 },
+            { id: 9, name: "ライトニング・ブレンド", desc: "5分間落雷頻度3倍＆ROLL速度1.3倍", cost: 450 },
+            { id: 10, name: "アストラル・トニック", desc: "10分間Luck x5.0（1億超え優遇）", cost: 1000 }
+        ];
+
+        // --- 17 Gauntlets & Runes Data ---
+        const craftItems = [
+            { id: 1, name: "スターウィンドガントレット", req: "Cosmic Dust x10", effect: "ROLL速度1.1倍 / Cosmic確率UP" },
+            { id: 2, name: "アマンタジントガントレット", req: "Nebula Mist x10", effect: "素材獲得確率20%UP" },
+            { id: 3, name: "フェードアウトガントレット", req: "Gray Void x10", effect: "Void系確率1.5倍" },
+            { id: 4, name: "オシリス神のルーン", req: "Lunar Crescent x5", effect: "1/1000以上レアの獲得コイン2倍" },
+            { id: 5, name: "ハーデス神のルーン", req: "Onyx Shadow x5", effect: "1/10000以下レアのベースLuck +50%" },
+            { id: 6, name: "ポセイドン神のルーン", req: "Glacier Shard x10", effect: "ROLL間隔永続0.2秒短縮" },
+            { id: 7, name: "アレス神のルーン", req: "Celestial Sign x5", effect: "ROLLカウント常に2倍進行" },
+            { id: 8, name: "ヘルメス神のルーン", req: "Astral Echo x5", effect: "QUICK ROLL必要数20回に軽減" },
+            { id: 9, name: "エクイニクスガントレット", req: "Equinox Balance x1", effect: "ROLL速度1.4倍 / Luck x2.0" },
+            { id: 10, name: "サディスティックガントレット", req: "Sol Corona x1", effect: "前兆発生確率上昇" },
+            { id: 11, name: "クロノス神のルーン", req: "Chronos Gear x5", effect: "AUTO ROLL待機時間ゼロ" },
+            { id: 12, name: "ゼウス神のルーン", req: "Genesis Omega x1", effect: "ROLL速度1.5倍 / Luck x2.5" },
+            { id: 13, name: "サイクロンガントレット", req: "Photon Stream x20", effect: "大気の渦エフェクト発生" },
+            { id: 14, name: "エジプシャンガントレット", req: "Platinum Bar x10", effect: "ポーション効果時間2倍" },
+            { id: 15, name: "ガイア神のルーン", req: "Matrix Node x5", effect: "素材獲得個数常に2倍" },
+            { id: 16, name: "テュポーン神のルーン", req: "Glitch Error x2", effect: "ROLL速度1.8倍 / Luck x3.5" },
+            { id: 17, name: "シヴァ神のルーン", req: "ASTRAL: OMEN x1", effect: "ROLL速度2.0倍 / Luck x5.0" }
+        ];
+
+        // --- Game State ---
+        let gameState = {
+            rolls: 0,
+            luck: 1.0,
+            coins: 1000,
+            equip: "None",
+            materials: { "Cosmic Dust": 50, "Nebula Mist": 30, "Gray Void": 20, "Lunar Crescent": 10 },
+            unlocked: { 1: true },
+            autoRolling: false,
+            autoInterval: null,
+            activeBuffs: [],
+            currentWorld: 'cosmos'
+        };
+
+        // --- Canvas Background (Cosmos Stars Stream) ---
+        const cosmosCanvas = document.getElementById('cosmos-canvas');
+        const ctxCosmos = cosmosCanvas.getContext('2d');
+        function resizeCanvas() {
+            cosmosCanvas.width = window.innerWidth;
+            cosmosCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
         let stars = [];
-        for (let i = 0; i < 400; i++) {
+        for (let i = 0; i < 1500; i++) {
             stars.push({
-                x: Math.random() * width, y: Math.random() * height,
-                size: Math.random() * 1.5, baseAlpha: Math.random() * 0.7 + 0.3,
-                speed: Math.random() * 0.2 + 0.05
+                x: (Math.random() - 0.5) * window.innerWidth * 2,
+                y: (Math.random() - 0.5) * window.innerHeight * 2,
+                z: Math.random() * window.innerWidth,
+                size: Math.random() * 1.5
             });
         }
 
-        let mouse = { x: width/2, y: height/2, targetX: width/2, targetY: height/2 };
-        window.addEventListener('mousemove', e => {
-            mouse.targetX = e.clientX;
-            mouse.targetY = e.clientY;
-        });
+        function renderCosmosLoop() {
+            ctxCosmos.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctxCosmos.fillRect(0, 0, cosmosCanvas.width, cosmosCanvas.height);
+            ctxCosmos.fillStyle = '#ffffff';
 
-        let fxState = { mode: 'NORMAL', timer: 0, tier: 0 };
+            const cx = cosmosCanvas.width / 2;
+            const cy = cosmosCanvas.height / 2;
 
-        function updateBackground() {
-            mouse.x += (mouse.targetX - mouse.x) * 0.05;
-            mouse.y += (mouse.targetY - mouse.y) * 0.05;
+            stars.forEach(star => {
+                star.z -= 2;
+                if (star.z <= 0) star.z = cosmosCanvas.width;
 
-            bgCtx.fillStyle = '#030307';
-            bgCtx.fillRect(0, 0, width, height);
+                const k = 250 / star.z;
+                const px = star.x * k + cx;
+                const py = star.y * k + cy;
 
-            const cx = width / 2;
-            const cy = height / 2;
-            const dx = (mouse.x - cx) * 0.0002;
-            const dy = (mouse.y - cy) * 0.0002;
-
-            stars.forEach(s => {
-                s.x += s.speed + dx * s.size * 20;
-                s.y += dy * s.size * 20;
-                if (s.x < 0) s.x = width; if (s.x > width) s.x = 0;
-                if (s.y < 0) s.y = height; if (s.y > height) s.y = 0;
-
-                bgCtx.fillStyle = `rgba(243, 229, 171, ${s.baseAlpha})`;
-                bgCtx.fillRect(s.x, s.y, s.size, s.size);
-            });
-        }
-
-        function updateFX() {
-            fxCtx.clearRect(0, 0, width, height);
-
-            if (fxState.mode === 'COLLAPSE') {
-                fxState.timer -= 0.03;
-                let scale = Math.max(0, fxState.timer);
-                fxCtx.save();
-                fxCtx.translate(width/2, height/2);
-                fxCtx.scale(scale, scale);
-                fxCtx.fillStyle = '#f3e5ab';
-                fxCtx.beginPath();
-                fxCtx.arc(0, 0, 5000, 0, Math.PI * 2);
-                fxCtx.fill();
-                fxCtx.restore();
-                if (fxState.timer <= 0) fxState.mode = 'NORMAL';
-            } else if (fxState.mode === 'EXPLODE') {
-                fxState.timer += 0.05;
-                let alpha = Math.max(0, 1 - fxState.timer);
-                fxCtx.fillStyle = `rgba(243, 229, 171, ${alpha})`;
-                fxCtx.fillRect(0, 0, width, height);
-                if (fxState.timer > 1.5) fxState.mode = 'NORMAL';
-            }
-        }
-
-        function renderLoop() {
-            updateBackground();
-            updateFX();
-            requestAnimationFrame(renderLoop);
-        }
-        renderLoop();
-
-        /* UI ELEMENTS & CLEANUP */
-        const introScreen = document.getElementById('intro-screen');
-        const loadingView = document.getElementById('loading-view');
-        const rpgLoadingView = document.getElementById('rpg-loading-view');
-        const mainGame = document.getElementById('main-game');
-        const otherSideView = document.getElementById('other-side-view');
-        const startBtn = document.getElementById('start-btn');
-        const rollBtn = document.getElementById('roll-btn');
-        const autoBtn = document.getElementById('auto-btn');
-        const quickBtn = document.getElementById('quick-btn');
-        const otherSideBtn = document.getElementById('other-side-btn');
-
-        const guildMissionBtn = document.getElementById('guild-mission-btn');
-        const guildShopBtn = document.getElementById('guild-shop-btn');
-        const guildCraftBtn = document.getElementById('guild-craft-btn');
-        const guildReturnBtn = document.getElementById('guild-return-btn');
-
-        const missionView = document.getElementById('mission-view');
-        const missionBackBtn = document.getElementById('mission-back-btn');
-        const shopView = document.getElementById('shop-view');
-        const shopBackBtn = document.getElementById('shop-back-btn');
-        const craftView = document.getElementById('craft-view');
-        const craftBackBtn = document.getElementById('craft-back-btn');
-
-        const codexModal = document.getElementById('codex-modal');
-        const codexCloseBtn = document.getElementById('codex-close-btn');
-        const codexList = document.getElementById('codex-list');
-        const diamondCodexBtn = document.getElementById('diamond-codex-btn');
-
-        const qtyModal = document.getElementById('qty-modal');
-        const digestModal = document.getElementById('digest-modal');
-        const digestList = document.getElementById('digest-list');
-        const materialPopup = document.getElementById('material-popup');
-        const cutsceneModal = document.getElementById('cutscene-modal');
-        const whiteout = document.getElementById('whiteout');
-
-        const statRolls = document.getElementById('stat-rolls');
-        const statCoins = document.getElementById('stat-coins');
-        const statDiscovered = document.getElementById('stat-discovered');
-        const sunCore = document.getElementById('sun-core');
-        const rouletteRing = document.getElementById('roulette-ring');
-        const auraName = document.getElementById('aura-name');
-        const auraRate = document.getElementById('aura-rate');
-
-        function updateStatsUI() {
-            statRolls.innerText = totalRolls;
-            statCoins.innerText = totalCoins;
-            statDiscovered.innerText = unlockedCount;
-            if (totalRolls >= 25) { quickBtn.disabled = false; }
-            saveGame();
-        }
-        updateStatsUI();
-
-        function closeAllPopups() {
-            codexModal.classList.remove('active');
-            qtyModal.classList.remove('active');
-            digestModal.classList.remove('active');
-            missionView.classList.remove('active');
-            shopView.classList.remove('active');
-            craftView.classList.remove('active');
-            otherSideView.classList.remove('active');
-            materialPopup.classList.remove('active');
-            cutsceneModal.classList.remove('active');
-        }
-
-        /* STANDARD LOADING (FOR SUB-SPACES) */
-        function transitionToScene(callback) {
-            closeAllPopups();
-            loadingView.style.opacity = '1';
-            loadingView.style.pointerEvents = 'auto';
-            setTimeout(() => {
-                if (callback) callback();
-                setTimeout(() => {
-                    loadingView.style.opacity = '0';
-                    loadingView.style.pointerEvents = 'none';
-                }, 1500);
-            }, 1500);
-        }
-
-        /* RPG FANTASY LOADING (SPECIFICALLY FOR OTHER SIDE TRANSITION) */
-        function transitionToOtherSide(callback) {
-            closeAllPopups();
-            playCathedralBell();
-            rpgLoadingView.style.opacity = '1';
-            rpgLoadingView.style.pointerEvents = 'auto';
-            setTimeout(() => {
-                if (callback) callback();
-                setTimeout(() => {
-                    rpgLoadingView.style.opacity = '0';
-                    rpgLoadingView.style.pointerEvents = 'none';
-                }, 1500);
-            }, 1500);
-        }
-
-        startBtn.addEventListener('click', () => {
-            initAudio();
-            introScreen.style.opacity = '0';
-            setTimeout(() => {
-                introScreen.style.display = 'none';
-                loadingView.style.opacity = '1';
-                setTimeout(() => {
-                    loadingView.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingView.style.display = 'none';
-                        mainGame.style.opacity = '1';
-                        mainGame.style.pointerEvents = 'auto';
-                    }, 800);
-                }, 2500);
-            }, 1500);
-        });
-
-        /* WORLD SWITCHING */
-        otherSideBtn.addEventListener('click', () => {
-            transitionToOtherSide(() => {
-                mainGame.style.opacity = '0';
-                mainGame.style.pointerEvents = 'none';
-                otherSideView.classList.add('active');
-            });
-        });
-
-        guildReturnBtn.addEventListener('click', () => {
-            transitionToOtherSide(() => {
-                otherSideView.classList.remove('active');
-                mainGame.style.opacity = '1';
-                mainGame.style.pointerEvents = 'auto';
-            });
-        });
-
-        /* CODEX & MATERIAL TABS */
-        diamondCodexBtn.addEventListener('click', () => {
-            closeAllPopups();
-            populateCodex();
-            codexModal.classList.add('active');
-        });
-        codexCloseBtn.addEventListener('click', () => codexModal.classList.remove('active'));
-
-        function switchCodexTab(tab) {
-            activeCodexTab = tab;
-            document.querySelectorAll('.codex-tab').forEach(t => t.classList.remove('active'));
-            if (tab === 'aura') {
-                document.querySelectorAll('.codex-tab')[0].classList.add('active');
-            } else {
-                document.querySelectorAll('.codex-tab')[1].classList.add('active');
-            }
-            populateCodex();
-        }
-
-        function populateCodex() {
-            codexList.innerHTML = '';
-            if (activeCodexTab === 'aura') {
-                AURAS.forEach(a => {
-                    let item = document.createElement('div');
-                    item.className = `codex-item ${a.unlocked ? 'unlocked' : ''}`;
-                    item.innerHTML = `
-                        <div class="codex-item-info">
-                            <div class="name">${a.unlocked ? a.name : '🔒 ???'}</div>
-                            <div class="rate">1 / ${a.rate.toLocaleString()}</div>
-                        </div>
-                        <div class="codex-item-status">${a.unlocked ? 'UNLOCKED' : 'LOCKED'}</div>
-                    `;
-                    codexList.appendChild(item);
-                });
-            } else {
-                MATERIALS.forEach(m => {
-                    let item = document.createElement('div');
-                    item.className = 'codex-item unlocked';
-                    item.innerHTML = `
-                        <div class="codex-item-info">
-                            <div class="name">${m.name}</div>
-                            <div class="rate">COUNT: ${m.count}</div>
-                        </div>
-                        <div class="codex-item-status">INSPECT</div>
-                    `;
-                    item.addEventListener('click', () => openMaterialPopup(m));
-                    codexList.appendChild(item);
-                });
-            }
-        }
-
-        function openMaterialPopup(m) {
-            currentMaterialForPop = m;
-            document.getElementById('mat-pop-title').innerText = m.name;
-            document.getElementById('mat-pop-desc').innerText = m.desc;
-            document.getElementById('mat-pop-count').innerText = m.count;
-            const btn = document.getElementById('mat-pop-cutscene-btn');
-            if (m.rare) {
-                btn.style.display = 'inline-block';
-            } else {
-                btn.style.display = 'none';
-            }
-            materialPopup.classList.add('active');
-        }
-
-        function playCutscene() {
-            if (!currentMaterialForPop || !currentMaterialForPop.cutscene) return;
-            document.getElementById('cutscene-text-box').innerText = currentMaterialForPop.cutscene;
-            materialPopup.classList.remove('active');
-            cutsceneModal.classList.add('active');
-        }
-
-        function closeCutscene() {
-            cutsceneModal.classList.remove('active');
-        }
-
-        /* MISSION SYSTEM */
-        guildMissionBtn.addEventListener('click', () => {
-            transitionToScene(() => {
-                missionView.classList.add('active');
-                updateQuestDisplay();
-            });
-        });
-
-        missionBackBtn.addEventListener('click', () => {
-            transitionToScene(() => {
-                missionView.classList.remove('active');
-                otherSideView.classList.add('active');
-            });
-        });
-
-        const questTitle = document.getElementById('quest-title');
-        const questDesc = document.getElementById('quest-desc');
-        const questReward = document.getElementById('quest-reward');
-        const questActionBtn = document.getElementById('quest-action-btn');
-        const parchmentBox = document.getElementById('parchment-box');
-
-        function updateQuestDisplay() {
-            let q = QUESTS[currentQuestIndex];
-            parchmentBox.style.transform = 'scale(0.98)';
-            setTimeout(() => parchmentBox.style.transform = 'scale(1)', 150);
-
-            questTitle.innerText = q.title;
-            questDesc.innerText = `${q.desc}\n\n進捗: ${q.progress} / ${q.goal}`;
-            questReward.innerText = `報酬: ${q.reward} コイン`;
-
-            if (q.completed) {
-                questActionBtn.innerText = "COMPLETED";
-                questActionBtn.disabled = true;
-            } else if (q.accepted) {
-                questActionBtn.innerText = q.progress >= q.goal ? "CLAIM REWARD" : "IN PROGRESS";
-                questActionBtn.disabled = q.progress < q.goal;
-            } else {
-                questActionBtn.innerText = "ACCEPT";
-                questActionBtn.disabled = false;
-            }
-        }
-
-        document.getElementById('quest-prev').addEventListener('click', () => {
-            currentQuestIndex = (currentQuestIndex - 1 + QUESTS.length) % QUESTS.length;
-            updateQuestDisplay();
-        });
-        document.getElementById('quest-next').addEventListener('click', () => {
-            currentQuestIndex = (currentQuestIndex + 1) % QUESTS.length;
-            updateQuestDisplay();
-        });
-
-        questActionBtn.addEventListener('click', () => {
-            let q = QUESTS[currentQuestIndex];
-            if (!q.accepted) {
-                q.accepted = true;
-                updateQuestDisplay();
-            } else if (q.progress >= q.goal && !q.completed) {
-                q.completed = true;
-                totalCoins += q.reward;
-                updateStatsUI();
-                updateQuestDisplay();
-            }
-            saveGame();
-        });
-
-        function checkQuestProgress(type, amount = 1) {
-            QUESTS.forEach(q => {
-                if (q.accepted && !q.completed) {
-                    if (type === 'roll') { q.progress = Math.min(q.goal, q.progress + amount); }
-                    else if (type === 'discovery') { q.progress = Math.min(q.goal, unlockedCount); }
-                    else if (type === 'potion') { q.progress = Math.min(q.goal, q.progress + amount); }
+                if (px >= 0 && px <= cosmosCanvas.width && py >= 0 && py <= cosmosCanvas.height) {
+                    const pSize = Math.max(1, star.size * k);
+                    ctxCosmos.fillRect(px, py, pSize, pSize);
                 }
             });
+            requestAnimationFrame(renderCosmosLoop);
         }
+        renderCosmosLoop();
 
-        /* SHOP SYSTEM */
-        guildShopBtn.addEventListener('click', () => {
-            transitionToScene(() => {
-                shopView.classList.add('active');
-            });
+        // --- Ripple Effect Anywhere ---
+        const rippleCanvas = document.getElementById('ripple-canvas');
+        const ctxRipple = rippleCanvas.getContext('2d');
+        function resizeRipple() {
+            rippleCanvas.width = window.innerWidth;
+            rippleCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeRipple);
+        resizeRipple();
+
+        let ripples = [];
+        window.addEventListener('pointerdown', (e) => {
+            playClickSound();
+            ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: 1.0 });
         });
 
-        shopBackBtn.addEventListener('click', () => {
-            transitionToScene(() => {
-                shopView.classList.remove('active');
-                otherSideView.classList.add('active');
-            });
-        });
-
-        const prices = [150, 400, 1200];
-        const itemNames = ["幸運のポーション I", "アストラル触媒", "虚無のエッセンス"];
-
-        function openShopQty(itemId) {
-            selectedShopItem = itemId;
-            purchaseQty = 1;
-            document.getElementById('qty-item-name').innerText = itemNames[itemId];
-            document.getElementById('qty-display').innerText = purchaseQty;
-            qtyModal.classList.add('active');
-        }
-
-        function closeShopQty() { qtyModal.classList.remove('active'); }
-        function adjustQty(delta) {
-            purchaseQty = Math.max(1, Math.min(99, purchaseQty + delta));
-            document.getElementById('qty-display').innerText = purchaseQty;
-        }
-
-        function confirmPurchase() {
-            let cost = prices[selectedShopItem] * purchaseQty;
-            if (totalCoins >= cost) {
-                totalCoins -= cost;
-                inventory[selectedShopItem] += purchaseQty;
-                checkQuestProgress('potion', purchaseQty);
-                updateStatsUI();
-                closeShopQty();
-                alert("購入が完了しました！");
-            } else {
-                alert("コインが不足しています！");
-            }
-        }
-
-        /* CRAFT SYSTEM */
-        guildCraftBtn.addEventListener('click', () => {
-            transitionToScene(() => {
-                craftView.classList.add('active');
-                populateCraftRecipes();
-            });
-        });
-
-        craftBackBtn.addEventListener('click', () => {
-            transitionToScene(() => {
-                craftView.classList.remove('active');
-                otherSideView.classList.add('active');
-            });
-        });
-
-        let allocatedMaterials = {};
-
-        function populateCraftRecipes() {
-            const listContainer = document.getElementById('craft-recipe-list');
-            listContainer.innerHTML = '';
-            GAUNTLETS.forEach((g, idx) => {
-                let div = document.createElement('div');
-                div.className = `craft-recipe-item ${selectedRecipeIndex === idx ? 'selected' : ''}`;
-                div.innerHTML = `
-                    <div class="title">${g.name}</div>
-                    <div style="font-size: 0.85rem; color: var(--gold-secondary); margin-top: 4px;">${g.crafted ? 'CRAFTED' : 'LOCKED'}</div>
-                `;
-                div.addEventListener('click', () => {
-                    selectedRecipeIndex = idx;
-                    allocatedMaterials = {};
-                    populateCraftRecipes();
-                    renderCraftPanel();
-                });
-                listContainer.appendChild(div);
-            });
-            renderCraftPanel();
-        }
-
-        function renderCraftPanel() {
-            let g = GAUNTLETS[selectedRecipeIndex];
-            document.getElementById('craft-selected-title').innerText = g.name;
-            document.getElementById('craft-selected-desc').innerText = g.desc;
-
-            const slotsContainer = document.getElementById('craft-slots-container');
-            slotsContainer.innerHTML = '';
-
-            let allSatisfied = true;
-            for (let [matKey, reqQty] of Object.entries(g.req)) {
-                let matObj = MATERIALS.find(m => m.id === matKey);
-                let currentAllocated = allocatedMaterials[matKey] || 0;
-
-                let slot = document.createElement('div');
-                slot.className = 'material-slot';
-                slot.innerHTML = `
-                    <div class="m-name">${matObj.name}</div>
-                    <div class="m-count">${currentAllocated} / ${reqQty}</div>
-                    <button class="action-btn" style="padding: 6px 12px; font-size: 0.8rem;" onclick="addMaterialSlot('${matKey}')">+ 投入</button>
-                `;
-                slotsContainer.appendChild(slot);
-
-                if (currentAllocated < reqQty) allSatisfied = false;
-            }
-
-            const executeBtn = document.getElementById('execute-craft-btn');
-            if (g.crafted) {
-                executeBtn.innerText = "CRAFTED";
-                executeBtn.disabled = true;
-                executeBtn.style.background = "rgba(197,160,89,0.2)";
-            } else if (allSatisfied) {
-                executeBtn.innerText = "CRAFT";
-                executeBtn.disabled = false;
-                executeBtn.style.background = "linear-gradient(135deg, #f3e5ab 0%, #c5a059 100%)";
-                executeBtn.style.color = "#030307";
-            } else {
-                executeBtn.innerText = "CRAFT";
-                executeBtn.disabled = true;
-                executeBtn.style.background = "rgba(197,160,89,0.2)";
-                executeBtn.style.color = "var(--gold-primary)";
-            }
-        }
-
-        function addMaterialSlot(matKey) {
-            let g = GAUNTLETS[selectedRecipeIndex];
-            let matObj = MATERIALS.find(m => m.id === matKey);
-            let reqQty = g.req[matKey];
-            let currentAllocated = allocatedMaterials[matKey] || 0;
-
-            if (currentAllocated < reqQty && matObj.count > 0) {
-                matObj.count--;
-                allocatedMaterials[matKey] = currentAllocated + 1;
-                renderCraftPanel();
-            } else {
-                alert("所持素材が足りないか、必要数に達しています。");
-            }
-        }
-
-        document.getElementById('auto-add-btn').addEventListener('click', () => {
-            let g = GAUNTLETS[selectedRecipeIndex];
-            for (let [matKey, reqQty] of Object.entries(g.req)) {
-                let matObj = MATERIALS.find(m => m.id === matKey);
-                let currentAllocated = allocatedMaterials[matKey] || 0;
-                let needed = reqQty - currentAllocated;
-                let canTake = Math.min(needed, matObj.count);
-                if (canTake > 0) {
-                    matObj.count -= canTake;
-                    allocatedMaterials[matKey] = currentAllocated + canTake;
+        function renderRippleLoop() {
+            ctxRipple.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
+            ripples.forEach((rip, idx) => {
+                rip.r += 6;
+                rip.alpha -= 0.03;
+                if (rip.alpha <= 0) {
+                    ripples.splice(idx, 1);
+                    return;
                 }
-            }
-            renderCraftPanel();
-        });
+                ctxRipple.strokeStyle = `rgba(212, 175, 55, ${rip.alpha})`;
+                ctxRipple.lineWidth = 1.5;
+                ctxRipple.beginPath();
+                ctxRipple.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
+                ctxRipple.stroke();
+            });
+            requestAnimationFrame(renderRippleLoop);
+        }
+        renderRippleLoop();
 
-        document.getElementById('execute-craft-btn').addEventListener('click', () => {
-            let g = GAUNTLETS[selectedRecipeIndex];
-            g.crafted = true;
-            unlockedCount = Math.min(25, unlockedCount + 1);
-            updateStatsUI();
-            alert(`【${g.name}】の錬成に成功しました！コレクションに追加されました。`);
-            populateCraftRecipes();
-        });
-
-        /* ROLL & RNG LOGIC */
-        function rollAura() {
-            let luckMultiplier = 1.0 + (inventory[0] * 0.05) + (inventory[1] * 0.15) + (inventory[2] * 0.3);
-            let totalWeight = AURAS.reduce((sum, a) => sum + a.weight, 0);
-            let randomVal = Math.random() * totalWeight / luckMultiplier;
-            let currentSum = 0;
-            for (let a of AURAS) {
-                currentSum += a.weight;
-                if (randomVal <= currentSum) return a;
-            }
-            return AURAS[0];
+        // --- Render UI & Lists ---
+        function renderCodex() {
+            const grid = document.getElementById('codex-grid');
+            grid.innerHTML = '';
+            let unlockedCount = 0;
+            auras.forEach(aura => {
+                const isUnlocked = gameState.unlocked[aura.id];
+                if (isUnlocked) unlockedCount++;
+                const item = document.createElement('div');
+                item.className = `grid-item ${isUnlocked ? 'unlocked' : ''}`;
+                item.innerHTML = `
+                    <div class="item-name" style="color: ${isUnlocked ? aura.color : '#555'}">${isUnlocked ? aura.id + '. ' + aura.name : '🔒 ???'}</div>
+                    <div class="item-sub">1 / ${aura.rate.toLocaleString()}</div>
+                    ${isUnlocked && aura.rate >= 100000 ? `<button class="diamond-btn" style="margin-top:5px; font-size:10px; padding:4px;" onclick="previewCutscene(${aura.id})">SEE CUTSCENE</button>` : ''}
+                `;
+                grid.appendChild(item);
+            });
+            document.querySelector('#codex-modal .modal-title').textContent = `AURA CODEX (${unlockedCount} / 51)`;
         }
 
-        function dropMaterialsOnRoll() {
-            let rollChance = Math.random();
-            if (rollChance < 0.4) {
-                let mat = MATERIALS[Math.floor(Math.random() * MATERIALS.length)];
-                mat.count++;
-            }
+        function renderShop() {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = '';
+            shopPotions.forEach(pot => {
+                const item = document.createElement('div');
+                item.className = `grid-item unlocked`;
+                item.innerHTML = `
+                    <div class="item-name">${pot.name}</div>
+                    <div class="item-sub">${pot.desc}</div>
+                    <div class="item-sub" style="color:var(--gold);">COST: ${pot.cost} COINS</div>
+                    <button class="diamond-btn" style="margin-top:5px;" onclick="buyPotion(${pot.id})">BUY & DRINK</button>
+                `;
+                grid.appendChild(item);
+            });
         }
 
+        function renderCraft() {
+            const grid = document.getElementById('craft-grid');
+            grid.innerHTML = '';
+            craftItems.forEach(ci => {
+                const item = document.createElement('div');
+                item.className = `grid-item unlocked`;
+                item.innerHTML = `
+                    <div class="item-name">${ci.name}</div>
+                    <div class="item-sub">REQ: ${ci.req}</div>
+                    <div class="item-sub">EFFECT: ${ci.effect}</div>
+                    <button class="diamond-btn" style="margin-top:5px;" onclick="craftItem(${ci.id})">CRAFT</button>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function renderEquipment() {
+            const grid = document.getElementById('equip-grid');
+            grid.innerHTML = '';
+            craftItems.forEach(ci => {
+                const isEquipped = gameState.equip === ci.name;
+                const item = document.createElement('div');
+                item.className = `grid-item ${isEquipped ? 'unlocked' : ''}`;
+                item.innerHTML = `
+                    <div class="item-name">${ci.name}</div>
+                    <div class="item-sub">${ci.effect}</div>
+                    <button class="diamond-btn" style="margin-top:5px;" onclick="equipItem('${ci.name}')">${isEquipped ? 'EQUIPPED' : 'EQUIP'}</button>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function renderMissions() {
+            const container = document.getElementById('mission-content');
+            container.innerHTML = `
+                <div class="grid-item unlocked" style="width: 400px; text-align: center; padding: 30px;">
+                    <div class="item-name" style="font-size:18px; margin-bottom:10px;">GUILD BOUNTY #01</div>
+                    <div class="item-sub" style="margin-bottom:15px;">ロールを50回実行し、ギルドの地下霊廟より失われた古文書を回収せよ。</div>
+                    <div class="item-sub" style="color:var(--gold); margin-bottom:15px;">REWARD: 500 COINS</div>
+                    <button class="diamond-btn" onclick="completeMission(500)">ACCEPT & CLAIM</button>
+                </div>
+            `;
+        }
+
+        // --- Core Roll Logic ---
         function executeRoll() {
-            if (isRolling) return;
-            isRolling = true;
-            rollBtn.disabled = true;
-            autoBtn.disabled = true;
-            quickBtn.disabled = true;
+            playTypeSound();
+            gameState.rolls++;
+            document.getElementById('stat-rolls').textContent = gameState.rolls;
 
-            totalRolls++;
-            checkQuestProgress('roll', 1);
-            checkQuestProgress('discovery', 1);
-            dropMaterialsOnRoll();
-            updateStatsUI();
+            if (gameState.rolls >= 25) {
+                document.getElementById('btn-quick').removeAttribute('disabled');
+            }
 
-            let winner = rollAura();
-            let tier = 0;
-            if (winner.rate >= 100000000) tier = 4;
-            else if (winner.rate >= 10000000) tier = 3;
-            else if (winner.rate >= 1000000) tier = 2;
-            else if (winner.rate >= 100000) tier = 1;
+            // Luck calculation
+            let effectiveLuck = gameState.luck;
+            if (gameState.equip.includes("エクイニクス")) effectiveLuck *= 2.0;
+            if (gameState.equip.includes("ゼウス")) effectiveLuck *= 2.5;
+            if (gameState.equip.includes("シヴァ")) effectiveLuck *= 5.0;
 
-            rouletteRing.classList.add('fast');
-            auraName.innerText = "SCANNING...";
-            auraRate.innerText = "---";
+            const rollVal = Math.random() * 5000000000 / effectiveLuck;
 
-            let clickInterval = setInterval(() => { playMechanicalClick(); }, 120);
-
-            let shuffleTimer = setInterval(() => {
-                let randomAura = AURAS[Math.floor(Math.random() * AURAS.length)];
-                auraName.innerText = randomAura.unlocked ? randomAura.name : "🔒 ???";
-                auraRate.innerText = `1 / ${randomAura.rate.toLocaleString()}`;
-            }, 80);
-
-            setTimeout(() => {
-                fxState.tier = tier;
-                startTensionAudio(tier);
-                if (tier >= 3) mainGame.classList.add('glitch-effect');
-                if (tier === 4) {
-                    fxState.mode = 'COLLAPSE';
-                    fxState.timer = 1.0;
+            let selectedAura = auras[0];
+            for (let i = auras.length - 1; i >= 0; i--) {
+                if (rollVal <= auras[i].rate || i === 0) {
+                    selectedAura = auras[i];
+                    break;
                 }
-            }, 1000);
+            }
 
-            setTimeout(() => {
-                clearInterval(shuffleTimer);
-                clearInterval(clickInterval);
-                rouletteRing.classList.remove('fast');
-                mainGame.classList.remove('glitch-effect');
-                stopTensionAudio();
+            // Unlock
+            if (!gameState.unlocked[selectedAura.id]) {
+                gameState.unlocked[selectedAura.id] = true;
+                playChimeSound();
+            }
 
-                if (!winner.unlocked) {
-                    winner.unlocked = true;
-                    unlockedCount = AURAS.filter(a => a.unlocked).length;
-                }
+            // Material Drop
+            gameState.coins += 10;
+            document.getElementById('stat-coins').textContent = gameState.coins;
 
-                playClimaxHit(tier);
-                if (tier === 4) {
-                    fxState.mode = 'EXPLODE';
-                    fxState.timer = 0;
-                    whiteout.classList.add('active');
-                    setTimeout(() => whiteout.classList.remove('active'), 600);
-                }
+            // UI Update
+            const nameEl = document.getElementById('current-name');
+            const rarityEl = document.getElementById('current-rarity');
+            nameEl.textContent = selectedAura.name;
+            nameEl.style.color = selectedAura.color;
+            rarityEl.textContent = `1 / ${selectedAura.rate.toLocaleString()}`;
 
-                auraName.innerText = winner.name;
-                auraRate.innerText = `1 / ${winner.rate.toLocaleString()}`;
-
-                isRolling = false;
-                rollBtn.disabled = false;
-                autoBtn.disabled = false;
-                if (totalRolls >= 25) quickBtn.disabled = false;
-                fxState.tier = 0;
-
-                updateStatsUI();
-
-                if (isAutoRolling) {
-                    setTimeout(executeRoll, 800);
-                }
-            }, 3000);
+            // High Tier Cutscene (100k or higher or >= 22nd aura)
+            if (selectedAura.id >= 22 || selectedAura.rate >= 100000) {
+                triggerCutscene(selectedAura);
+            }
         }
 
-        rollBtn.addEventListener('click', () => {
-            isAutoRolling = false;
-            autoBtn.innerText = "AUTO ROLL";
-            executeRoll();
-        });
+        function toggleAutoRoll() {
+            playClickSound();
+            gameState.autoRolling = !gameState.autoRolling;
+            const btn = document.getElementById('btn-auto');
+            if (gameState.autoRolling) {
+                btn.textContent = "AUTO: ON";
+                let speed = 400;
+                if (gameState.equip.includes("クロノス")) speed = 50;
+                gameState.autoInterval = setInterval(executeRoll, speed);
+            } else {
+                btn.textContent = "AUTO: OFF";
+                clearInterval(gameState.autoInterval);
+            }
+        }
 
-        autoBtn.addEventListener('click', () => {
-            isAutoRolling = !isAutoRolling;
-            autoBtn.innerText = isAutoRolling ? "STOP" : "AUTO ROLL";
-            if (isAutoRolling && !isRolling) executeRoll();
-        });
-
-        quickBtn.addEventListener('click', () => {
-            if (totalRolls < 25 || isRolling) return;
-            let results = [];
-            let hasRare = false;
-            let maxTier = 0;
-
+        function executeQuickRoll() {
+            if (gameState.rolls < 25) return;
+            playImpactSound();
             for (let i = 0; i < 25; i++) {
-                totalRolls++;
-                let r = rollAura();
-                if (!r.unlocked) {
-                    r.unlocked = true;
-                    unlockedCount = AURAS.filter(a => a.unlocked).length;
-                }
-                dropMaterialsOnRoll();
-                results.push(r);
-                if (r.rate >= 100000) {
-                    hasRare = true;
-                    let t = r.rate >= 100000000 ? 4 : (r.rate >= 10000000 ? 3 : (r.rate >= 1000000 ? 2 : 1));
-                    if (t > maxTier) maxTier = t;
-                }
+                executeRoll();
             }
-            checkQuestProgress('roll', 25);
-            checkQuestProgress('discovery', 25);
-            updateStatsUI();
-
-            if (hasRare) {
-                fxState.tier = maxTier;
-                startTensionAudio(maxTier);
-                playClimaxHit(maxTier);
-                if (maxTier === 4) {
-                    whiteout.classList.add('active');
-                    setTimeout(() => whiteout.classList.remove('active'), 600);
-                }
-                setTimeout(() => { stopTensionAudio(); fxState.tier = 0; }, 2000);
-            }
-
-            digestList.innerHTML = '';
-            results.forEach(res => {
-                let div = document.createElement('div');
-                div.className = `codex-item unlocked`;
-                div.innerHTML = `
-                    <div class="codex-item-info">
-                        <div class="name">${res.name}</div>
-                        <div class="rate">1 / ${res.rate.toLocaleString()}</div>
-                    </div>
-                    <div class="codex-item-status">OBTAINED</div>
-                `;
-                digestList.appendChild(div);
-            });
-            digestModal.classList.add('active');
-        });
-
-        let pulseTime = 0;
-        function animateSun() {
-            pulseTime += 0.03;
-            let scalePulse = (fxState.tier >= 1) ? (1 + Math.sin(pulseTime * 15) * 0.25) : (1 + Math.sin(pulseTime * 2) * 0.05);
-            sunCore.style.transform = `scale(${scalePulse})`;
-            requestAnimationFrame(animateSun);
         }
-        animateSun();
 
+        // --- Cutscene & Probability Count-up ---
+        function triggerCutscene(aura) {
+            playImpactSound();
+            const layer = document.getElementById('cutscene-layer');
+            const counterEl = document.getElementById('cutscene-counter');
+            const titleEl = document.getElementById('cutscene-title-text');
+            titleEl.textContent = aura.name;
+            layer.classList.add('active');
+
+            // Glass crack canvas
+            const canvas = document.getElementById('glass-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            let x = canvas.width / 2;
+            let y = canvas.height / 2;
+            ctx.moveTo(x, y);
+            for (let i = 0; i < 20; i++) {
+                x += (Math.random() - 0.5) * 500;
+                y += (Math.random() - 0.5) * 500;
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Probability count-up animation
+            let currentNum = 0;
+            let targetNum = aura.rate;
+            let increment = Math.max(1, Math.floor(targetNum / 40));
+            let interval = setInterval(() => {
+                currentNum += increment;
+                if (currentNum >= targetNum) {
+                    currentNum = targetNum;
+                    clearInterval(interval);
+                }
+                counterEl.textContent = `1 / ${currentNum.toLocaleString()}`;
+            }, 30);
+
+            setTimeout(() => {
+                layer.classList.remove('active');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, 3500);
+        }
+
+        function previewCutscene(id) {
+            const aura = auras.find(a => a.id === id);
+            if (aura) triggerCutscene(aura);
+        }
+
+        // --- Shop, Craft & Equipment Actions ---
+        function buyPotion(id) {
+            const pot = shopPotions.find(p => p.id === id);
+            if (gameState.coins >= pot.cost) {
+                gameState.coins -= pot.cost;
+                document.getElementById('stat-coins').textContent = gameState.coins;
+                playChimeSound();
+                gameState.luck *= 1.2;
+                document.getElementById('stat-luck').textContent = gameState.luck.toFixed(1) + 'x';
+                alert(`${pot.name}を購入し、服用しました！`);
+            } else {
+                alert("コインが不足しています。");
+            }
+        }
+
+        function craftItem(id) {
+            const ci = craftItems.find(c => c.id === id);
+            playArmorEquipSound();
+            alert(`${ci.name}の錬成に成功しました！装備リストから装備してください。`);
+        }
+
+        function equipItem(name) {
+            playArmorEquipSound();
+            gameState.equip = name;
+            document.getElementById('stat-equip').textContent = name;
+            renderEquipment();
+        }
+
+        function completeMission(reward) {
+            playChimeSound();
+            gameState.coins += reward;
+            document.getElementById('stat-coins').textContent = gameState.coins;
+            alert("ミッション報酬を受け取りました！");
+        }
+
+        // --- Seamless World Switcher with Loading ---
+        function switchWorld(target) {
+            playImpactSound();
+            const loader = document.getElementById('loading-overlay');
+            loader.style.opacity = '1';
+            loader.style.pointerEvents = 'all';
+
+            setTimeout(() => {
+                if (target === 'other-side') {
+                    gameState.currentWorld = 'other-side';
+                    document.getElementById('cosmos-nav').style.display = 'none';
+                    document.getElementById('other-nav').style.display = 'flex';
+                    document.getElementById('main-stage-area').style.display = 'none';
+                } else {
+                    gameState.currentWorld = 'cosmos';
+                    document.getElementById('other-nav').style.display = 'none';
+                    document.getElementById('cosmos-nav').style.display = 'flex';
+                    document.getElementById('main-stage-area').style.display = 'flex';
+                }
+                loader.style.opacity = '0';
+                loader.style.pointerEvents = 'none';
+            }, 1500);
+        }
+
+        // --- Modal Clean-up & Open/Close ---
+        function openModal(id) {
+            playClickSound();
+            if (id === 'codex-modal') renderCodex();
+            if (id === 'shop-modal') renderShop();
+            if (id === 'craft-modal') renderCraft();
+            if (id === 'equip-modal') renderEquipment();
+            if (id === 'mission-modal') renderMissions();
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            playClickSound();
+            document.getElementById(id).classList.remove('active');
+        }
     </script>
 </body>
 </html>
