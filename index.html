@@ -1,377 +1,258 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AETHERIA RNG - Deep Space Celestial Jet</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@200;300;400&family=Jost:wght@100;200;300&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Idle -待機画面-</title>
+    <style>
+        /* === 基本スタイル === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    :root {
-      --bg-deep: #010104;
-      --pure-white: #ffffff;
-      --easing-divine: cubic-bezier(0.16, 1, 0.3, 1);
-    }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #05020a;
+            color: #ffffff;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+        .screen-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #05020a 100%);
+        }
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      background-color: var(--bg-deep);
-      font-family: 'Jost', sans-serif;
-      overflow: hidden;
-      color: var(--pure-white);
-    }
+        /* === 3. 星雲の呼吸（パルス）エフェクト === */
+        .nebula-background {
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: 
+                radial-gradient(ellipse at 30% 40%, rgba(120, 40, 200, 0.25) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(40, 100, 220, 0.2) 0%, transparent 60%);
+            opacity: 0.7;
+            filter: blur(40px);
+            z-index: 1;
+            animation: nebulaPulse 12s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
 
-    /* ===================================================
-       1. 3D深度をもつディープスペース背景 & 3層の星々
-       =================================================== */
-    .deep-space {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(35, 12, 64, 0.4) 0%, transparent 60%),
-        radial-gradient(circle at 80% 70%, rgba(8, 30, 60, 0.45) 0%, transparent 65%),
-        radial-gradient(circle at 50% 50%, rgba(10, 45, 55, 0.25) 0%, transparent 80%),
-        linear-gradient(135deg, #010104 0%, #03060c 100%);
-      overflow: hidden;
-    }
+        @keyframes nebulaPulse {
+            0% {
+                opacity: 0.5;
+                filter: blur(35px) scale(1);
+            }
+            100% {
+                opacity: 0.9;
+                filter: blur(55px) scale(1.08);
+            }
+        }
 
-    /* 星雲（ネビュラ）のベール：mix-blend-modeで漆黒になじませる */
-    .nebula-veil {
-      position: absolute;
-      inset: -20%;
-      background: 
-        radial-gradient(ellipse at 40% 40%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 60% 60%, rgba(14, 165, 233, 0.12) 0%, transparent 55%),
-        radial-gradient(ellipse at 50% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
-      filter: blur(60px);
-      mix-blend-mode: screen;
-      opacity: 0.7;
-      animation: nebula-drift 40s ease-in-out infinite alternate;
-    }
+        /* === 1. 空間の緩やかなワープ効果（星々レイヤー） === */
+        .stars-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 40px 70px, #7df9ff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #ffdfba, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 130px 80px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: cosmicWarp 25s linear infinite;
+        }
 
-    /* 遠景の星レイヤー（極小0.5px・スロー回転） */
-    .star-layer-far {
-      position: absolute;
-      inset: -50%;
-      background: transparent;
-      box-shadow: 
-        12.3vw 45.1vw 0px 0.5px rgba(255,255,255,0.42), 85.6vw 12.4vw 0px 1px rgba(255,255,255,0.73), /* ...多層ドット... */
-        42.1vw 88.3vw 0px 0.5px rgba(255,255,255,0.25), 91.2vw 34.5vw 0px 1.5px rgba(255,255,255,0.88);
-      width: 1px;
-      height: 1px;
-      animation: rotate-space 240s linear infinite;
-      opacity: 0.4;
-    }
+        @keyframes cosmicWarp {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.15) rotate(3deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.7;
+            }
+        }
 
-    /* 中景の星レイヤー（中サイズ1px・微小明滅） */
-    .star-layer-mid {
-      position: absolute;
-      inset: -50%;
-      background: transparent;
-      box-shadow: 
-        23.4vw 61.2vw 0px 1px rgba(255,255,255,0.61), 74.1vw 22.8vw 0px 1.5px rgba(255,255,255,0.54),
-        15.6vw 89.2vw 0px 0.5px rgba(255,255,255,0.78), 58.9vw 41.3vw 0px 1px rgba(255,255,255,0.33);
-      width: 1.5px;
-      height: 1.5px;
-      animation: rotate-space 160s linear infinite reverse, star-twinkle 4s ease-in-out infinite alternate;
-      opacity: 0.6;
-    }
+        /* === コンテンツ本体 === */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
 
-    /* 近景の星レイヤー（大サイズ2px・高輝度） */
-    .star-layer-near {
-      position: absolute;
-      inset: -50%;
-      background: transparent;
-      box-shadow: 
-        45.2vw 15.3vw 0px 2px rgba(255,255,255,0.85), 12.8vw 78.4vw 0px 1.5px rgba(255,255,255,0.62),
-        88.4vw 65.1vw 0px 2px rgba(255,255,255,0.9);
-      width: 2px;
-      height: 2px;
-      animation: rotate-space 100s linear infinite;
-      opacity: 0.85;
-    }
+        /* === 4. タイトルの静かなグリッチ / スキャンエフェクト === */
+        .game-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 30%, #a78bfa 70%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
+            margin-bottom: 3rem;
+            position: relative;
+            animation: titleGlitch 6s ease infinite;
+        }
 
-    /* ===================================================
-       2. 極細かつ超高密度な粒子ジェット束（シャープな光の川）
-       =================================================== */
-    .celestial-core-system {
-      position: absolute;
-      top: 40%;
-      left: 28%;
-      width: 0;
-      height: 0;
-      z-index: 2;
-      pointer-events: none;
-      transform: rotate(-32deg);
-    }
+        /* スキャン線演出 */
+        .game-title::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            animation: scanLine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
 
-    /* 超高純度の中心核 (ホワイトアウトコア) */
-    .core-nucleus {
-      position: absolute;
-      top: -12px;
-      left: -12px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #ffffff;
-      box-shadow: 
-        0 0 15px 4px #ffffff,
-        0 0 40px 12px rgba(56, 182, 255, 0.9),
-        0 0 80px 25px rgba(168, 85, 247, 0.8),
-        0 0 140px 45px rgba(16, 185, 129, 0.3);
-      animation: core-pulse 2.5s ease-in-out infinite alternate;
-    }
+        @keyframes titleGlitch {
+            0%, 92%, 98%, 100% {
+                transform: translate(0);
+                filter: drop-shadow(0 0 10px rgba(167,139,250,0.5));
+            }
+            94% {
+                transform: translate(-2px, 1px) skewX(-2deg);
+                filter: drop-shadow(2px -1px 15px rgba(56,189,248,0.8));
+            }
+            96% {
+                transform: translate(2px, -1px) skewX(2deg);
+                filter: drop-shadow(-2px 1px 15px rgba(236,72,153,0.8));
+            }
+        }
 
-    /* ジェット背景の薄いGlowベール */
-    .jet-glow-beam {
-      position: absolute;
-      top: -25px;
-      left: 0;
-      width: 950px;
-      height: 50px;
-      background: linear-gradient(90deg, rgba(168,85,247,0.3) 0%, rgba(56,182,255,0.2) 35%, transparent 100%);
-      filter: blur(25px);
-      transform-origin: left center;
-      mix-blend-mode: screen;
-      z-index: 1;
-    }
+        @keyframes scanLine {
+            0%, 85% {
+                left: -100%;
+            }
+            95%, 100% {
+                left: 200%;
+            }
+        }
 
-    .particle-jet-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 1px;
-      height: 1px;
-      background: transparent;
-      transform-origin: left center;
-      z-index: 3;
-    }
+        /* === 2. ボタンからのオーラエフェクト === */
+        .play-btn-container {
+            position: relative;
+            display: inline-block;
+        }
 
-    /* レイヤー1：奥の広範囲粒子束（1px〜1.5pxの超高密度シャドウ） */
-    .particle-jet-layer.layer-1 {
-      box-shadow: 
-        12px -2px 0px 1px rgba(255,255,255,0.85), 24px 3px 0px 0.5px rgba(56,182,255,0.9),
-        45px -1px 0px 1.25px #b1d4ff, 68px 2px 0px 1px rgba(168,85,247,0.8),
-        92px -3px 0px 0.5px #ffffff, 115px 1px 0px 1.5px rgba(56,182,255,0.7),
-        140px -2px 0px 1px rgba(255,255,255,0.9), 165px 3px 0px 0.5px #e0f4ff,
-        190px -1px 0px 1.25px rgba(168,85,247,0.95), 215px 2px 0px 1px #ffffff,
-        240px -3px 0px 0.5px rgba(56,182,255,0.8), 265px 1px 0px 1.5px #38bdf8,
-        290px -2px 0px 1px rgba(255,255,255,0.85), 315px 3px 0px 0.5px rgba(168,85,247,0.8);
-      animation: jet-flicker-1 0.15s ease-in-out infinite alternate;
-    }
+        /* オーラのモヤ・粒子を表現する擬似要素 */
+        .play-btn-container::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            background: linear-gradient(45deg, #38bdf8, #a78bfa, #ec4899, #38bdf8);
+            background-size: 300% 300%;
+            border-radius: 50px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(12px);
+            animation: auraPulse 4s ease infinite, auraFlow 8s linear infinite;
+        }
 
-    /* レイヤー2：中間の高密度高速粒子束 */
-    .particle-jet-layer.layer-2 {
-      top: -4px;
-      box-shadow: 
-        18px 1px 0px 1.25px #ffffff, 38px -2px 0px 1px rgba(56,182,255,0.95),
-        58px 2px 0px 0.5px #c084fc, 82px -1px 0px 1.5px rgba(255,255,255,0.9),
-        105px 1px 0px 1px rgba(16,185,129,0.7), 130px -2px 0px 1.25px #ffffff,
-        155px 2px 0px 0.5px rgba(56,182,255,0.85), 180px -1px 0px 1px #e0f4ff,
-        205px 1px 0px 1.5px rgba(168,85,247,0.9), 230px -2px 0px 1px #ffffff;
-      animation: jet-flicker-2 0.09s ease-in-out infinite alternate;
-    }
+        .play-btn {
+            position: relative;
+            display: inline-block;
+            padding: 18px 54px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(167, 139, 250, 0.5);
+            border-radius: 50px;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    /* レイヤー3：中心軸の純白超高密度コア粒子束 */
-    .particle-jet-layer.layer-3 {
-      top: -2px;
-      box-shadow: 
-        8px 0px 0px 1.5px #ffffff, 25px 0px 0px 1.25px #ffffff,
-        42px 0px 0px 1.5px rgba(56,182,255,0.95), 60px 0px 0px 1px #ffffff,
-        78px 0px 0px 1.5px #e0f4ff, 95px 0px 0px 1.25px #ffffff,
-        115px 0px 0px 1.5px rgba(168,85,247,0.9), 135px 0px 0px 1px #ffffff,
-        155px 0px 0px 1.5px #ffffff, 175px 0px 0px 1.25px rgba(56,182,255,0.9);
-      animation: jet-flicker-3 0.05s ease-in-out infinite alternate;
-    }
+        .play-btn:hover {
+            background: linear-gradient(135deg, rgba(49, 46, 129, 0.9), rgba(30, 41, 59, 0.9));
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.8);
+            transform: translateY(-2px);
+        }
 
-    .geometric-orbit {
-      position: absolute;
-      top: -120px;
-      left: -120px;
-      width: 240px;
-      height: 240px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      animation: rotate-space 50s linear infinite;
-    }
+        /* ホバー時はオーラの明滅が速くなり、輝きが増す */
+        .play-btn-container:hover::before {
+            opacity: 0.9;
+            filter: blur(16px);
+            animation: auraPulse 1.5s ease infinite, auraFlow 4s linear infinite;
+        }
 
-    /* ===================================================
-       3. ミニマル & ホログラフィック UI レイヤー
-       =================================================== */
-    .ui-layer {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      padding-bottom: 14vh;
-      pointer-events: none;
-    }
+        @keyframes auraPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
 
-    .celestial-subtitle {
-      font-family: 'Cinzel', serif;
-      font-weight: 200;
-      font-size: clamp(0.7rem, 1vw, 0.9rem);
-      letter-spacing: 0.7em;
-      color: rgba(255, 255, 255, 0.5);
-      text-transform: uppercase;
-      margin-bottom: 1.8vh;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    }
-
-    .celestial-title {
-      font-family: 'Cinzel', serif;
-      font-weight: 200;
-      font-size: clamp(2.8rem, 5.5vw, 6.5rem);
-      letter-spacing: 0.35em;
-      color: var(--pure-white);
-      margin-bottom: 5.5vh;
-      text-shadow: 
-        0 0 25px rgba(255, 255, 255, 0.3),
-        0 0 60px rgba(56, 182, 255, 0.2);
-      opacity: 0;
-      transform: translateY(15px);
-      animation: divine-reveal 1.8s var(--easing-divine) forwards 0.4s;
-    }
-
-    .play-btn-container {
-      pointer-events: auto;
-    }
-
-    .play-btn {
-      position: relative;
-      background: rgba(255, 255, 255, 0.015);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 40px;
-      padding: 1rem 4rem;
-      font-family: 'Cinzel', serif;
-      font-size: clamp(0.9rem, 1.3vw, 1.2rem);
-      font-weight: 300;
-      color: var(--pure-white);
-      letter-spacing: 0.5em;
-      cursor: pointer;
-      overflow: hidden;
-      transition: all 0.6s var(--easing-divine);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.02);
-    }
-
-    .play-btn span {
-      position: relative;
-      z-index: 2;
-      transition: text-shadow 0.4s ease;
-    }
-
-    .play-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: 
-        0 0 35px rgba(56, 182, 255, 0.3),
-        0 15px 45px rgba(0, 0, 0, 0.6),
-        inset 0 0 20px rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-      letter-spacing: 0.6em;
-    }
-
-    .play-btn:hover span {
-      text-shadow: 0 0 10px #fff, 0 0 20px rgba(56, 182, 255, 0.7);
-    }
-
-    .play-btn:active {
-      transform: translateY(1px) scale(0.98);
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* ===================================================
-       4. Keyframe Animations
-       =================================================== */
-    @keyframes rotate-space {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes nebula-drift {
-      0% { transform: scale(1) translate(0, 0); }
-      100% { transform: scale(1.08) translate(-15px, 10px); }
-    }
-
-    @keyframes star-twinkle {
-      0% { opacity: 0.4; }
-      100% { opacity: 0.8; }
-    }
-
-    @keyframes core-pulse {
-      0% { transform: scale(0.96); opacity: 0.85; }
-      100% { transform: scale(1.04); opacity: 1; }
-    }
-
-    @keyframes jet-flicker-1 {
-      0% { opacity: 0.7; transform: scaleY(0.98) translateX(0px); }
-      100% { opacity: 0.9; transform: scaleY(1.02) translateX(2px); }
-    }
-
-    @keyframes jet-flicker-2 {
-      0% { opacity: 0.8; transform: scaleY(0.96) translateX(1px); }
-      100% { opacity: 1; transform: scaleY(1.04) translateX(-1px); }
-    }
-
-    @keyframes jet-flicker-3 {
-      0% { opacity: 0.9; transform: scaleY(0.98) translateX(-1px); }
-      100% { opacity: 1; transform: scaleY(1.02) translateX(1px); }
-    }
-
-    @keyframes divine-reveal {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
+        @keyframes auraFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- 1. ディープスペース背景 & 3層の星々 & 星雲ベール -->
-  <div class="deep-space">
-    <div class="nebula-veil"></div>
-    <div class="star-layer-far"></div>
-    <div class="star-layer-mid"></div>
-    <div class="star-layer-near"></div>
-  </div>
+    <div class="screen-container">
+        <!-- 3. 星雲の呼吸（パルス）レイヤー -->
+        <div class="nebula-background"></div>
 
-  <!-- 2. 天体現象: 超高密度・極細の粒子ジェット束 -->
-  <div class="celestial-core-system">
-    <div class="geometric-orbit"></div>
-    <div class="core-nucleus"></div>
-    <div class="jet-glow-beam"></div>
-    
-    <div class="particle-jet-layer layer-1"></div>
-    <div class="particle-jet-layer layer-2"></div>
-    <div class="particle-jet-layer layer-3"></div>
-  </div>
+        <!-- 1. 空間の緩やかなワープ効果レイヤー -->
+        <div class="stars-layer"></div>
 
-  <!-- 3. ミニマルなホログラフィック UI レイヤー -->
-  <div class="ui-layer">
-    <div class="celestial-subtitle">Celestial Probability Architecture</div>
-    <h1 class="celestial-title">AETHERIA</h1>
-    
-    <div class="play-btn-container">
-      <button class="play-btn">
-        <span>PLAY</span>
-      </button>
+        <!-- メインコンテンツ -->
+        <div class="content-wrapper">
+            <!-- 4. タイトルの静かなグリッチ / スキャンエフェクト -->
+            <h1 class="game-title">Stellar Odyssey</h1>
+
+            <!-- 2. ボタンからのオーラエフェクト -->
+            <div class="play-btn-container">
+                <button class="play-btn">PLAY</button>
+            </div>
+        </div>
     </div>
-  </div>
 
 </body>
 </html>
